@@ -1,15 +1,14 @@
 import { Button, Stack } from "react-bootstrap"
 import toast from "react-hot-toast"
-import { MeatInfo } from "../utils/types/meatTypes"
+import { MeatInfo, MeatInfoWithCount } from "../../utils/types/meatTypes"
 
 type EditCardType = {
-    meatInfo: MeatInfo
+    meatInfo: MeatInfoWithCount
     clickEvent: () => void
-    count: number
 }
 
 export const EditCard = (props: EditCardType) => {
-    const { meatInfo, clickEvent, count } = props
+    const { meatInfo, clickEvent } = props
 
     return (
         <div>
@@ -48,7 +47,7 @@ export const EditCard = (props: EditCardType) => {
                             <h6>
                                 등급: {meatInfo.grade ? meatInfo.grade : "-"}
                             </h6>
-                            <h6>수량: {count}</h6>
+                            <h6>수량: {meatInfo.count}</h6>
                         </Stack>
                         <div
                             className='vr'

@@ -1,12 +1,13 @@
-import { useState } from "react"
 import { ScanResultBox } from "./scanResultBox"
-import { Button, Col, Row, Stack } from "react-bootstrap"
-import { MeatInfo, MeatScanned } from "../utils/types/meatTypes"
+import { Col, Row, Stack } from "react-bootstrap"
+import { MeatInfoWithCount } from "../../utils/types/meatTypes"
 import { BsDashSquareFill, BsFillPlusSquareFill } from "react-icons/bs"
 
 type ScannedItemsAndCount = {
-    items: Map<MeatInfo, number>
-    modifyHash: (value: React.SetStateAction<Map<MeatInfo, number>>) => void
+    items: Map<string, MeatInfoWithCount>
+    modifyHash: (
+        value: React.SetStateAction<Map<string, MeatInfoWithCount>>
+    ) => void
 }
 
 export const ScanResultCart = (props: ScannedItemsAndCount) => {
@@ -14,7 +15,7 @@ export const ScanResultCart = (props: ScannedItemsAndCount) => {
     const list = Array.from(items).map((item) => {
         return (
             <MeatCartItem
-                key={item[0].meatNumber}
+                key={item[0]}
                 item={item}
                 modifyHash={modifyHash}
             />
@@ -24,26 +25,32 @@ export const ScanResultCart = (props: ScannedItemsAndCount) => {
 }
 
 type CartItem = {
-    item: [MeatInfo, number]
-    modifyHash: (value: React.SetStateAction<Map<MeatInfo, number>>) => void
+    item: [string, MeatInfoWithCount]
+    modifyHash: (
+        value: React.SetStateAction<Map<string, MeatInfoWithCount>>
+    ) => void
 }
 
 const MeatCartItem = (props: CartItem) => {
     const { item, modifyHash } = props
-    const meatInfo = item[0]
-    const count = item[1]
+    const meatNumber = item[0]
+    const meatInfo = item[1]
     const onClickIncrease = () => {
-        modifyHash((prev) => new Map([...prev, [meatInfo, count + 1]]))
+        let plus1 = Object.assign(meatInfo)
+        plus1.count = meatInfo.count + 1
+        modifyHash((prev) => new Map([...prev, [meatNumber, plus1]]))
     }
     const onClickDecrease = () => {
-        if (count > 1) {
-            modifyHash((prev) => new Map([...prev, [meatInfo, count - 1]]))
+        if (meatInfo.count > 1) {
+            let plus1 = Object.assign(meatInfo)
+            plus1.count = meatInfo.count - 1
+            modifyHash((prev) => new Map([...prev, [meatNumber, plus1]]))
         }
     }
     return (
         <div>
             <ScanResultBox
-                meatNumber={meatInfo.meatNumber ? meatInfo.meatNumber : "null"}
+                meatNumber={meatNumber ? meatNumber : "null"}
                 species={meatInfo.species}
                 grade={meatInfo.grade ? meatInfo.grade : "null"}
                 gender={meatInfo.gender ? meatInfo.gender : "null"}
@@ -65,7 +72,7 @@ const MeatCartItem = (props: CartItem) => {
                     <h6 style={{ marginLeft: "10px", marginRight: "6px" }}>
                         ▲ 동일 수량:
                     </h6>
-                    <h5>{count}개</h5>
+                    <h5>{meatInfo.count}개</h5>
                 </Col>
                 <Col
                     style={{

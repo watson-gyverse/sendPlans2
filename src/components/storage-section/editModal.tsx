@@ -2,8 +2,12 @@ import { FloatingLabel } from "react-bootstrap"
 import Button from "react-bootstrap/Button"
 import Form from "react-bootstrap/Form"
 import { useForm } from "react-hook-form"
-import { BeefOriginAndGrades, PorkOriginAndGrades } from "../utils/consts/meat"
+import {
+    BeefOriginAndGrades,
+    PorkOriginAndGrades,
+} from "../../utils/consts/meat"
 import { useEffect } from "react"
+import { MeatInfo, MeatInfoWithCount } from "../../utils/types/meatTypes"
 
 type FormOptions = {
     price: number
@@ -14,17 +18,13 @@ type FormOptions = {
 }
 
 type ModalParams = {
-    species: string
-    setPrice: (price: number) => void
-    setOrigin: (origin: string) => void
-    setGrade: (grade: string) => void
-    setGender: (gender: string) => void
-    setFreeze: (freeze: string) => void
+    meatInfo: MeatInfoWithCount
+    setMeatInfo: (mInfo: MeatInfoWithCount) => void
+    setClose: () => void
 }
 
 function EditModal(props: ModalParams) {
-    const { species, setPrice, setOrigin, setGender, setGrade, setFreeze } =
-        props
+    const { meatInfo, setMeatInfo, setClose } = props
     const {
         register,
         formState: { errors },
@@ -45,8 +45,24 @@ function EditModal(props: ModalParams) {
             origin: "",
         },
     })
-    const onSubmit = (values: any) => {
-        console.log(values)
+    const onSubmit = (data: FormOptions) => {
+        console.log("data submitted")
+        console.log(data)
+        const newInfo = {
+            ...meatInfo,
+            price: data.price.toString(),
+            freeze: data.freeze,
+            gender: data.gender,
+            grade: data.grade,
+            origin: data.origin,
+        }
+        // meatInfo.price = data.price.toString()
+        // meatInfo.freeze = data.freeze
+        // meatInfo.gender = data.gender
+        // meatInfo.grade = data.grade
+        // meatInfo.origin = data.origin
+        setMeatInfo(newInfo)
+        setClose()
     }
 
     const onError = (error: any) => {
@@ -55,49 +71,38 @@ function EditModal(props: ModalParams) {
 
     const currentOrigin = watch("origin")
     useEffect(() => {
-        console.log(currentOrigin)
-        console.log(BeefOriginAndGrades.get(currentOrigin))
+        setFocus("grade")
     }, [currentOrigin])
-    const currentGrade = watch("grade")
     return (
         <Form onSubmit={handleSubmit(onSubmit, onError)}>
-            {/* <Form.Group className='mb-3'>
-                <FloatingLabel
-                    label='무게'
-                    className='mb-3'
-                >
-                    <Form.Control
-                        type='number'
-                        placeholder='Weight'
-                        {...register("weight", {
-                            required: "무게를 입력해주세요",
-                        })}
-                    />
-                </FloatingLabel>
-            </Form.Group> */}
-
             <Form.Group className='mb-3'>
                 <FloatingLabel label='단가(원)'>
                     <Form.Control
                         type='number'
                         placeholder='Price'
                         {...register("price", {
-                            required: "단가를 입력해주세요",
+                            required: `단가를 입력해주세요 ${watch("origin")}`,
                         })}
                     />
+                    {errors.price?.type === "required" && (
+                        <h6 style={{ color: "red" }}>※단가를 입력해주세요</h6>
+                    )}
                 </FloatingLabel>
             </Form.Group>
             <Form.Group>
                 <h6>원산지</h6>
                 <Form.Select
-                    aria-label='Default select example'
-                    {...register("origin")}
+                    aria-label='origin'
+                    {...register("origin", { required: true })}
                 >
-                    {species === "소"
+                    {meatInfo.species === "소"
                         ? Array.from(BeefOriginAndGrades.entries()).map(
                               (entry) => {
                                   return (
-                                      <option value={entry[0]}>
+                                      <option
+                                          key={entry[0]}
+                                          value={entry[0]}
+                                      >
                                           {entry[0]}
                                       </option>
                                   )
@@ -106,33 +111,56 @@ function EditModal(props: ModalParams) {
                         : Array.from(PorkOriginAndGrades.entries()).map(
                               (entry) => {
                                   return (
-                                      <option value={entry[0]}>
+                                      <option
+                                          key={entry[0]}
+                                          value={entry[0]}
+                                      >
                                           {entry[0]}
                                       </option>
                                   )
                               }
                           )}
                 </Form.Select>
-
+                {errors.origin?.type === "required" &&
+                    watch("origin") === "" && (
+                        <h6 style={{ color: "red" }}>※원산지를 입력해주세요</h6>
+                    )}
                 <h6 style={{ marginTop: "12px" }}>등급</h6>
                 <Form.Select
-                    aria-label='Default select example'
+                    aria-label='grade'
                     {...register("grade", {
                         required: "등급을 설정해주세요",
                     })}
                 >
-                    {species === "소"
+                    {meatInfo.species === "소"
                         ? BeefOriginAndGrades.get(currentOrigin)?.map(
                               (grade) => {
-                                  return <option value={grade}>{grade}</option>
+                                  return (
+                                      <option
+                                          key={grade}
+                                          value={grade}
+                                      >
+                                          {grade}
+                                      </option>
+                                  )
                               }
                           )
                         : PorkOriginAndGrades.get(currentOrigin)?.map(
                               (grade) => {
-                                  return <option value={grade}>{grade}</option>
+                                  return (
+                                      <option
+                                          key={grade}
+                                          value={grade}
+                                      >
+                                          {grade}
+                                      </option>
+                                  )
                               }
                           )}
                 </Form.Select>
+                {errors.grade?.type === "required" && watch("grade") === "" && (
+                    <h6 style={{ color: "red" }}>※등급을 입력해주세요</h6>
+                )}
             </Form.Group>
             <Form.Group>
                 <Form.Label
@@ -177,6 +205,10 @@ function EditModal(props: ModalParams) {
                     name='gender'
                     id='genderX'
                 />
+                {errors.gender?.type === "required" &&
+                    watch("gender") === "" && (
+                        <h6 style={{ color: "red" }}>※성별을 입력해주세요</h6>
+                    )}
             </Form.Group>
             <Form.Group>
                 <Form.Label
@@ -211,6 +243,12 @@ function EditModal(props: ModalParams) {
                     name='freeze'
                     id='fridgeRadioE'
                 />
+                {errors.freeze?.type === "required" &&
+                    watch("freeze") === "" && (
+                        <h6 style={{ color: "red" }}>
+                            ※보관방식을 입력해주세요
+                        </h6>
+                    )}
             </Form.Group>
 
             <Button

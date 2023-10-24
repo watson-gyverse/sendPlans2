@@ -15,6 +15,7 @@ export async function getMeatInfo(
     setGrade: (setGrade: string) => void,
     setScanSpecies: (scanSpecies: string) => void,
     setGender: (scanGender: string) => void,
+    setOrigin: (scanOrigin: string) => void,
     setLoadingState: (loadingState: number) => void,
     setFailed: (hasFailed: boolean) => void,
     setWrongCut: (isWrong: boolean) => void
@@ -78,6 +79,7 @@ export async function getMeatInfo(
                 let g = a[index]["gradeNm"]
                 console.log(g)
                 setGrade(g)
+                setOrigin("국산")
                 setLoadingState(2)
             })
     } catch (err) {
@@ -90,6 +92,7 @@ export async function getForeignMeatInfo(
     setGrade: (setGrade: string) => void,
     setScanSpecies: (scanSpecies: string) => void,
     setGender: (scanGender: string) => void,
+    setOrigin: (scanOrigin: string) => void,
     setLoadingState: (loadingState: number) => void,
     setFailed: (hasFailed: boolean) => void,
     setWrongCut: (isWrong: boolean) => void
@@ -113,6 +116,7 @@ export async function getForeignMeatInfo(
                 }
                 setGrade("-")
                 setGender("-")
+                setOrigin("-")
                 setLoadingState(2)
             })
     } catch (err) {

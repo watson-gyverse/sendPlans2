@@ -24,3 +24,7 @@ export type MeatInfo = MeatScanned & {
     //순번 001 002 ..
     entryNumber: string | null
 }
+
+export type MeatInfoWithCount = MeatInfo & {
+    count: number
+}

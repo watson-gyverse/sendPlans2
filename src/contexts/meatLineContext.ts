@@ -1,13 +1,15 @@
 import { createContext, useState } from "react"
-import { MeatInfo } from "../utils/types/meatTypes"
+import { MeatInfo, MeatInfoWithCount } from "../utils/types/meatTypes"
 
 type SetCurrentContextType = {
     currentContext: MeatInfo | null
     setCurrentContext: React.Dispatch<React.SetStateAction<MeatInfo | null>>
 }
 type SetTotalContextType = {
-    totalContext: Map<MeatInfo, number>
-    setTotalContext: React.Dispatch<React.SetStateAction<Map<MeatInfo, number>>>
+    totalContext: Map<string, MeatInfoWithCount>
+    setTotalContext: React.Dispatch<
+        React.SetStateAction<Map<string, MeatInfoWithCount>>
+    >
 }
 const CurrentMeatLine = {
     currentContext: null,

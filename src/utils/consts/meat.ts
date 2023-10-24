@@ -1,4 +1,4 @@
-import { MeatInfo } from "../types/meatTypes"
+import { MeatInfo, MeatInfoWithCount } from "../types/meatTypes"
 
 export const BeefCuts = [
     "윗등심",
@@ -45,11 +45,11 @@ export const PorkOriginAndGrades: Map<string, string[]> = new Map([
     ["스페인", ["등외"]],
 ])
 
-const dummyMeatInfo: MeatInfo = {
+const dummyMeatInfo: MeatInfoWithCount = {
     storedDate: new Date(),
     species: "돼지",
     cut: "목살",
-    meatNumber: "123443211234",
+    meatNumber: "646464144141",
     origin: null,
     //아래는 소만 조회되고 돼지는 직접 기입
     gender: null,
@@ -58,8 +58,9 @@ const dummyMeatInfo: MeatInfo = {
     price: null,
     beforeWeight: null,
     entryNumber: null,
+    count: 2,
 }
-const dummyMeatInfo2: MeatInfo = {
+const dummyMeatInfo2: MeatInfoWithCount = {
     storedDate: new Date(),
     species: "소",
     cut: "채끝",
@@ -72,5 +73,6 @@ const dummyMeatInfo2: MeatInfo = {
     price: null,
     beforeWeight: null,
     entryNumber: null,
+    count: 3,
 }
 export const dummys = [dummyMeatInfo, dummyMeatInfo2]
