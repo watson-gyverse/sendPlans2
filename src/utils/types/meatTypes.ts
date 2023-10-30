@@ -28,3 +28,16 @@ export type MeatInfo = MeatScanned & {
 export type MeatInfoWithCount = MeatInfo & {
     count: number
 }
+
+export type CSVType = {
+    storedDate: string
+    meatNumber: string
+    entryNumber: string
+    species: string
+    origin: string
+    gender: string
+    grade: string
+    cut: string
+    freeze: string
+    price: string
+}

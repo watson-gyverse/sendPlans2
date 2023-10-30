@@ -3,22 +3,9 @@ import toast, { Toaster } from "react-hot-toast"
 import { EditCard } from "../../components/storage-section/editCard"
 import { Button, Modal, Stack } from "react-bootstrap"
 import EditModal from "../../components/storage-section/editModal"
-import { MeatInfoWithCount } from "../../utils/types/meatTypes"
-import { sessionKeys } from "../../utils/consts/constants"
+import { CSVType, MeatInfoWithCount } from "../../utils/types/meatTypes"
+import { csvHeaders, sessionKeys } from "../../utils/consts/constants"
 import { CSVLink } from "react-csv"
-
-type CSVType = {
-    storedDate: string
-    meatNumber: string
-    entryNumber: string
-    species: string
-    origin: string
-    gender: string
-    grade: string
-    cut: string
-    freeze: string
-    price: string
-}
 
 export default function EditScreen() {
     const [show, setShow] = useState(false)
@@ -33,19 +20,6 @@ export default function EditScreen() {
         MeatInfoWithCount | undefined
     >()
     let [csvData, setCSVData] = useState<CSVType[]>([])
-    // let csvData: CSVType[] = []
-    const csvHeaders = [
-        { label: "입고일", key: "storedDate" },
-        { label: "이력번호", key: "meatNumber" },
-        { label: "순번", key: "entryNumber" },
-        { label: "육종", key: "species" },
-        { label: "원산지", key: "origin" },
-        { label: "암수", key: "gender" },
-        { label: "등급", key: "grade" },
-        { label: "부위", key: "cut" },
-        { label: "냉장/냉동", key: "freeze" },
-        { label: "단가", key: "price" },
-    ]
 
     const csvLink = useRef<
         CSVLink & HTMLAnchorElement & { link: HTMLAnchorElement }
@@ -96,7 +70,7 @@ export default function EditScreen() {
         setCSVData(list)
     }
 
-    const downloadCSV = () => {
+    const csvLinkClick = () => {
         csvLink?.current?.link.click()
     }
 
@@ -128,7 +102,7 @@ export default function EditScreen() {
                 filename={`${new Date().toLocaleString("ko-KR")}.csv`}
                 ref={csvLink}
             />
-            <Button onClick={downloadCSV}>csv다운로드</Button>
+            <Button onClick={csvLinkClick}>csv다운로드</Button>
             <Modal
                 show={show}
                 onHide={() => setShow(false)}
