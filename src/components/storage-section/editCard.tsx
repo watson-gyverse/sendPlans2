@@ -33,15 +33,11 @@ export const EditCard = (props: EditCardType) => {
                         }}
                     >
                         <Stack
-                            style={{ width: "26%" }}
+                            style={{ width: "30%" }}
                             gap={1}
                         >
                             <h6>입고일:</h6>
-                            <h6>
-                                {meatInfo.storedDate.toLocaleDateString(
-                                    "ko-KR"
-                                )}
-                            </h6>
+                            <h6>{meatInfo.storedDate}</h6>
                             <h6>육종: {meatInfo.species}</h6>
                             <h6>부위: {meatInfo.cut}</h6>
                             <h6>

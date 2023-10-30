@@ -46,7 +46,7 @@ export const PorkOriginAndGrades: Map<string, string[]> = new Map([
 ])
 
 const dummyMeatInfo: MeatInfoWithCount = {
-    storedDate: new Date(),
+    storedDate: new Date().toLocaleDateString("ko-KR"),
     species: "돼지",
     cut: "목살",
     meatNumber: "646464144141",
@@ -61,7 +61,7 @@ const dummyMeatInfo: MeatInfoWithCount = {
     count: 2,
 }
 const dummyMeatInfo2: MeatInfoWithCount = {
-    storedDate: new Date(),
+    storedDate: new Date().toLocaleDateString("ko-KR"),
     species: "소",
     cut: "채끝",
     meatNumber: "432112344321",

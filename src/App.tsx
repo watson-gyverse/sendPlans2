@@ -9,6 +9,7 @@ import CameraScreen from "./screens/storage-section/cameraScreen"
 import { Container } from "react-bootstrap"
 import {
     CurrentMeatLineContext,
+    CurrentScanTextContext,
     TotalMeatLineContext,
 } from "./contexts/meatLineContext"
 import { MeatInfo } from "./utils/types/meatTypes"
@@ -66,6 +67,7 @@ function App() {
     init()
     const [currentContext, setCurrentContext] = useState<MeatInfo | null>(null)
     const [totalContext, setTotalContext] = useState(new Map())
+    const [scanText, setScanText] = useState<string>("initiated")
     return (
         <TotalMeatLineContext.Provider
             value={{ totalContext, setTotalContext }}
@@ -73,15 +75,19 @@ function App() {
             <CurrentMeatLineContext.Provider
                 value={{ currentContext, setCurrentContext }}
             >
-                <Container
-                    style={{
-                        width: "380px",
-                        height: "auto",
-                        backgroundColor: "whitesmoke",
-                    }}
+                <CurrentScanTextContext.Provider
+                    value={{ scanText, setScanText }}
                 >
-                    <RouterProvider router={router} />
-                </Container>
+                    <Container
+                        style={{
+                            width: "380px",
+                            height: "auto",
+                            backgroundColor: "whitesmoke",
+                        }}
+                    >
+                        <RouterProvider router={router} />
+                    </Container>
+                </CurrentScanTextContext.Provider>
             </CurrentMeatLineContext.Provider>
         </TotalMeatLineContext.Provider>
     )

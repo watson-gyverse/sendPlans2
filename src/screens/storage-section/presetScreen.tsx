@@ -3,55 +3,35 @@ import { useNavigate } from "react-router-dom"
 import { useContext, useEffect, useState } from "react"
 import { BeefCuts, PorkCuts } from "../../utils/consts/meat"
 import DatePickerComponent from "../../components/storage-section/datePicker"
-import { CurrentMeatLineContext } from "../../contexts/meatLineContext"
-import { MeatInfo, MeatPreset } from "../../utils/types/meatTypes"
 import toast, { Toaster } from "react-hot-toast"
+import { sessionKeys } from "../../utils/consts/constants"
+import { CurrentScanTextContext } from "../../contexts/meatLineContext"
 
 export default function PresetScreen() {
+    const { scanText, setScanText } = useContext(CurrentScanTextContext)
     const [date, setDate] = useState(new Date())
     const [species, setSpecies] = useState("돼지")
     const [cutList, setCutList] = useState<string[]>(PorkCuts)
     const [cut, setCut] = useState("")
 
-    const { currentContext, setCurrentContext } = useContext(
-        CurrentMeatLineContext
-    )
-
+    const session = sessionStorage
     const navigate = useNavigate()
+
     const goToCameraScreen = () => {
         if (cut == "") {
             console.log("안돼요")
             toast("부위도 골라주세요")
         } else {
             console.log(date + "카메라로" + species + " " + cut)
-            let thisPreset: MeatPreset = {
-                storedDate: date,
-                species: species,
-                cut: cut,
-            }
-            let meatInfo: MeatInfo = {
-                ...thisPreset,
-                meatNumber: null,
-                origin: null,
-                //아래는 소만 스캔되고, 돼지는 직접 기입
-                gender: null,
-                grade: null,
-                freeze: null,
-                price: null,
-                beforeWeight: null,
-                // fridgeNumber: null,
-                // storageNumber: null,
-                entryNumber: null,
-            }
-            setCurrentContext(meatInfo)
 
-            navigate("../camera", {
-                state: {
-                    date: date,
-                    species: species,
-                    cut: cut,
-                },
-            })
+            session.setItem(
+                sessionKeys.storageDate,
+                date.toLocaleDateString("ko-KR")
+            )
+            session.setItem(sessionKeys.storageSpecies, species)
+            session.setItem(sessionKeys.storageCut, cut)
+
+            navigate("../camera")
         }
     }
 
@@ -66,11 +46,14 @@ export default function PresetScreen() {
     }
 
     useEffect(() => {
-        if (currentContext != null) {
-            setDate(currentContext.storedDate)
-            setSpecies(currentContext.species)
-            setCut(currentContext.cut)
-        }
+        let tempDate = session.getItem(sessionKeys.storageDate)
+        let tempSpecies = session.getItem(sessionKeys.storageSpecies)
+        let tempCut = session.getItem(sessionKeys.storageCut)
+        if (tempDate != null) setDate(new Date(tempDate))
+        if (tempSpecies != null) setSpecies(tempSpecies)
+        if (tempCut != null) setCut(tempCut)
+        session.setItem("scanText", "initiated")
+        setScanText("initiated")
     }, [])
 
     useEffect(() => {

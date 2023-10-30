@@ -1,61 +1,69 @@
 import { useContext, useEffect, useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { Button, Spinner, Stack } from "react-bootstrap"
 import { Html5QrcodeResult, Html5QrcodeError } from "html5-qrcode/esm/core"
 import Html5QrcodePlugin from "../../components/storage-section/qrScanPlugin"
-import {
-    MeatInfo,
-    MeatInfoWithCount,
-    MeatScanned,
-} from "../../utils/types/meatTypes"
+import { MeatInfoWithCount, MeatScanned } from "../../utils/types/meatTypes"
 import { ScanResultBox } from "../../components/storage-section/scanResultBox"
 import { getForeignMeatInfo, getMeatInfo } from "../../apis/MeatApi"
-import { ScanResultCart } from "../../components/storage-section/scanResultCart"
-import {
-    CurrentMeatLineContext,
-    TotalMeatLineContext,
-} from "../../contexts/meatLineContext"
 import toast, { Toaster } from "react-hot-toast"
-import { BeefCuts, PorkCuts } from "../../utils/consts/meat"
+import { sessionKeys } from "../../utils/consts/constants"
+import * as _ from "lodash"
+import { ScanResultCart } from "../../components/storage-section/scanResultCart"
+import { CurrentScanTextContext } from "../../contexts/meatLineContext"
 
 export default function CameraScreen() {
-    const { currentContext, setCurrentContext } = useContext(
-        CurrentMeatLineContext
-    )
-    const { totalContext, setTotalContext } = useContext(TotalMeatLineContext)
-    const navigate = useNavigate()
+    // const { currentContext, setCurrentContext } = useContext(
+    //     CurrentMeatLineContext
+    // )
+    // const { totalContext, setTotalContext } = useContext(TotalMeatLineContext)
+
+    const { scanText, setScanText } = useContext(CurrentScanTextContext)
 
     const [failToGetMeatInfo, setFailedGetMeatInfo] = useState(false)
     const [wrongCut, setWrongCut] = useState(false)
-    const [scanText, setScanText] = useState("")
+    // const [scanText, setScanText] = useState(currentScanText)
     const [loadingInfo, setLoadingInfo] = useState(false)
     const [isButtonEnabled, setButtonEnable] = useState(false)
 
-    const [hash, setHash] =
-        useState<Map<string, MeatInfoWithCount>>(totalContext)
-
-    const addHash = (key: string, value: MeatInfoWithCount) => {
-        setHash((prev) => new Map([...prev, [key, value]]))
-    }
-
-    const upsertHash = (key: string, value: MeatInfoWithCount) => {
-        setHash((prev) => new Map(prev).set(key, value))
-    }
-
-    useEffect(() => {
-        console.log(hash)
-    }, [hash])
-    const [scanSpecies, setScanSpecie] = useState<string>("")
+    const navigate = useNavigate()
+    const session = sessionStorage
+    const [items, setItems] = useState<MeatInfoWithCount[]>([])
+    const species = session.getItem(sessionKeys.storageSpecies)
+    // const [scanText, setScanText] = useState(session.getItem("scanText"))
+    const [scanSpecies, setScanSpecie] = useState<string>(
+        species ? species : ""
+    )
     const [grade, setGrade] = useState<string>()
     const [gender, setGender] = useState<string>()
     const [origin, setOrigin] = useState<string>()
 
     const [show, setShow] = useState(false)
     const [loadingState, setLoadingState] = useState(0)
+
     const onScanSuccess = (
         decodedText: string,
         decodedResult: Html5QrcodeResult
     ) => {
+        toast("스캔 성공")
+        console.log("before: " + scanText)
+        console.log("after " + decodedText)
+        if (scanText !== decodedText) {
+            let alreadyExist = false
+            _.forEach(items, (item) => {
+                if (item.meatNumber === scanText) {
+                    item.count++
+                    alreadyExist = true
+                    return false
+                }
+            })
+            if (!alreadyExist && scanText !== "initiated") {
+                console.log("중복이 있음")
+                setItems(items)
+                setLoadingState(2)
+            }
+        }
+        session.setItem("scanText", decodedText.trim())
         setScanText(decodedText.trim())
     }
 
@@ -66,76 +74,54 @@ export default function CameraScreen() {
     const onAddButtonClick = () => {
         setShow(!show)
         setLoadingState(0)
-        if (currentContext == null) {
-            console.log("프리셋이 업서")
-            contextErrorMessage()
-        } else {
-            console.log(currentContext)
-            let { storedDate, species, cut } = currentContext!!
 
-            let scanned: MeatScanned = {
-                storedDate: storedDate,
-                species: scanSpecies,
-                cut: cut,
-                meatNumber: scanText,
-                origin: origin ? origin : null,
-                gender: gender ? gender : null,
-                grade: grade ? grade : null,
-            }
-            let meatInfo: MeatInfoWithCount = {
-                ...scanned,
-                freeze: null,
-                price: null,
-                beforeWeight: null,
-                // fridgeNumber: null,
-                // storageNumber: null,
-                entryNumber: null,
-                count: 1,
-            }
-            const copiedMap = hash
-            console.log(`${copiedMap}`)
-            if (copiedMap.size == 0) {
-                console.log("첫 아이템")
-                upsertHash(meatInfo.meatNumber!!, meatInfo)
+        let storedDate = session.getItem(sessionKeys.storageDate)
+        let cut = session.getItem(sessionKeys.storageCut)
+        let scanned: MeatScanned = {
+            storedDate: storedDate!!,
+            species: scanSpecies,
+            cut: cut!!,
+            meatNumber: scanText,
+            origin: origin ? origin : null,
+            gender: gender ? gender : null,
+            grade: grade ? grade : null,
+        }
+        let meatInfo: MeatInfoWithCount = {
+            ...scanned,
+            freeze: null,
+            price: null,
+            beforeWeight: null,
+            entryNumber: null,
+            count: 1,
+        }
+        var alreadyExist = false
+
+        _.forEach(items, (item) => {
+            if (item.meatNumber === scanText) {
+                item.count++
+                alreadyExist = true
                 return false
             }
-            var a = false
-            console.log("for전")
-            for (let [meatnumber, meatinfo] of copiedMap) {
-                const s1 = JSON.stringify(Object.entries(meatnumber).sort())
-                const s2 = JSON.stringify(Object.entries(scanned).sort())
-                console.log(`${meatnumber}`)
-                console.log(`${meatinfo}`)
-                console.log(`s1과 s2 ${meatnumber} ${scanned.meatNumber}`)
-                console.log(`${s1}`)
-                console.log(`${s2}`)
-
-                if (s1 === s2) {
-                    console.log("동일할 경우")
-                    console.log(`${copiedMap}`)
-                    const plus1 = Object.assign(meatinfo)
-                    plus1.count = meatinfo.count + 1
-                    addHash(meatnumber, plus1)
-                    a = true
-                }
-
-                setCurrentContext(meatInfo)
-            }
-            if (!a) {
-                console.log("넣습니다")
-                console.log(scanned)
-                addHash(scanText, meatInfo)
-            }
+        })
+        if (!alreadyExist) {
+            console.log("중복이 있음")
+            setItems([...items, meatInfo])
+        } else {
+            setItems(items)
         }
+        console.log("pushed")
+        console.log(items)
     }
 
     const onNextButtonClicked = () => {
-        setTotalContext(hash)
+        // setTotalContext(hash)
+
+        session.setItem(sessionKeys.storageItems, JSON.stringify(items))
         navigate("/submit/edit")
     }
-
     useEffect(() => {
-        console.log("useEffect1")
+        console.log("scantext touched")
+        if (scanText === null) return
         if (scanText.length != 12 && scanText.length != 15) {
             console.log("이력번호가 아닙니다")
         } else if (
@@ -166,11 +152,12 @@ export default function CameraScreen() {
                     setWrongCut
                 )
             }
+        } else {
+            console.log("방황하는가")
         }
     }, [scanText])
 
     useEffect(() => {
-        console.log("useEffect2")
         switch (loadingState) {
             //초기화
             case 0: {
@@ -187,37 +174,25 @@ export default function CameraScreen() {
             //추가가능
             case 2: {
                 setLoadingInfo(false)
-                setButtonEnable(true)
+                if (!wrongCut) setButtonEnable(true)
                 break
             }
         }
     }, [loadingState])
 
     useEffect(() => {
-        console.log("useEffect3")
-        if (currentContext == null) {
-            contextErrorMessage()
-        } else {
-            if (scanSpecies === "소") {
-                if (BeefCuts.indexOf(currentContext!!.cut) === -1) {
-                    setWrongCut(true)
-                    setLoadingState(0)
-                }
-            } else if (scanSpecies === "돼지") {
-                if (PorkCuts.indexOf(currentContext!!.cut) === -1) {
-                    setWrongCut(true)
-                    setLoadingState(0)
-                }
-            }
-        }
+        setWrongCut(scanSpecies != species)
     }, [scanSpecies])
 
     const goToPreset = () => {
         navigate("/submit/preset")
     }
-    return currentContext ? (
+    return (
         <div>
             <Toaster />
+            <div style={{ display: "center", alignItems: "start" }}>
+                <Button onClick={goToPreset}>뒤로</Button>
+            </div>
             <Stack className='border-1 rounded '>
                 {/* <h6>{printKorDate(location.state.date)}</h6> */}
                 {/* <h6>{location.state.species}</h6>
@@ -234,7 +209,7 @@ export default function CameraScreen() {
             />
             <h4> {"조회내역: "}</h4>
             <ScanResultBox
-                meatNumber={scanText}
+                meatNumber={scanText ? scanText : "null"}
                 species={scanSpecies}
                 grade={grade}
                 gender={gender}
@@ -255,7 +230,7 @@ export default function CameraScreen() {
                     style={{ width: "auto" }}
                     onClick={goToPreset}
                 >
-                    뒤로가기
+                    뒤로
                 </Button>
             </div>
             <div
@@ -267,7 +242,7 @@ export default function CameraScreen() {
             >
                 <Button
                     style={{ width: "8rem", height: "3rem" }}
-                    disabled={!isButtonEnabled}
+                    disabled={!isButtonEnabled && !wrongCut}
                     onClick={onAddButtonClick}
                 >
                     {loadingInfo ? (
@@ -280,10 +255,12 @@ export default function CameraScreen() {
                     )}
                 </Button>
             </div>
-            <hr style={{ height: "2px" }} /> <h4>장바구니</h4>
+            <hr style={{ height: "2px" }} /> <h4>바구니:</h4>
             <ScanResultCart
-                items={hash}
-                modifyHash={setHash}
+                items={items.sort(
+                    (a, b) => Number(a.meatNumber) - Number(b.meatNumber)
+                )}
+                modifyItems={setItems}
             />
             <div
                 style={{
@@ -295,22 +272,12 @@ export default function CameraScreen() {
             >
                 <Button
                     style={{ width: "8rem", height: "3rem" }}
-                    disabled={hash.size === 0}
+                    disabled={items.length === 0}
                     onClick={onNextButtonClicked}
                 >
                     다음
                 </Button>
             </div>
-        </div>
-    ) : (
-        <div style={{ paddingTop: "20px", paddingBottom: "20px" }}>
-            <h5>사전 정보가 입력되지 않았습니다</h5>
-            <Button
-                style={{ padding: "10px" }}
-                href='/submit/preset'
-            >
-                입고화면으로 가기
-            </Button>
         </div>
     )
 }

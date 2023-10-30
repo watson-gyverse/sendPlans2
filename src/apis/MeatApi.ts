@@ -5,8 +5,6 @@ import {
     meatInfoKey,
     meatInfoUrl,
 } from "../utils/consts/urls"
-
-import { XMLParser, XMLBuilder, XMLValidator } from "fast-xml-parser"
 import { xmlThatIWannaKill } from "../utils/consts/functions"
 import { BeefCuts } from "../utils/consts/meat"
 
@@ -40,9 +38,9 @@ export async function getMeatInfo(
                         console.log(s)
                         console.log(a.length)
                         if (s === "암") {
-                            setGender("암소")
+                            setGender("암")
                         } else {
-                            setGender("한우 거세")
+                            setGender("수")
                         }
                         for (let i = 0; i < a.length; i++) {
                             if (a[i].hasOwnProperty("gradeNm")) {
@@ -56,7 +54,7 @@ export async function getMeatInfo(
                         break
                     }
                     case "CATTLE|LOT_NO": {
-                        setScanSpecies("한우(묶음)")
+                        setScanSpecies("소")
                         console.log(Object.keys(a).length)
                         var set = new Set()
                         for (let i = 1; i < Object.keys(a).length; i++) {

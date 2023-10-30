@@ -1,5 +1,5 @@
 export type MeatPreset = {
-    storedDate: Date
+    storedDate: string
     species: string
     cut: string
 }

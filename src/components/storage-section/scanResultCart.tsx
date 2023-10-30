@@ -2,22 +2,22 @@ import { ScanResultBox } from "./scanResultBox"
 import { Col, Row, Stack } from "react-bootstrap"
 import { MeatInfoWithCount } from "../../utils/types/meatTypes"
 import { BsDashSquareFill, BsFillPlusSquareFill } from "react-icons/bs"
+import _ from "lodash"
 
 type ScannedItemsAndCount = {
-    items: Map<string, MeatInfoWithCount>
-    modifyHash: (
-        value: React.SetStateAction<Map<string, MeatInfoWithCount>>
-    ) => void
+    // items: Map<string, MeatInfoWithCount>
+    items: MeatInfoWithCount[]
+    modifyItems: (value: React.SetStateAction<MeatInfoWithCount[]>) => void
 }
 
 export const ScanResultCart = (props: ScannedItemsAndCount) => {
-    const { items, modifyHash } = props
+    const { items, modifyItems } = props
     const list = Array.from(items).map((item) => {
         return (
             <MeatCartItem
-                key={item[0]}
+                key={item.meatNumber}
                 item={item}
-                modifyHash={modifyHash}
+                modifyItems={modifyItems}
             />
         )
     })
@@ -25,26 +25,30 @@ export const ScanResultCart = (props: ScannedItemsAndCount) => {
 }
 
 type CartItem = {
-    item: [string, MeatInfoWithCount]
-    modifyHash: (
-        value: React.SetStateAction<Map<string, MeatInfoWithCount>>
-    ) => void
+    item: MeatInfoWithCount
+    modifyItems: (value: React.SetStateAction<MeatInfoWithCount[]>) => void
 }
 
 const MeatCartItem = (props: CartItem) => {
-    const { item, modifyHash } = props
-    const meatNumber = item[0]
-    const meatInfo = item[1]
+    const { item, modifyItems: modifyItems } = props
+    const meatNumber = item.meatNumber
+    const meatInfo = item
     const onClickIncrease = () => {
         let plus1 = Object.assign(meatInfo)
         plus1.count = meatInfo.count + 1
-        modifyHash((prev) => new Map([...prev, [meatNumber, plus1]]))
+        modifyItems((prev) => [
+            ...prev.filter((it) => it.meatNumber !== meatNumber),
+            plus1,
+        ])
     }
     const onClickDecrease = () => {
         if (meatInfo.count > 1) {
             let plus1 = Object.assign(meatInfo)
             plus1.count = meatInfo.count - 1
-            modifyHash((prev) => new Map([...prev, [meatNumber, plus1]]))
+            modifyItems((prev) => [
+                ...prev.filter((it) => it.meatNumber !== meatNumber),
+                plus1,
+            ])
         }
     }
     return (

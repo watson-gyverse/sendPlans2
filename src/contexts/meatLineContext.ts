@@ -11,6 +11,10 @@ type SetTotalContextType = {
         React.SetStateAction<Map<string, MeatInfoWithCount>>
     >
 }
+type SetScanTextContextType = {
+    scanText: string
+    setScanText: React.Dispatch<React.SetStateAction<string>>
+}
 const CurrentMeatLine = {
     currentContext: null,
     setCurrentContext: () => {},
@@ -21,7 +25,12 @@ const TotalMeatLine = {
     setTotalContext: () => {},
 }
 
+const CurrentScanText = { scanText: "init_scanText", setScanText: () => {} }
+
 export const CurrentMeatLineContext =
     createContext<SetCurrentContextType>(CurrentMeatLine)
 export const TotalMeatLineContext =
     createContext<SetTotalContextType>(TotalMeatLine)
+
+export const CurrentScanTextContext =
+    createContext<SetScanTextContextType>(CurrentScanText)

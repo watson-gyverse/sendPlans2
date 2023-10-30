@@ -1,81 +1,134 @@
-import { useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import toast, { Toaster } from "react-hot-toast"
-import { TotalMeatLineContext } from "../../contexts/meatLineContext"
 import { EditCard } from "../../components/storage-section/editCard"
 import { Button, Modal, Stack } from "react-bootstrap"
 import EditModal from "../../components/storage-section/editModal"
-import { MeatInfo, MeatInfoWithCount } from "../../utils/types/meatTypes"
-import { dummys } from "../../utils/consts/meat"
+import { MeatInfoWithCount } from "../../utils/types/meatTypes"
+import { sessionKeys } from "../../utils/consts/constants"
+import { CSVLink } from "react-csv"
+
+type CSVType = {
+    storedDate: string
+    meatNumber: string
+    entryNumber: string
+    species: string
+    origin: string
+    gender: string
+    grade: string
+    cut: string
+    freeze: string
+    price: string
+}
 
 export default function EditScreen() {
-    const { totalContext, setTotalContext } = useContext(TotalMeatLineContext)
     const [show, setShow] = useState(false)
-    const [currentSpecies, setCurrentSpecies] = useState<string>("")
 
-    const newMap = new Map().set(dummys[0].meatNumber, dummys[0])
-    newMap.set(dummys[1].meatNumber, dummys[1])
-    const sorted = new Map([...totalContext].sort())
-    const [dummyHash, setDHash] =
-        useState<Map<string, MeatInfoWithCount>>(sorted)
+    const session = sessionStorage
+    const initItems = session.getItem(sessionKeys.storageItems)
+    const [items, setItems] = useState<MeatInfoWithCount[]>(
+        JSON.parse(initItems ? initItems : "")
+    )
+
     const [recentMeatInfo, setRecentMeatInfo] = useState<
         MeatInfoWithCount | undefined
     >()
+    let [csvData, setCSVData] = useState<CSVType[]>([])
+    // let csvData: CSVType[] = []
+    const csvHeaders = [
+        { label: "입고일", key: "storedDate" },
+        { label: "이력번호", key: "meatNumber" },
+        { label: "순번", key: "entryNumber" },
+        { label: "육종", key: "species" },
+        { label: "원산지", key: "origin" },
+        { label: "암수", key: "gender" },
+        { label: "등급", key: "grade" },
+        { label: "부위", key: "cut" },
+        { label: "냉장/냉동", key: "freeze" },
+        { label: "단가", key: "price" },
+    ]
+
+    const csvLink = useRef<
+        CSVLink & HTMLAnchorElement & { link: HTMLAnchorElement }
+    >(null)
 
     useEffect(() => {
-        // toast("하이요")
-        console.log("****")
-        if (totalContext.size != 0) {
-            console.log(totalContext)
-            const entries = totalContext.entries()
-            console.log("entries count " + totalContext.size)
-            for (let entry of entries) {
-                console.log(entry[0])
-                console.log(entry[1])
-            }
-        }
+        console.log("**init use effect**")
+        console.log(items)
     }, [])
 
     useEffect(() => {
-        console.log("++++++++++++++")
         if (recentMeatInfo === undefined) {
             console.error("recentMeatInfo : undefined")
             return
         }
+        console.log("++meatinfo changed++")
+
         console.log(recentMeatInfo)
-        let tempMap = new Map([...dummyHash])
-        tempMap.forEach((value, key) => {
-            if (key == `${recentMeatInfo.meatNumber}${recentMeatInfo.price}`) {
-                tempMap.delete(key)
-            }
+        let tempList = items.filter((item) => {
+            return item.meatNumber !== recentMeatInfo.meatNumber
         })
-        tempMap.set(recentMeatInfo.meatNumber!!, recentMeatInfo)
-        console.log(tempMap)
-        setDHash(tempMap)
+        tempList.push(recentMeatInfo)
+        setItems(tempList)
+        makeCSVData(tempList)
     }, [recentMeatInfo])
+
+    const makeCSVData = (items: MeatInfoWithCount[]) => {
+        let list: CSVType[] = []
+        for (let item of items) {
+            for (let i = 0; i < item.count; i++) {
+                list = [
+                    ...list,
+                    {
+                        storedDate: item.storedDate,
+                        meatNumber: item.meatNumber!!,
+                        entryNumber: String(i).padStart(3, "0"),
+                        species: item.species,
+                        origin: item.origin!!,
+                        gender: item.gender!!,
+                        grade: item.grade!!,
+                        cut: item.cut,
+                        freeze: item.freeze!!,
+                        price: item.price!!,
+                    },
+                ]
+            }
+        }
+        setCSVData(list)
+    }
+
+    const downloadCSV = () => {
+        csvLink?.current?.link.click()
+    }
 
     return (
         <div>
             <Toaster />
-            <Button onClick={() => toast.success("쓰러갑시다")}>버튼</Button>
+            <Button onClick={() => toast.success("쓰러갑시다")}>뒤로</Button>
             <Stack gap={2}>
                 <h5>전부 입력하기 전에 못 내리신다고</h5>
-                {Array.from(dummyHash.values()).map(
-                    (item: MeatInfoWithCount) => {
+                {items
+                    .sort((a, b) => Number(a.meatNumber) - Number(b.meatNumber))
+                    .map((item: MeatInfoWithCount) => {
                         return (
                             <EditCard
                                 key={item.meatNumber!! + item.price}
                                 meatInfo={item}
                                 clickEvent={() => {
                                     setShow(!show)
-                                    setCurrentSpecies(item.species)
                                     setRecentMeatInfo(item)
                                 }}
                             />
                         )
-                    }
-                )}
+                    })}
             </Stack>
-
+            <CSVLink
+                data={csvData}
+                headers={csvHeaders}
+                asyncOnClick={true}
+                filename={`${new Date().toLocaleString("ko-KR")}.csv`}
+                ref={csvLink}
+            />
+            <Button onClick={downloadCSV}>csv다운로드</Button>
             <Modal
                 show={show}
                 onHide={() => setShow(false)}
