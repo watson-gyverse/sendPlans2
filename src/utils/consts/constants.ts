@@ -20,3 +20,29 @@ export const csvHeaders = [
     { label: "냉장/냉동", key: "freeze" },
     { label: "단가", key: "price" },
 ]
+
+export const xlsxHeaders = [
+    "입고일",
+    "이력번호",
+    "순번",
+    "육종",
+    "원산지",
+    "암수",
+    "등급",
+    "부위",
+    "보관",
+    "단가",
+]
+
+export type XlsxType = {
+    입고일: string
+    이력번호: string
+    순번: string
+    육종: string
+    원산지: string
+    암수: string
+    등급: string
+    부위: string
+    보관: string
+    단가: string
+}

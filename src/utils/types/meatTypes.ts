@@ -30,6 +30,7 @@ export type MeatInfoWithCount = MeatInfo & {
 }
 
 export type CSVType = {
+    [index: string]: string
     storedDate: string
     meatNumber: string
     entryNumber: string
