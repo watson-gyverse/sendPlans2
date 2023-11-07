@@ -22,9 +22,9 @@ export const ScanResultBox = (props: ScanResult) => {
             <ContentText>{meatNumber ? meatNumber : "-"}</ContentText>
             <h6>분류: </h6>
             <ContentText>{species ? species : "-"}</ContentText>
-            <h6>등급(단일 이력번호만 표시):</h6>
+            <h6>등급(단일 이력번호일 때만 표시):</h6>
             <ContentText>{grade ? grade : "-"}</ContentText>
-            <h6>부가정보(단일 이력번호만 표시): </h6>
+            <h6>부가정보(단일 이력번호일 때만 표시): </h6>
             <ContentText>{gender ? gender : "-"}</ContentText>
         </div>
     )

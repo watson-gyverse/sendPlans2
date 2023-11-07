@@ -13,7 +13,7 @@ export const StorageMiddleWare = (props: any) => {
         return (
             <>
                 <Toaster />
-                <Navigate to={{ pathname: "/submit/preset" }} />{" "}
+                <Navigate to={{ pathname: "/storage/preset" }} />{" "}
             </>
         )
     }

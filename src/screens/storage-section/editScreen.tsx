@@ -1,33 +1,28 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import toast, { Toaster } from "react-hot-toast"
 import { EditCard } from "../../components/storage-section/editCard"
 import { Button, Modal, Stack } from "react-bootstrap"
 import EditModal from "../../components/storage-section/editModal"
-import { CSVType, MeatInfoWithCount } from "../../utils/types/meatTypes"
-import {
-    XlsxType,
-    sessionKeys,
-    xlsxHeaders,
-} from "../../utils/consts/constants"
-import { CSVLink } from "react-csv"
+import { MeatInfoWithCount, XlsxType } from "../../utils/types/meatTypes"
+import { sessionKeys, xlsxHeaders } from "../../utils/consts/constants"
 import * as xlsx from "xlsx"
+import { useNavigate } from "react-router-dom"
+import { addToFirestore } from "../../apis/storageApi"
 export default function EditScreen() {
     const [show, setShow] = useState(false)
 
     const session = sessionStorage
     const initItems = session.getItem(sessionKeys.storageItems)
     const [items, setItems] = useState<MeatInfoWithCount[]>(
-        JSON.parse(initItems ? initItems : "")
+        JSON.parse(initItems ? initItems : "[]")
     )
 
     const [recentMeatInfo, setRecentMeatInfo] = useState<
         MeatInfoWithCount | undefined
     >()
-    let [csvData, setCSVData] = useState<CSVType[]>([])
+    let [xlsxData, setXlsxData] = useState<XlsxType[]>([])
 
-    const csvLink = useRef<
-        CSVLink & HTMLAnchorElement & { link: HTMLAnchorElement }
-    >(null)
+    const navigate = useNavigate()
 
     useEffect(() => {
         console.log("**init use effect**")
@@ -47,67 +42,77 @@ export default function EditScreen() {
         })
         tempList.push(recentMeatInfo)
         setItems(tempList)
-        makeCSVData(tempList)
+        makeXlsxData(tempList)
     }, [recentMeatInfo])
 
-    const makeCSVData = (items: MeatInfoWithCount[]) => {
-        let list: CSVType[] = []
+    const makeXlsxData = (items: MeatInfoWithCount[]) => {
+        let list: XlsxType[] = []
         for (let item of items) {
             for (let i = 0; i < item.count; i++) {
                 list = [
                     ...list,
                     {
-                        storedDate: item.storedDate,
-                        meatNumber: item.meatNumber!!,
-                        entryNumber: String(i).padStart(3, "0"),
-                        species: item.species,
-                        origin: item.origin!!,
-                        gender: item.gender!!,
-                        grade: item.grade!!,
-                        cut: item.cut,
-                        freeze: item.freeze!!,
-                        price: item.price!!,
+                        입고일: item.storedDate,
+                        이력번호: item.meatNumber!!,
+                        순번: String(i).padStart(3, "0"),
+                        육종: item.species,
+                        원산지: item.origin!!,
+                        암수: item.gender!!,
+                        등급: item.grade!!,
+                        부위: item.cut,
+                        보관: item.freeze!!,
+                        단가: item.price!!,
                     },
                 ]
             }
         }
-        setCSVData(list)
+        setXlsxData(list)
     }
-
-    // const csvLinkClick = () => {
-    //     csvLink?.current?.link.click()
-    //     console.log(csvData)
-    // }
 
     const writeXlsx = () => {
         const book = xlsx.utils.book_new()
-        const dataForXlsx = csvData.map((item) => {
-            let data: XlsxType = {
-                입고일: item.storedDate,
-                이력번호: item.meatNumber,
-                순번: item.entryNumber,
-                육종: item.species,
-                원산지: item.origin,
-                암수: item.gender,
-                등급: item.grade,
-                부위: item.cut,
-                보관: item.freeze,
-                단가: item.price,
-            }
-            return data
-        })
-        const xlsxData = xlsx.utils.json_to_sheet(dataForXlsx, {
+        const xlsxLetsgo = xlsx.utils.json_to_sheet(xlsxData, {
             header: xlsxHeaders,
         })
-        xlsx.utils.book_append_sheet(book, xlsxData, "DGAZA")
-        xlsx.writeFile(book, "dgatna.xlsx")
+        xlsx.utils.book_append_sheet(book, xlsxLetsgo, "DGAZA")
+        xlsx.writeFile(book, "storedInfo.xlsx")
     }
+
+    const addDocumentToFirestore = () => {
+        xlsxData.forEach((item) => {
+            addToFirestore(
+                item,
+                () => {
+                    toast.success("DB에 등록 성공")
+                    setTimeout(() => {
+                        navigate("../preset")
+                    }, 1000)
+                },
+                () => {
+                    toast.error("실패했다..!")
+                }
+            )
+        })
+    }
+
+    const dataNullChecker = xlsxData.some((item) => {
+        for (let key of Object.keys(item)) {
+            if (item[key] === null) return true
+        }
+        return false
+    })
     return (
         <div>
             <Toaster />
-            <Button onClick={() => toast.success("쓰러갑시다")}>뒤로</Button>
             <Stack gap={2}>
-                <h5>전부 입력하기 전에 못 내리신다고</h5>
+                <Button
+                    style={{ width: "100px", height: "4rem" }}
+                    onClick={() => navigate("../camera")}
+                    variant='secondary'
+                >
+                    뒤로
+                </Button>
+                {/* <h5>전부 입력하기 전에 못 내리신다고</h5> */}
                 {items
                     .sort((a, b) => Number(a.meatNumber) - Number(b.meatNumber))
                     .map((item: MeatInfoWithCount) => {
@@ -122,39 +127,28 @@ export default function EditScreen() {
                             />
                         )
                     })}
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                    }}
+                >
+                    <Button
+                        disabled={dataNullChecker}
+                        onClick={writeXlsx}
+                    >
+                        엑셀로 추출하기
+                    </Button>
+                    <Button
+                        disabled={dataNullChecker}
+                        onClick={addDocumentToFirestore}
+                    >
+                        DB에 저장하고 돌아가기
+                    </Button>
+                </div>
             </Stack>
-            {/* <CSVLink
-                data={csvData}
-                headers={csvHeaders}
-                asyncOnClick={true}
-                filename={`${new Date().toLocaleDateString("ko-KR")}.csv`}
-                ref={csvLink}
-                uFEFF={true}
-                enclosingCharacter=''
-            />
-            <Button
-                disabled={csvData.some((item) => {
-                    for (let key of Object.keys(item)) {
-                        if (isNotNull(item[key])) return true
-                    }
-                    return false
-                })}
-                onClick={csvLinkClick}
-            >
-                csv다운로드
-            </Button> */}
-            <Button onClick={writeXlsx}>드가</Button>
-            {/* <CsvDownloader
-                columns={csvdHeaders}
-                datas={csvData}
-                extension='.csv'
-                filename='yes'
-                wrapColumnChar=''
-                bom={true}
-                prefix={true}
-                separator=','
-                meta={true}
-            /> */}
+
             <Modal
                 show={show}
                 onHide={() => setShow(false)}

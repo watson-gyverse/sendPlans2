@@ -1,7 +1,12 @@
 import { useState } from "react"
 import "./App.css"
 import PresetScreen from "./screens/storage-section/presetScreen"
-import { Outlet, RouterProvider, createBrowserRouter } from "react-router-dom"
+import {
+    Outlet,
+    RouterProvider,
+    createBrowserRouter,
+    useNavigate,
+} from "react-router-dom"
 import MainScreen from "./screens/mainScreen"
 import Layout from "./screens/initScreen"
 import ErrorScreen from "./screens/errorScreen"
@@ -15,44 +20,72 @@ import {
 import { MeatInfo } from "./utils/types/meatTypes"
 import EditScreen from "./screens/storage-section/editScreen"
 import { StorageMiddleWare } from "./utils/toLobbyMiddleware"
+import PlaceScreen from "./screens/aging-section/placeScreen"
+import { FetchScreen } from "./screens/aging-section/fetchScreen"
+
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <Layout />,
+        // loader: async () => {
+        //     return new Promise((res) => {
+        //         setTimeout(() => {
+        //             return res("finish!")
+        //         }, 3000)
+        //     })
+        // },
+        element: <Outlet />,
         errorElement: <ErrorScreen />,
-    },
-    {
-        path: "main",
-        element: <MainScreen />,
-    },
-    {
-        path: "submit",
-        element: (
-            <div>
-                <Outlet />
-            </div>
-        ),
         children: [
             {
                 index: true,
-                path: "preset",
-                element: <PresetScreen />,
+                // path: "main",
+                element: <MainScreen />,
             },
             {
-                path: "camera",
+                path: "storage",
                 element: (
-                    <StorageMiddleWare>
-                        <CameraScreen />
-                    </StorageMiddleWare>
+                    <div>
+                        <Outlet />
+                    </div>
                 ),
+                children: [
+                    {
+                        path: "preset",
+
+                        element: <PresetScreen />,
+                    },
+                    {
+                        path: "camera",
+                        element: (
+                            <StorageMiddleWare>
+                                <CameraScreen />
+                            </StorageMiddleWare>
+                        ),
+                    },
+                    {
+                        path: "edit",
+                        element: (
+                            // <StorageMiddleWare>
+                            <EditScreen />
+                            // </StorageMiddleWare>
+                        ),
+                    },
+                ],
             },
             {
-                path: "edit",
+                path: "aging",
                 element: (
-                    // <StorageMiddleWare>
-                    <EditScreen />
-                    // </StorageMiddleWare>
+                    <div>
+                        <Outlet />
+                    </div>
                 ),
+                children: [
+                    { index: true, element: <PlaceScreen /> },
+                    {
+                        path: "fetch/",
+                        element: <FetchScreen />,
+                    },
+                ],
             },
         ],
     },
@@ -67,7 +100,7 @@ function App() {
     init()
     const [currentContext, setCurrentContext] = useState<MeatInfo | null>(null)
     const [totalContext, setTotalContext] = useState(new Map())
-    const [scanText, setScanText] = useState<string>("initiated")
+    const [scanText, setScanText] = useState<string>("undefined")
     return (
         <TotalMeatLineContext.Provider
             value={{ totalContext, setTotalContext }}
@@ -85,7 +118,10 @@ function App() {
                             backgroundColor: "whitesmoke",
                         }}
                     >
-                        <RouterProvider router={router} />
+                        <RouterProvider
+                            router={router}
+                            // fallbackElement={<div>로딩</div>}
+                        />
                     </Container>
                 </CurrentScanTextContext.Provider>
             </CurrentMeatLineContext.Provider>

@@ -1,4 +1,4 @@
-import { MeatInfo, MeatInfoWithCount } from "../types/meatTypes"
+import { MeatInfoWithCount } from "../types/meatTypes"
 
 export const BeefCuts = [
     "윗등심",
@@ -56,8 +56,6 @@ const dummyMeatInfo: MeatInfoWithCount = {
     grade: null,
     freeze: null,
     price: null,
-    beforeWeight: null,
-    entryNumber: null,
     count: 2,
 }
 const dummyMeatInfo2: MeatInfoWithCount = {
@@ -71,8 +69,6 @@ const dummyMeatInfo2: MeatInfoWithCount = {
     grade: null,
     freeze: null,
     price: null,
-    beforeWeight: null,
-    entryNumber: null,
     count: 3,
 }
 export const dummys = [dummyMeatInfo, dummyMeatInfo2]

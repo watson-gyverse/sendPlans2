@@ -11,17 +11,17 @@ export default function MainScreen() {
     const navigate = useNavigate()
     const naviToDateScreen = () => {
         toast.remove()
-        navigate("/submit/preset")
+        navigate("/storage/preset")
     }
     const naviToAgingScreen = () => {
         toast("숙성반드시해야지")
         // toast.remove()
-        // navigate("/submit/preset")
+        navigate("/aging/")
     }
     const naviToHistoryScreen = () => {
         toast("입고/숙성기록")
         // toast.remove()
-        // navigate("/submit/preset")
+        // navigate("/storage/preset")
     }
 
     const { totalContext, setTotalContext } = useContext(TotalMeatLineContext)
@@ -40,12 +40,7 @@ export default function MainScreen() {
     useEffect(() => {
         console.log(currentContext)
     }, [currentContext])
-    const onAddClick = () => {
-        // let temp = currentContext
-        // if (temp != null) {
-        //     setTotalContext((preList: MeatInfo[]) => [...preList, temp!!])
-        // }
-    }
+
     const samples = (
         <Stack>
             <Toaster />

@@ -4,6 +4,13 @@ export const sessionKeys = {
     storageCut: "storageCut",
     storagePreset: "storagePreset",
     storageItems: "storageItems",
+    storageScanText: "storageScanText",
+} as const
+
+export const fbStorages = {
+    sp2Storage: "Sp2Storage",
+    sp2Aging: "Sp2Aging",
+    sp2History: "Sp2History",
 } as const
 
 export type SessionKeys = (typeof sessionKeys)[keyof typeof sessionKeys]
@@ -33,16 +40,3 @@ export const xlsxHeaders = [
     "보관",
     "단가",
 ]
-
-export type XlsxType = {
-    입고일: string
-    이력번호: string
-    순번: string
-    육종: string
-    원산지: string
-    암수: string
-    등급: string
-    부위: string
-    보관: string
-    단가: string
-}

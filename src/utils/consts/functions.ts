@@ -28,3 +28,13 @@ export function xmlThatIWannaKill(xmlString: string, paramId: string): string {
     }
     return "none"
 }
+
+export const parseToDate = (storedDate: string): Date => {
+    const cDate = new Date(
+        Number(storedDate.slice(0, 4)),
+        Number(storedDate.slice(5, 7)),
+        Number(storedDate.slice(8, 10)),
+        Number(storedDate.slice(11, 13))
+    )
+    return cDate
+}

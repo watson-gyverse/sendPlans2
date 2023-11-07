@@ -16,29 +16,45 @@ export type MeatScanned = MeatPreset & {
 export type MeatInfo = MeatScanned & {
     freeze: string | null
     price: string | null
-    beforeWeight: number | null
-    // fridgeNumber: string | null
-    // //숙성고 번호
-    // storageNumber: string | null
-
-    //순번 001 002 ..
-    entryNumber: string | null
 }
 
 export type MeatInfoWithCount = MeatInfo & {
     count: number
 }
 
-export type CSVType = {
+export type MeatInfoWithEntry = MeatInfo & {
+    entry: string
+    place: string | null
+    fridgeName: string | null
+    floor: number | null
+    beforeWeight: number | null
+    agingDate: string | null
+}
+
+// export type CSVType = {
+//     [index: string]: string
+//     storedDate: string
+//     meatNumber: string
+//     entryNumber: string
+//     species: string
+//     origin: string
+//     gender: string
+//     grade: string
+//     cut: string
+//     freeze: string
+//     price: string
+// }
+
+export type XlsxType = {
     [index: string]: string
-    storedDate: string
-    meatNumber: string
-    entryNumber: string
-    species: string
-    origin: string
-    gender: string
-    grade: string
-    cut: string
-    freeze: string
-    price: string
+    입고일: string
+    이력번호: string
+    순번: string
+    육종: string
+    원산지: string
+    암수: string
+    등급: string
+    부위: string
+    보관: string
+    단가: string
 }

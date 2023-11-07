@@ -6,7 +6,6 @@ import {
     meatInfoUrl,
 } from "../utils/consts/urls"
 import { xmlThatIWannaKill } from "../utils/consts/functions"
-import { BeefCuts } from "../utils/consts/meat"
 
 export async function getMeatInfo(
     meatNumber: string,
@@ -82,6 +81,7 @@ export async function getMeatInfo(
             })
     } catch (err) {
         console.log(err)
+        setLoadingState(0)
     }
 }
 
@@ -120,5 +120,6 @@ export async function getForeignMeatInfo(
     } catch (err) {
         console.log(err)
         setFailed(true)
+        setLoadingState(0)
     }
 }

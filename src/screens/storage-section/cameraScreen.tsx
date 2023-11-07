@@ -5,7 +5,7 @@ import { Html5QrcodeResult, Html5QrcodeError } from "html5-qrcode/esm/core"
 import Html5QrcodePlugin from "../../components/storage-section/qrScanPlugin"
 import { MeatInfoWithCount, MeatScanned } from "../../utils/types/meatTypes"
 import { ScanResultBox } from "../../components/storage-section/scanResultBox"
-import { getForeignMeatInfo, getMeatInfo } from "../../apis/MeatApi"
+import { getForeignMeatInfo, getMeatInfo } from "../../apis/meatApi"
 import toast, { Toaster } from "react-hot-toast"
 import { sessionKeys } from "../../utils/consts/constants"
 import * as _ from "lodash"
@@ -13,24 +13,19 @@ import { ScanResultCart } from "../../components/storage-section/scanResultCart"
 import { CurrentScanTextContext } from "../../contexts/meatLineContext"
 
 export default function CameraScreen() {
-    // const { currentContext, setCurrentContext } = useContext(
-    //     CurrentMeatLineContext
-    // )
-    // const { totalContext, setTotalContext } = useContext(TotalMeatLineContext)
-
     const { scanText, setScanText } = useContext(CurrentScanTextContext)
 
     const [failToGetMeatInfo, setFailedGetMeatInfo] = useState(false)
     const [wrongCut, setWrongCut] = useState(false)
-    // const [scanText, setScanText] = useState(currentScanText)
     const [loadingInfo, setLoadingInfo] = useState(false)
     const [isButtonEnabled, setButtonEnable] = useState(false)
 
     const navigate = useNavigate()
     const session = sessionStorage
-    const [items, setItems] = useState<MeatInfoWithCount[]>([])
+    const initItems = session.getItem(sessionKeys.storageItems)
+    const parsed: MeatInfoWithCount[] = JSON.parse(initItems ? initItems : "[]")
+    const [items, setItems] = useState<MeatInfoWithCount[]>(parsed)
     const species = session.getItem(sessionKeys.storageSpecies)
-    // const [scanText, setScanText] = useState(session.getItem("scanText"))
     const [scanSpecies, setScanSpecie] = useState<string>(
         species ? species : ""
     )
@@ -45,9 +40,22 @@ export default function CameraScreen() {
         decodedText: string,
         decodedResult: Html5QrcodeResult
     ) => {
-        toast("스캔 성공")
+        toast.success("스캔 성공")
         console.log("before: " + scanText)
         console.log("after " + decodedText)
+        //나가리 존
+        if (decodedText === "") return
+        if (
+            decodedText.length !== 12 &&
+            decodedText.length !== 15 &&
+            decodedText.charAt(0) !== ("0" || "1" || "8" || "9" || "L")
+        ) {
+            console.log("이력번호가 아닙니다")
+            setLoadingState(0)
+            return
+        }
+
+        //새로운 스캔텍스트
         if (scanText !== decodedText) {
             let alreadyExist = false
             _.forEach(items, (item) => {
@@ -57,13 +65,12 @@ export default function CameraScreen() {
                     return false
                 }
             })
-            if (!alreadyExist && scanText !== "initiated") {
+            if (!alreadyExist && scanText !== "undefined") {
                 console.log("중복이 있음")
                 setItems(items)
-                setLoadingState(2)
+                setLoadingState(0)
             }
         }
-        session.setItem("scanText", decodedText.trim())
         setScanText(decodedText.trim())
     }
 
@@ -72,6 +79,8 @@ export default function CameraScreen() {
     }
 
     const onAddButtonClick = () => {
+        console.log(wrongCut)
+        console.log(isButtonEnabled)
         setShow(!show)
         setLoadingState(0)
 
@@ -90,8 +99,6 @@ export default function CameraScreen() {
             ...scanned,
             freeze: null,
             price: null,
-            beforeWeight: null,
-            entryNumber: null,
             count: 1,
         }
         var alreadyExist = false
@@ -114,22 +121,16 @@ export default function CameraScreen() {
     }
 
     const onNextButtonClicked = () => {
-        // setTotalContext(hash)
-
         session.setItem(sessionKeys.storageItems, JSON.stringify(items))
-        navigate("/submit/edit")
+        navigate("/storage/edit")
     }
     useEffect(() => {
-        console.log("scantext touched")
-        if (scanText === null) return
-        if (scanText.length != 12 && scanText.length != 15) {
-            console.log("이력번호가 아닙니다")
-        } else if (
-            (scanText.length == 12 || scanText.length == 15) &&
-            loadingState == 0
+        if (
+            (scanText.length === 12 || scanText.length === 15) &&
+            loadingState === 0
         ) {
             setLoadingState(1)
-            if (scanText.charAt(0) == "8" || scanText.charAt(0) == "9") {
+            if (scanText.charAt(0) === "8" || scanText.charAt(0) === "9") {
                 getForeignMeatInfo(
                     scanText,
                     setGrade,
@@ -153,7 +154,10 @@ export default function CameraScreen() {
                 )
             }
         } else {
-            console.log("방황하는가")
+            console.warn("wander")
+            console.log(scanText)
+            console.log(loadingState)
+            setLoadingState(0)
         }
     }, [scanText])
 
@@ -174,30 +178,31 @@ export default function CameraScreen() {
             //추가가능
             case 2: {
                 setLoadingInfo(false)
-                if (!wrongCut) setButtonEnable(true)
+                setButtonEnable(!wrongCut)
                 break
             }
         }
-    }, [loadingState])
+    }, [loadingState, wrongCut])
 
     useEffect(() => {
-        setWrongCut(scanSpecies != species)
+        setWrongCut(scanSpecies !== species)
     }, [scanSpecies])
 
     const goToPreset = () => {
-        navigate("/submit/preset")
+        navigate("/storage/preset")
     }
     return (
         <div>
             <Toaster />
-            <div style={{ display: "center", alignItems: "start" }}>
+            <div
+                style={{
+                    display: "center",
+                    alignItems: "start",
+                    marginBottom: "2rem",
+                }}
+            >
                 <Button onClick={goToPreset}>뒤로</Button>
             </div>
-            <Stack className='border-1 rounded '>
-                {/* <h6>{printKorDate(location.state.date)}</h6> */}
-                {/* <h6>{location.state.species}</h6>
-                <h6>{location.state.cut}</h6> */}
-            </Stack>
             <Html5QrcodePlugin
                 fps={1}
                 qrbox={{ width: 250, height: 250 }}
@@ -207,6 +212,8 @@ export default function CameraScreen() {
                 qrCodeErrorCallback={onScanFailure}
                 showTorchButtonIfSupported={true}
             />
+            <h6>같은 번호는 아래에서 수량을 조절해주세요.</h6>
+            <hr style={{ height: "2px" }} />
             <h4> {"조회내역: "}</h4>
             <ScanResultBox
                 meatNumber={scanText ? scanText : "null"}
@@ -222,15 +229,24 @@ export default function CameraScreen() {
             >
                 ※이력번호 조회에 실패했습니다
             </h6>
-            <div style={{ display: wrongCut ? "flex" : "none" }}>
+            <div
+                style={{
+                    display: wrongCut ? "flex" : "none",
+                    justifyContent: "space-between",
+                }}
+            >
                 <h6 style={{ color: "red" }}>
-                    ※선택한 부위가 육종과 맞지않습니다
+                    ※선택한 부위가 <br />
+                    스캔한 육종과 맞지 않습니다!
+                    <br />
+                    다시 확인해주세요!!
                 </h6>
+
                 <Button
                     style={{ width: "auto" }}
                     onClick={goToPreset}
                 >
-                    뒤로
+                    돌아가기
                 </Button>
             </div>
             <div
@@ -242,7 +258,7 @@ export default function CameraScreen() {
             >
                 <Button
                     style={{ width: "8rem", height: "3rem" }}
-                    disabled={!isButtonEnabled && !wrongCut}
+                    disabled={!isButtonEnabled || wrongCut}
                     onClick={onAddButtonClick}
                 >
                     {loadingInfo ? (
@@ -279,11 +295,5 @@ export default function CameraScreen() {
                 </Button>
             </div>
         </div>
-    )
-}
-
-const contextErrorMessage = () => {
-    toast.error(
-        "입력정보가 손상되었습니다\n이전화면으로 돌아가서\n다시 입력해주세요"
     )
 }
