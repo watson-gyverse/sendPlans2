@@ -1,26 +1,28 @@
 import {
-    DocumentData,
+    addDoc,
     collection,
+    deleteDoc,
+    doc,
     getDocs,
     orderBy,
     query,
     where,
 } from "firebase/firestore"
-import { MeatInfoWithCount, MeatInfoWithEntry } from "../utils/types/meatTypes"
+import { MeatInfoWithEntry } from "../utils/types/meatTypes"
 import { firestoreDB } from "../utils/Firebase"
-import { fbStorages } from "../utils/consts/constants"
+import { fbCollections } from "../utils/consts/constants"
 import { parseToDate } from "../utils/consts/functions"
 
-const dbRef = collection(firestoreDB, fbStorages.sp2Storage)
-const q = query(dbRef, where("p", "==", "df"), orderBy("storedDate"))
+const dbStorage = collection(firestoreDB, fbCollections.sp2Storage)
+const dbAging = collection(firestoreDB, fbCollections.sp2Aging)
 
 export async function fetchFromFirestore(
-    setArray: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
+    setItems: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
 
     thenWhat: () => void,
     catchWhat: () => void
 ) {
-    const result = await getDocs(dbRef)
+    const result = await getDocs(dbStorage)
     var array: MeatInfoWithEntry[] = []
     result.forEach((doc: any) => {
         let data: MeatInfoWithEntry = doc.data()
@@ -41,12 +43,13 @@ export async function fetchFromFirestore(
             floor: null,
             beforeWeight: null,
             agingDate: null,
+            docId: doc.id,
         }
         array.push(item)
         console.log(item)
     })
     console.log(array)
-    setArray(
+    setItems(
         array.sort((a, b) => {
             if (a.storedDate !== b.storedDate) {
                 return (
@@ -62,4 +65,40 @@ export async function fetchFromFirestore(
             }
         })
     )
+}
+
+export async function passToAgingCollection(
+    item: MeatInfoWithEntry,
+    thenWhat: Promise<void>
+) {
+    await addDoc(dbAging, {
+        storedDate: item.storedDate,
+        species: item.species,
+        cut: item.cut,
+        meatNumber: item.meatNumber,
+        origin: item.origin,
+        gender: item.gender,
+        grade: item.grade,
+        freeze: item.freeze,
+        price: item.price,
+        entry: item.entry,
+        fridgeName: item.fridgeName,
+        floor: item.floor,
+        beforeWeight: item.beforeWeight,
+        agingDate: item.agingDate,
+        place: item.place,
+    })
+        .then(() => console.warn("오예"))
+        .catch(() => {
+            console.error("않되")
+        })
+
+    await deleteDoc(doc(firestoreDB, fbCollections.sp2Storage, item.docId!!))
+        .then(async () => {
+            console.warn("삭제도함")
+            await thenWhat
+        })
+        .catch(() => {
+            console.error("삭제하는데 문제생김")
+        })
 }

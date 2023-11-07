@@ -1,6 +1,6 @@
 import { Firestore, addDoc, collection, getFirestore } from "firebase/firestore"
 import { MeatInfoWithCount, XlsxType } from "../utils/types/meatTypes"
-import { fbStorages } from "../utils/consts/constants"
+import { fbCollections } from "../utils/consts/constants"
 import { firestoreDB } from "../utils/Firebase"
 
 export async function addToFirestore(
@@ -8,7 +8,7 @@ export async function addToFirestore(
     thenWhat: () => void,
     catchWhat: () => void
 ) {
-    await addDoc(collection(firestoreDB, fbStorages.sp2Storage), {
+    await addDoc(collection(firestoreDB, fbCollections.sp2Storage), {
         storedDate: data.입고일,
         species: data.육종,
         cut: data.부위,

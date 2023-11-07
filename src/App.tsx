@@ -19,7 +19,7 @@ import {
 } from "./contexts/meatLineContext"
 import { MeatInfo } from "./utils/types/meatTypes"
 import EditScreen from "./screens/storage-section/editScreen"
-import { StorageMiddleWare } from "./utils/toLobbyMiddleware"
+import { AgingMiddleWare, StorageMiddleWare } from "./utils/toLobbyMiddleware"
 import PlaceScreen from "./screens/aging-section/placeScreen"
 import { FetchScreen } from "./screens/aging-section/fetchScreen"
 
@@ -65,9 +65,9 @@ const router = createBrowserRouter([
                     {
                         path: "edit",
                         element: (
-                            // <StorageMiddleWare>
-                            <EditScreen />
-                            // </StorageMiddleWare>
+                            <StorageMiddleWare>
+                                <EditScreen />
+                            </StorageMiddleWare>
                         ),
                     },
                 ],
@@ -83,7 +83,11 @@ const router = createBrowserRouter([
                     { index: true, element: <PlaceScreen /> },
                     {
                         path: "fetch/",
-                        element: <FetchScreen />,
+                        element: (
+                            <AgingMiddleWare>
+                                <FetchScreen />
+                            </AgingMiddleWare>
+                        ),
                     },
                 ],
             },

@@ -19,3 +19,18 @@ export const StorageMiddleWare = (props: any) => {
     }
     return <React.Fragment>{props.children}</React.Fragment>
 }
+
+export const AgingMiddleWare = (props: any) => {
+    const session = sessionStorage
+    let tempPlace = session.getItem(sessionKeys.agingPlace)
+    if (!tempPlace) {
+        toast("숙성장소를 먼저 선택해주세요")
+        return (
+            <>
+                <Toaster />
+                <Navigate to={{ pathname: "/aging" }} />
+            </>
+        )
+    }
+    return <React.Fragment>{props.children}</React.Fragment>
+}

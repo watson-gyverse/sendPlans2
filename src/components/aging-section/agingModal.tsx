@@ -1,4 +1,4 @@
-import { FloatingLabel } from "react-bootstrap"
+import { Col, Dropdown, FloatingLabel, Row } from "react-bootstrap"
 import Button from "react-bootstrap/Button"
 import Form from "react-bootstrap/Form"
 import { useForm } from "react-hook-form"
@@ -6,8 +6,14 @@ import {
     BeefOriginAndGrades,
     PorkOriginAndGrades,
 } from "../../utils/consts/meat"
-import { useEffect } from "react"
-import { MeatInfo, MeatInfoWithCount } from "../../utils/types/meatTypes"
+import { useEffect, useState } from "react"
+import {
+    MeatInfo,
+    MeatInfoWithCount,
+    MeatInfoWithEntry,
+} from "../../utils/types/meatTypes"
+import DatePickerComponent from "../storage-section/datePicker"
+import moment from "moment"
 
 type AgingFormOptions = {
     fridgeName: string
@@ -17,24 +23,22 @@ type AgingFormOptions = {
 }
 
 type ModalParams = {
-    meatInfo: MeatInfoWithCount
+    meatInfo: MeatInfoWithEntry
     place: string
-    setMeatInfo: (mInfo: MeatInfoWithCount) => void
+    setMeatInfo: (mInfo: MeatInfoWithEntry) => void
     setClose: () => void
 }
 
 function AgingModal(props: ModalParams) {
     const { meatInfo, setMeatInfo, setClose } = props
+    const [date, setDate] = useState<Date>(new Date())
+    const [time, setTime] = useState<number>(new Date().getHours())
+
     const {
         register,
         formState: { errors },
         watch,
-        reset,
         handleSubmit,
-        getValues,
-        setError,
-        setFocus,
-        control,
     } = useForm<AgingFormOptions>({
         mode: "onSubmit",
         defaultValues: {
@@ -53,13 +57,10 @@ function AgingModal(props: ModalParams) {
             fridgeName: data.fridgeName,
             floor: data.floor,
             place: props.place,
-            agingDate: data.agingDate,
+            agingDate:
+                moment(date).format("YYYY-MM-DD ") +
+                time.toString().padStart(2, "0"),
         }
-        // meatInfo.price = data.price.toString()
-        // meatInfo.freeze = data.freeze
-        // meatInfo.gender = data.gender
-        // meatInfo.grade = data.grade
-        // meatInfo.origin = data.origin
         setMeatInfo(newInfo)
         setClose()
     }
@@ -68,14 +69,37 @@ function AgingModal(props: ModalParams) {
         console.log("ERROR:::", error)
     }
 
-    // const currentOrigin = watch("origin")
-    // useEffect(() => {
-    //     setFocus("grade")
-    // }, [currentOrigin])
     return (
         <Form onSubmit={handleSubmit(onSubmit, onError)}>
+            <h6>숙성 시작 시각</h6>
+            <Row>
+                <Col>
+                    <DatePickerComponent
+                        targetDate={date}
+                        setTargetDate={setDate}
+                    />
+                </Col>
+                <Col>
+                    <Dropdown>
+                        <Dropdown.Toggle
+                            style={{
+                                fontSize: "1.5rem",
+                            }}
+                            id='dropdown-hour'
+                        >{`${time}시`}</Dropdown.Toggle>
+                        <Dropdown.Menu>
+                            {Array.from({ length: 24 }, (_, i) => (
+                                <Dropdown.Item onClick={() => setTime(i)}>
+                                    {i}
+                                </Dropdown.Item>
+                            ))}
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </Col>
+            </Row>
+
             <Form.Group className='mb-3'>
-                <FloatingLabel label='무게'>
+                <FloatingLabel label='무게(g)'>
                     <Form.Control
                         type='number'
                         placeholder='BeforeWeight'
@@ -112,51 +136,18 @@ function AgingModal(props: ModalParams) {
                     aria-label='floor'
                     {...register("floor", { required: true })}
                 >
-                    <option
-                        key={5}
-                        value={5}
-                    >
-                        {5}
-                    </option>
-                    <option
-                        key={4}
-                        value={4}
-                    >
-                        {4}
-                    </option>
-                    <option
-                        key={3}
-                        value={3}
-                    >
-                        {3}
-                    </option>
-                    <option
-                        key={2}
-                        value={2}
-                    >
-                        {2}
-                    </option>
-                    <option
-                        key={1}
-                        value={1}
-                    >
-                        {1}
-                    </option>
+                    {Array.from({ length: 5 }, (_, i) => (
+                        <option
+                            key={5 - i}
+                            value={5 - i}
+                        >
+                            {5 - i}
+                        </option>
+                    ))}
                 </Form.Select>
                 {errors.floor?.type === "required" &&
                     watch("floor") === undefined && (
                         <h6 style={{ color: "red" }}>※층을 입력해주세요</h6>
-                    )}
-                <h6 style={{ marginTop: "12px" }}>등급</h6>
-                <Form.Select
-                    aria-label='agingDate'
-                    {...register("agingDate", {
-                        required: "등급을 설정해주세요",
-                    })}
-                ></Form.Select>
-                {errors.agingDate?.type === "required" &&
-                    watch("agingDate") === "" && (
-                        <h6 style={{ color: "red" }}>※등급을 입력해주세요</h6>
                     )}
             </Form.Group>
 

@@ -5,9 +5,10 @@ export const sessionKeys = {
     storagePreset: "storagePreset",
     storageItems: "storageItems",
     storageScanText: "storageScanText",
+    agingPlace: "agingPlace",
 } as const
 
-export const fbStorages = {
+export const fbCollections = {
     sp2Storage: "Sp2Storage",
     sp2Aging: "Sp2Aging",
     sp2History: "Sp2History",

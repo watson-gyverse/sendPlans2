@@ -1,18 +1,15 @@
 import { Button, Stack } from "react-bootstrap"
 import toast from "react-hot-toast"
-import {
-    MeatInfo,
-    MeatInfoWithCount,
-    MeatInfoWithEntry,
-} from "../../utils/types/meatTypes"
+import { MeatInfoWithEntry } from "../../utils/types/meatTypes"
 
-type EditCardType = {
+type AgingCardType = {
     meatInfo: MeatInfoWithEntry
     clickEvent: () => void
+    startAgingEvent: (arg0: MeatInfoWithEntry) => void
 }
 
-export const AgingEditCard = (props: EditCardType) => {
-    const { meatInfo, clickEvent } = props
+export const AgingEditCard = (props: AgingCardType) => {
+    const { meatInfo, clickEvent, startAgingEvent } = props
 
     return (
         <div>
@@ -37,7 +34,7 @@ export const AgingEditCard = (props: EditCardType) => {
                         }}
                     >
                         <Stack
-                            style={{ width: "30%" }}
+                            style={{ width: "35%" }}
                             gap={1}
                         >
                             <h6>입고일:</h6>
@@ -62,8 +59,6 @@ export const AgingEditCard = (props: EditCardType) => {
                             style={{ width: "33%" }}
                             gap={2}
                         >
-                            {/* <h6>무게: 1234g</h6> */}
-
                             <h6>
                                 냉장: {meatInfo.freeze ? meatInfo.freeze : "-"}
                             </h6>
@@ -88,17 +83,41 @@ export const AgingEditCard = (props: EditCardType) => {
                                     : "-"}
                             </h6>
                         </Stack>
-                        <Button
-                            style={{ width: "100px", height: "100px" }}
-                            onClick={clickEvent}
+                        <Stack
+                            style={{
+                                width: "30%",
+                                justifyContent: "space-around",
+                            }}
+                            gap={4}
                         >
-                            숙성정보
-                            <br />
-                            입력
-                        </Button>
+                            <Button
+                                style={{ width: "100px", height: "80px" }}
+                                onClick={clickEvent}
+                            >
+                                숙성정보
+                                <br />
+                                입력
+                            </Button>
+                            <Button
+                                disabled={checkNullAgingInfo(meatInfo)}
+                                style={{ width: "100px", height: "80px" }}
+                                onClick={() => startAgingEvent(meatInfo)}
+                            >
+                                숙성 시작
+                            </Button>
+                        </Stack>
                     </div>
                 </div>
             )}
         </div>
+    )
+}
+
+function checkNullAgingInfo(info: MeatInfoWithEntry): boolean {
+    return (
+        info.beforeWeight === null ||
+        info.fridgeName === null ||
+        info.floor === null ||
+        info.agingDate === null
     )
 }

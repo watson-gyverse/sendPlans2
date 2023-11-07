@@ -1,4 +1,5 @@
 import { XMLParser } from "fast-xml-parser"
+import { MeatInfoWithEntry } from "../types/meatTypes"
 
 export function printKorDate(date: Date) {
     const dateString = date.toLocaleDateString("ko-KR", {
@@ -37,4 +38,23 @@ export const parseToDate = (storedDate: string): Date => {
         Number(storedDate.slice(11, 13))
     )
     return cDate
+}
+
+export const sortAgingItems = (
+    array: MeatInfoWithEntry[]
+): MeatInfoWithEntry[] => {
+    return array.sort((a, b) => {
+        if (a.storedDate !== b.storedDate) {
+            return (
+                parseToDate(a.storedDate).getTime() -
+                parseToDate(b.storedDate).getTime()
+            )
+        } else {
+            if (a.meatNumber !== b.meatNumber) {
+                return Number(a.meatNumber) - Number(b.meatNumber)
+            } else {
+                return Number(a.entry) - Number(b.entry)
+            }
+        }
+    })
 }
