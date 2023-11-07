@@ -23,3 +23,5 @@ yarn-debug.log*
 yarn-error.log*
 
 /src/utils/consts/urls.ts
+
+/src/utils/Firebase.ts
