@@ -24,13 +24,14 @@ type AgingFormOptions = {
 
 type ModalParams = {
     meatInfo: MeatInfoWithEntry
-    place: string
+    placeName: string
+    placeCount: number
     setMeatInfo: (mInfo: MeatInfoWithEntry) => void
     setClose: () => void
 }
 
 function AgingModal(props: ModalParams) {
-    const { meatInfo, setMeatInfo, setClose } = props
+    const { meatInfo, placeName, placeCount, setMeatInfo, setClose } = props
     const [date, setDate] = useState<Date>(new Date())
     const [time, setTime] = useState<number>(new Date().getHours())
 
@@ -56,7 +57,7 @@ function AgingModal(props: ModalParams) {
             beforeWeight: data.beforeWeight,
             fridgeName: data.fridgeName,
             floor: data.floor,
-            place: props.place,
+            place: placeName,
             agingDate:
                 moment(date).format("YYYY-MM-DD ") +
                 time.toString().padStart(2, "0"),
@@ -113,6 +114,40 @@ function AgingModal(props: ModalParams) {
                         <h6 style={{ color: "red" }}>※무게를 입력해주세요</h6>
                     )}
                 </FloatingLabel>
+                <Form.Group>
+                    <Form.Label
+                        style={{
+                            width: "5rem",
+                            marginTop: "10px",
+                            marginRight: "12px",
+                        }}
+                    >
+                        냉장고 번호:
+                    </Form.Label>
+                    {Array.from({ length: placeCount }, (_, i) => {
+                        let a = i + 1
+                        return (
+                            <Form.Check
+                                inline
+                                type='radio'
+                                label={a}
+                                {...register("fridgeName", {
+                                    required: "보관방식을 입력해주세요",
+                                })}
+                                value={a}
+                                name='fridgeName'
+                                id={"fridgeName" + a}
+                            />
+                        )
+                    })}
+
+                    {errors.fridgeName?.type === "required" &&
+                        watch("fridgeName") === "" && (
+                            <h6 style={{ color: "red" }}>
+                                ※냉장고 번호를 입력해주세요
+                            </h6>
+                        )}
+                </Form.Group>
                 <FloatingLabel label='냉장고'>
                     <Form.Control
                         type=''

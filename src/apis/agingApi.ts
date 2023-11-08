@@ -12,9 +12,15 @@ import { MeatInfoWithEntry } from "../utils/types/meatTypes"
 import { firestoreDB } from "../utils/Firebase"
 import { fbCollections } from "../utils/consts/constants"
 import { parseToDate } from "../utils/consts/functions"
+import { FirestorePlace } from "../utils/types/otherTypes"
 
-const dbStorage = collection(firestoreDB, fbCollections.sp2Storage)
-const dbAging = collection(firestoreDB, fbCollections.sp2Aging)
+const dbStorage = getCollection(fbCollections.sp2Storage)
+const dbAging = getCollection(fbCollections.sp2Aging)
+const dbPlace = getCollection(fbCollections.sp2Places)
+
+function getCollection(dbName: string) {
+    return collection(firestoreDB, dbName)
+}
 
 export async function fetchFromFirestore(
     setItems: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
@@ -101,4 +107,17 @@ export async function passToAgingCollection(
         .catch(() => {
             console.error("삭제하는데 문제생김")
         })
+}
+
+export async function getPlaces(
+    setPlaces: React.Dispatch<React.SetStateAction<FirestorePlace[]>>
+) {
+    const result = await getDocs(dbPlace)
+    var places: FirestorePlace[] = []
+    result.forEach((doc: any) => {
+        let data: FirestorePlace = doc.data()
+        places.push(data)
+    })
+
+    setPlaces(places)
 }

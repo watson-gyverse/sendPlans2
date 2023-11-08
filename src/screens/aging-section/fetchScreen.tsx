@@ -5,12 +5,15 @@ import { MeatInfoWithEntry } from "../../utils/types/meatTypes"
 import { AgingEditCard } from "../../components/aging-section/agingEditCard"
 import toast, { Toaster } from "react-hot-toast"
 import AgingModal from "../../components/aging-section/agingModal"
-import { sessionKeys } from "../../utils/consts/constants"
 import { sortAgingItems } from "../../utils/consts/functions"
+import { useLocation } from "react-router-dom"
 
 export const FetchScreen = () => {
-    const session = window.sessionStorage
-    const placeText = session.getItem(sessionKeys.agingPlace)
+    const location = useLocation()
+    const placeName = location.state.placeName
+    const placeCount = location.state.placeCount
+    // const session = window.sessionStorage
+    // const placeText = session.getItem(sessionKeys.agingPlace)
     const [items, setItems] = useState<MeatInfoWithEntry[]>([])
     const [modalShow, setShow] = useState(false)
     const [recentMeatInfo, setClickedItem] = useState<MeatInfoWithEntry>()
@@ -79,7 +82,7 @@ export const FetchScreen = () => {
             <Toaster />
             <Col>
                 <Row>
-                    <p>현재 장소 : {placeText}</p>
+                    <p>현재 장소 : {placeName}</p>
                 </Row>
                 <Row>
                     <h1>입고된 고기 목록</h1>
@@ -114,7 +117,8 @@ export const FetchScreen = () => {
                     {recentMeatInfo !== undefined ? (
                         <AgingModal
                             meatInfo={recentMeatInfo}
-                            place={placeText!!}
+                            placeName={placeName}
+                            placeCount={placeCount}
                             setMeatInfo={setClickedItem}
                             setClose={() => setShow(false)}
                         />

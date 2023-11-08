@@ -11,6 +11,7 @@ export const sessionKeys = {
 export const fbCollections = {
     sp2Storage: "Sp2Storage",
     sp2Aging: "Sp2Aging",
+    sp2Places: "Sp2Places",
     sp2History: "Sp2History",
 } as const
 
