@@ -87,10 +87,27 @@ export default function PresetScreen() {
                 position='top-center'
                 reverseOrder={false}
             />
-            <Button onClick={() => navigate("../../")}>뒤로</Button>
+            <Button
+                // style={{
+                //     backgroundColor: "white",
+                // }}
+                // variant='outlined-success'
+                variant='success'
+                onClick={() => navigate("../../")}
+            >
+                뒤로
+            </Button>
+
             <Stack
                 gap={1}
-                style={{ zIndex: "2", position: "relative" }}
+                style={{
+                    marginTop: "20px",
+                    zIndex: "2",
+                    position: "relative",
+                    backgroundColor: "#b6d3b8",
+                    borderRadius: "20px",
+                    padding: "12px",
+                }}
             >
                 <h2>언제 입고되었나요?</h2>
                 <Row>
@@ -106,6 +123,7 @@ export default function PresetScreen() {
                                 style={{
                                     fontSize: "1.5rem",
                                 }}
+                                variant='success'
                                 id='dropdown-hour'
                             >{`${time}시`}</Dropdown.Toggle>
                             <Dropdown.Menu>
@@ -119,10 +137,16 @@ export default function PresetScreen() {
                     </Col>
                 </Row>
             </Stack>
-            <div style={{ height: "3rem" }}></div>
+            <div style={{ height: "1rem" }}></div>
             <Stack
                 gap={1}
-                style={{ zIndex: "1", position: "relative" }}
+                style={{
+                    zIndex: "1",
+                    position: "relative",
+                    backgroundColor: "#b6d3b8",
+                    borderRadius: "20px",
+                    padding: "12px",
+                }}
             >
                 <h2>어떤 고기인가요?</h2>
                 <ButtonGroup>
@@ -135,7 +159,9 @@ export default function PresetScreen() {
                             variant='outline-success'
                             checked={radio === species}
                             onChange={onSpeciesChanged}
-                            style={{ fontSize: "1.3rem" }}
+                            style={{
+                                fontSize: "1.3rem",
+                            }}
                         >
                             {radio}
                         </ToggleButton>
@@ -152,11 +178,13 @@ export default function PresetScreen() {
                             id={`cut-${idx}`}
                             value={radio}
                             type='radio'
-                            variant='outline-success'
+                            variant=' success'
                             checked={radio === cut}
                             onChange={onCutChanged}
                             style={{
                                 fontSize: "1.3rem",
+
+                                backgroundColor: "white",
                             }}
                         >
                             {radio}
@@ -166,8 +194,12 @@ export default function PresetScreen() {
             </Stack>
             <div style={{ height: "4px" }}></div>
             <Button
-                style={{ width: "5rem", height: "3rem", fontSize: "1.2rem" }}
-                variant='primary'
+                style={{
+                    width: "5rem",
+                    height: "3rem",
+                    fontSize: "1.2rem",
+                }}
+                variant='success'
                 onClick={goToCameraScreen}
             >
                 다음

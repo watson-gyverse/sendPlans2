@@ -23,14 +23,15 @@ function getCollection(dbName: string) {
 }
 
 export async function fetchFromFirestore(
-    setItems: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
-
+    setStoredItems: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
+    setAgingItems: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
+    place: string,
     thenWhat: () => void,
     catchWhat: () => void
 ) {
-    const result = await getDocs(dbStorage)
-    var array: MeatInfoWithEntry[] = []
-    result.forEach((doc: any) => {
+    const sResult = await getDocs(dbStorage)
+    var sArray: MeatInfoWithEntry[] = []
+    sResult.forEach((doc: any) => {
         let data: MeatInfoWithEntry = doc.data()
         console.log(doc.id, "=>", doc.data())
         const item: MeatInfoWithEntry = {
@@ -51,31 +52,42 @@ export async function fetchFromFirestore(
             agingDate: null,
             docId: doc.id,
         }
-        array.push(item)
+        sArray.push(item)
         console.log(item)
     })
-    console.log(array)
-    setItems(
-        array.sort((a, b) => {
-            if (a.storedDate !== b.storedDate) {
-                return (
-                    parseToDate(a.storedDate).getTime() -
-                    parseToDate(b.storedDate).getTime()
-                )
-            } else {
-                if (a.meatNumber !== b.meatNumber) {
-                    return Number(a.meatNumber) - Number(b.meatNumber)
-                } else {
-                    return Number(a.entry) - Number(b.entry)
-                }
-            }
-        })
-    )
+    const aQuery = query(dbAging, where("place", "==", place))
+    const aResult = await getDocs(aQuery)
+    var aArray: MeatInfoWithEntry[] = []
+    aResult.forEach((doc: any) => {
+        let data: MeatInfoWithEntry = doc.data()
+        console.log(doc.id, "=>", doc.data())
+        const item: MeatInfoWithEntry = {
+            storedDate: data.storedDate,
+            species: data.species,
+            cut: data.cut,
+            meatNumber: data.meatNumber,
+            origin: data.origin,
+            gender: data.gender,
+            grade: data.grade,
+            freeze: data.freeze,
+            price: data.price,
+            entry: data.entry,
+            place: data.place,
+            fridgeName: data.fridgeName,
+            floor: data.floor,
+            beforeWeight: data.beforeWeight,
+            agingDate: data.agingDate,
+            docId: doc.id,
+        }
+        aArray.push(item)
+    })
+    setStoredItems(sortArray(sArray))
+    setAgingItems(sortArray(aArray))
 }
 
 export async function passToAgingCollection(
-    item: MeatInfoWithEntry,
-    thenWhat: Promise<void>
+    item: MeatInfoWithEntry
+    // thenWhat: () => Promise<void>
 ) {
     await addDoc(dbAging, {
         storedDate: item.storedDate,
@@ -102,7 +114,7 @@ export async function passToAgingCollection(
     await deleteDoc(doc(firestoreDB, fbCollections.sp2Storage, item.docId!!))
         .then(async () => {
             console.warn("삭제도함")
-            await thenWhat
+            // thenWhat()
         })
         .catch(() => {
             console.error("삭제하는데 문제생김")
@@ -120,4 +132,21 @@ export async function getPlaces(
     })
 
     setPlaces(places)
+}
+
+function sortArray(array: MeatInfoWithEntry[]) {
+    return array.sort((a, b) => {
+        if (a.storedDate !== b.storedDate) {
+            return (
+                parseToDate(a.storedDate).getTime() -
+                parseToDate(b.storedDate).getTime()
+            )
+        } else {
+            if (a.meatNumber !== b.meatNumber) {
+                return Number(a.meatNumber) - Number(b.meatNumber)
+            } else {
+                return Number(a.entry) - Number(b.entry)
+            }
+        }
+    })
 }

@@ -2,16 +2,8 @@ import { Col, Dropdown, FloatingLabel, Row } from "react-bootstrap"
 import Button from "react-bootstrap/Button"
 import Form from "react-bootstrap/Form"
 import { useForm } from "react-hook-form"
-import {
-    BeefOriginAndGrades,
-    PorkOriginAndGrades,
-} from "../../utils/consts/meat"
-import { useEffect, useState } from "react"
-import {
-    MeatInfo,
-    MeatInfoWithCount,
-    MeatInfoWithEntry,
-} from "../../utils/types/meatTypes"
+import { useState } from "react"
+import { MeatInfoWithEntry } from "../../utils/types/meatTypes"
 import DatePickerComponent from "../storage-section/datePicker"
 import moment from "moment"
 
@@ -117,7 +109,7 @@ function AgingModal(props: ModalParams) {
                 <Form.Group>
                     <Form.Label
                         style={{
-                            width: "5rem",
+                            width: "auto",
                             marginTop: "10px",
                             marginRight: "12px",
                         }}
@@ -148,22 +140,6 @@ function AgingModal(props: ModalParams) {
                             </h6>
                         )}
                 </Form.Group>
-                <FloatingLabel label='냉장고'>
-                    <Form.Control
-                        type=''
-                        placeholder='fridgeName'
-                        {...register("fridgeName", {
-                            required: `냉장고 이름을 입력해주세요 ${watch(
-                                "fridgeName"
-                            )}`,
-                        })}
-                    />
-                    {errors.fridgeName?.type === "required" && (
-                        <h6 style={{ color: "red" }}>
-                            ※냉장고이름을 입력해주세요
-                        </h6>
-                    )}
-                </FloatingLabel>
             </Form.Group>
             <Form.Group>
                 <h6>층</h6>
@@ -190,7 +166,7 @@ function AgingModal(props: ModalParams) {
                 variant='primary'
                 type='submit'
             >
-                Submit
+                적용
             </Button>
         </Form>
     )

@@ -68,11 +68,7 @@ export default function MainScreen() {
     )
 
     return (
-        <div
-            style={{
-                backgroundColor: "lightgray",
-            }}
-        >
+        <div>
             <Stack gap={3}>
                 <h1>SendPlans</h1>
                 <Button
@@ -93,7 +89,7 @@ export default function MainScreen() {
                 >
                     조회하기
                 </Button>
-                {samples}
+                {/* {samples} */}
             </Stack>
         </div>
     )

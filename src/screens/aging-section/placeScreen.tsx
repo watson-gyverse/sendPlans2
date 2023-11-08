@@ -1,6 +1,5 @@
 import { Button, Stack } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
-import { sessionKeys } from "../../utils/consts/constants"
 import { useEffect, useState } from "react"
 import { getPlaces } from "../../apis/agingApi"
 import { FirestorePlace } from "../../utils/types/otherTypes"
@@ -8,7 +7,6 @@ import { FirestorePlace } from "../../utils/types/otherTypes"
 export default function PlaceScreen() {
     const navigate = useNavigate()
     const [places, setPlaces] = useState<FirestorePlace[]>([])
-
     useEffect(() => {
         getPlaces(setPlaces)
     }, [])
@@ -29,6 +27,7 @@ export default function PlaceScreen() {
                 {places.map((item) => {
                     return (
                         <Button
+                            key={item.name + item.count}
                             style={{ height: "4rem" }}
                             onClick={() => onPlaceClick(item)}
                         >

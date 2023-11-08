@@ -1,14 +1,8 @@
 import { useState } from "react"
 import "./App.css"
 import PresetScreen from "./screens/storage-section/presetScreen"
-import {
-    Outlet,
-    RouterProvider,
-    createBrowserRouter,
-    useNavigate,
-} from "react-router-dom"
+import { Outlet, RouterProvider, createBrowserRouter } from "react-router-dom"
 import MainScreen from "./screens/mainScreen"
-import Layout from "./screens/initScreen"
 import ErrorScreen from "./screens/errorScreen"
 import CameraScreen from "./screens/storage-section/cameraScreen"
 import { Container } from "react-bootstrap"
@@ -83,11 +77,7 @@ const router = createBrowserRouter([
                     { index: true, element: <PlaceScreen /> },
                     {
                         path: "fetch/",
-                        element: (
-                            <AgingMiddleWare>
-                                <FetchScreen />
-                            </AgingMiddleWare>
-                        ),
+                        element: <FetchScreen />,
                     },
                 ],
             },
@@ -115,18 +105,26 @@ function App() {
                 <CurrentScanTextContext.Provider
                     value={{ scanText, setScanText }}
                 >
-                    <Container
+                    <div
                         style={{
-                            width: "380px",
-                            height: "auto",
-                            backgroundColor: "whitesmoke",
+                            width: "100%",
+                            height: "100%",
+                            // backgroundColor: "#6d9985",
                         }}
                     >
-                        <RouterProvider
-                            router={router}
-                            // fallbackElement={<div>로딩</div>}
-                        />
-                    </Container>
+                        <Container
+                            style={{
+                                width: "380px",
+                                height: "auto",
+                                padding: "24px 20px 30px 20px",
+                            }}
+                        >
+                            <RouterProvider
+                                router={router}
+                                // fallbackElement={<div>로딩</div>}
+                            />
+                        </Container>
+                    </div>
                 </CurrentScanTextContext.Provider>
             </CurrentMeatLineContext.Provider>
         </TotalMeatLineContext.Provider>

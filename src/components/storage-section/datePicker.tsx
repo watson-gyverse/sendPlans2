@@ -22,6 +22,7 @@ const DatePickerComponent = (props: DatePickerProps) => {
                 style={{
                     fontSize: "1.5rem",
                 }}
+                variant='success'
                 onClick={onClick}
                 ref={ref}
             >

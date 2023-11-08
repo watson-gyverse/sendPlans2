@@ -9,7 +9,7 @@ type AgingCardType = {
     startAgingEvent: (meatInfo: MeatInfoWithEntry) => void
 }
 
-export const AgingEditCard = (props: AgingCardType) => {
+export const AgingFinishCard = (props: AgingCardType) => {
     const { meatInfo, clickEvent, startAgingEvent, onClosed } = props
 
     return (
