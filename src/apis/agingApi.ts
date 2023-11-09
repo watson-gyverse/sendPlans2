@@ -127,7 +127,11 @@ export async function getPlaces(
     const result = await getDocs(dbPlace)
     var places: FirestorePlace[] = []
     result.forEach((doc: any) => {
-        let data: FirestorePlace = doc.data()
+        let data: FirestorePlace = {
+            id: doc.id,
+            name: doc.data().name,
+            count: doc.data().count,
+        }
         places.push(data)
     })
 
@@ -149,4 +153,34 @@ function sortArray(array: MeatInfoWithEntry[]) {
             }
         }
     })
+}
+
+export async function addPlace(
+    placeName: string,
+    count: string,
+    setPlaces: React.Dispatch<React.SetStateAction<FirestorePlace[]>>
+) {
+    await addDoc(dbPlace, {
+        name: placeName,
+        count: count,
+    })
+        .then(() => {
+            console.log("추가완료")
+            getPlaces(setPlaces)
+        })
+        .catch(() => {
+            console.error("추가실패")
+        })
+}
+
+export async function deletePlace(
+    placeId: string,
+    setPlaces: React.Dispatch<React.SetStateAction<FirestorePlace[]>>
+) {
+    await deleteDoc(doc(firestoreDB, fbCollections.sp2Places, placeId))
+        .then(() => {
+            console.log("장소 삭제됨")
+            getPlaces(setPlaces)
+        })
+        .catch(() => console.error("장소 삭제실패"))
 }

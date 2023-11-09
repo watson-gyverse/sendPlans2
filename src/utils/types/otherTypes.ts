@@ -1,4 +1,5 @@
 export type FirestorePlace = {
+    id: string | null
     name: string
-    count: number
+    count: string
 }
