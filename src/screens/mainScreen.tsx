@@ -19,8 +19,9 @@ export default function MainScreen() {
         navigate("/aging/")
     }
     const naviToHistoryScreen = () => {
-        toast("입고/숙성기록")
         // toast.remove()
+        toast("입고/숙성기록")
+
         // navigate("/storage/preset")
     }
 
@@ -69,6 +70,7 @@ export default function MainScreen() {
 
     return (
         <div>
+            <Toaster />
             <Stack gap={3}>
                 <h1>SendPlans</h1>
                 <Button

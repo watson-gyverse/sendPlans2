@@ -14,7 +14,7 @@ type AgingFormOptions = {
     agingDate: string
 }
 
-type ModalParams = {
+type AgingModalParams = {
     meatInfo: MeatInfoWithEntry
     placeName: string
     placeCount: number
@@ -22,7 +22,7 @@ type ModalParams = {
     setClose: () => void
 }
 
-function AgingModal(props: ModalParams) {
+function AgingModal(props: AgingModalParams) {
     const { meatInfo, placeName, placeCount, setMeatInfo, setClose } = props
     const [date, setDate] = useState<Date>(new Date())
     const [time, setTime] = useState<number>(new Date().getHours())

@@ -1,16 +1,18 @@
 import { Button, Stack } from "react-bootstrap"
-import toast from "react-hot-toast"
 import { MeatInfoWithEntry } from "../../utils/types/meatTypes"
+import { TiDeleteOutline } from "react-icons/ti"
 
 type AgingCardType = {
     meatInfo: MeatInfoWithEntry
+    isEditMode: boolean
     clickEvent: () => void
-    onClosed: (meatInfo: MeatInfoWithEntry) => void
+    onClickDelete: (meatInfo: MeatInfoWithEntry) => void
     startAgingEvent: (meatInfo: MeatInfoWithEntry) => void
 }
 
 export const AgingEditCard = (props: AgingCardType) => {
-    const { meatInfo, clickEvent, startAgingEvent, onClosed } = props
+    const { meatInfo, isEditMode, clickEvent, startAgingEvent, onClickDelete } =
+        props
 
     return (
         <div>
@@ -25,7 +27,28 @@ export const AgingEditCard = (props: AgingCardType) => {
                         borderRadius: "5px",
                     }}
                 >
-                    <h6>이력번호: {meatInfo.meatNumber}</h6>
+                    <div
+                        style={{
+                            height: "30px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                        }}
+                    >
+                        <h6 style={{ margin: 0 }}>
+                            이력번호: {meatInfo.meatNumber}
+                        </h6>
+                        <TiDeleteOutline
+                            style={{
+                                display: isEditMode ? "flex" : "none",
+                                width: "30px",
+                                height: "30px",
+                                color: "#f74f32",
+                            }}
+                            onClick={() => onClickDelete(meatInfo)}
+                        />
+                    </div>
+
                     <hr style={{ height: "1px", margin: "8px" }} />
                     <div
                         style={{
@@ -47,7 +70,7 @@ export const AgingEditCard = (props: AgingCardType) => {
                             </h6>
                             <h6>
                                 순번: {String(meatInfo.entry).padStart(3, "0")}
-                            </h6>{" "}
+                            </h6>
                             <h6>
                                 단가: {meatInfo.price ? meatInfo.price : "-"}
                             </h6>
@@ -64,21 +87,21 @@ export const AgingEditCard = (props: AgingCardType) => {
                                 냉장: {meatInfo.freeze ? meatInfo.freeze : "-"}
                             </h6>
                             <h6>
-                                원산지:{" "}
+                                원산지:
                                 {meatInfo.origin ? meatInfo.origin : "-"}
                             </h6>
                             <h6>
                                 암수: {meatInfo.gender ? meatInfo.gender : "-"}
                             </h6>
                             <h6>
-                                냉장고:{" "}
+                                냉장고:
                                 {meatInfo.fridgeName
                                     ? meatInfo.fridgeName
                                     : "-"}
                             </h6>
                             <h6>층: {meatInfo.floor ? meatInfo.floor : "-"}</h6>
                             <h6>
-                                무게:{" "}
+                                무게(g):
                                 {meatInfo.beforeWeight
                                     ? meatInfo.beforeWeight
                                     : "-"}
@@ -86,13 +109,18 @@ export const AgingEditCard = (props: AgingCardType) => {
                         </Stack>
                         <Stack
                             style={{
-                                width: "30%",
+                                display: "flex",
                                 justifyContent: "space-around",
+                                alignItems: "right",
                             }}
                             gap={4}
                         >
                             <Button
-                                style={{ width: "100px", height: "80px" }}
+                                style={{
+                                    width: "70px",
+                                    height: "80px",
+                                    padding: 0,
+                                }}
                                 onClick={clickEvent}
                             >
                                 숙성정보
@@ -101,10 +129,16 @@ export const AgingEditCard = (props: AgingCardType) => {
                             </Button>
                             <Button
                                 disabled={checkNullAgingInfo(meatInfo)}
-                                style={{ width: "100px", height: "80px" }}
+                                style={{
+                                    width: "70px",
+                                    height: "80px",
+                                    padding: 0,
+                                }}
                                 onClick={() => startAgingEvent(meatInfo)}
                             >
-                                숙성 시작
+                                숙성
+                                <br />
+                                시작
                             </Button>
                         </Stack>
                     </div>

@@ -1,5 +1,7 @@
 import { XMLParser } from "fast-xml-parser"
 import { MeatInfoWithEntry } from "../types/meatTypes"
+import { collection } from "firebase/firestore"
+import { firestoreDB } from "../Firebase"
 
 export function printKorDate(date: Date) {
     const dateString = date.toLocaleDateString("ko-KR", {
@@ -40,6 +42,23 @@ export const parseToDate = (storedDate: string): Date => {
     return cDate
 }
 
+export function sortMeatInfoArray(array: MeatInfoWithEntry[]) {
+    return array.sort((a, b) => {
+        if (a.storedDate !== b.storedDate) {
+            return (
+                parseToDate(a.storedDate).getTime() -
+                parseToDate(b.storedDate).getTime()
+            )
+        } else {
+            if (a.meatNumber !== b.meatNumber) {
+                return Number(a.meatNumber) - Number(b.meatNumber)
+            } else {
+                return Number(a.entry) - Number(b.entry)
+            }
+        }
+    })
+}
+
 export const sortAgingItems = (
     array: MeatInfoWithEntry[]
 ): MeatInfoWithEntry[] => {
@@ -57,4 +76,7 @@ export const sortAgingItems = (
             }
         }
     })
+}
+export function getCollection(dbName: string) {
+    return collection(firestoreDB, dbName)
 }

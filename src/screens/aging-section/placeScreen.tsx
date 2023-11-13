@@ -1,10 +1,9 @@
-import { Button, FloatingLabel, Form, Modal, Stack } from "react-bootstrap"
+import { Button, Modal, Stack } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
-import { addPlace, deletePlace, getPlaces } from "../../apis/agingApi"
+import { addPlace, deletePlace, getPlaces } from "../../apis/placeApi"
 import { FirestorePlace } from "../../utils/types/otherTypes"
 import { AiFillSetting } from "react-icons/ai"
-import { TiDelete, TiDeleteOutline } from "react-icons/ti"
 import { CgAdd } from "react-icons/cg"
 import toast, { Toaster } from "react-hot-toast"
 import { PlaceCard } from "../../components/aging-section/placeCard"
@@ -44,6 +43,9 @@ export default function PlaceScreen() {
         setEditMode(!isEditMode)
     }
 
+    const onBackButtonClick = () => {
+        navigate("..")
+    }
     const onDeleteClick = (id: string) => {
         const ok = window.confirm("삭제합니다? 진짜?")
         if (ok) {
@@ -70,17 +72,46 @@ export default function PlaceScreen() {
             style={{
                 display: "flex",
                 flexDirection: "column",
-                paddingTop: "30px",
-                paddingBottom: "30px",
+                padding: "30px 20px",
                 backgroundColor: "#dde7a4",
                 justifyContent: "center",
+                alignItems: "center",
             }}
         >
             <Toaster />
-            <AiFillSetting
-                style={{ width: "30px", height: "30px" }}
-                onClick={onClickSetting}
-            />
+
+            <div
+                style={{
+                    display: "flex",
+                    alignContent: "top",
+                    width: "100%",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: "10px",
+                }}
+            >
+                <Button
+                    style={{ width: "60px", height: "40px" }}
+                    onClick={onBackButtonClick}
+                >
+                    뒤로
+                </Button>
+                <h2>숙성장소</h2>
+
+                <div
+                    style={{
+                        display: "flex",
+                        width: "60px",
+                        justifyContent: "right",
+                    }}
+                >
+                    <AiFillSetting
+                        style={{ width: "30px", height: "30px" }}
+                        onClick={onClickSetting}
+                    />
+                </div>
+            </div>
+
             <Stack
                 gap={3}
                 style={{

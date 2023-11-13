@@ -17,7 +17,7 @@ export default function CameraScreen() {
 
     const [failToGetMeatInfo, setFailedGetMeatInfo] = useState(false)
     const [wrongCut, setWrongCut] = useState(false)
-    const [loadingInfo, setLoadingInfo] = useState(false)
+    const [showLoading, setShowLoading] = useState(false)
     const [isButtonEnabled, setButtonEnable] = useState(false)
 
     const navigate = useNavigate()
@@ -26,7 +26,7 @@ export default function CameraScreen() {
     const parsed: MeatInfoWithCount[] = JSON.parse(initItems ? initItems : "[]")
     const [items, setItems] = useState<MeatInfoWithCount[]>(parsed)
     const species = session.getItem(sessionKeys.storageSpecies)
-    const [scanSpecies, setScanSpecie] = useState<string>(
+    const [scanSpecies, setScanSpecies] = useState<string>(
         species ? species : ""
     )
     const [grade, setGrade] = useState<string>()
@@ -43,7 +43,7 @@ export default function CameraScreen() {
         toast.success("스캔 성공")
         console.log("before: " + scanText)
         console.log("after " + decodedText)
-        //나가리 존
+
         if (decodedText === "") return
         if (
             decodedText.length !== 12 &&
@@ -79,8 +79,6 @@ export default function CameraScreen() {
     }
 
     const onAddButtonClick = () => {
-        console.log(wrongCut)
-        console.log(isButtonEnabled)
         setShow(!show)
         setLoadingState(0)
 
@@ -134,7 +132,7 @@ export default function CameraScreen() {
                 getForeignMeatInfo(
                     scanText,
                     setGrade,
-                    setScanSpecie,
+                    setScanSpecies,
                     setGender,
                     setOrigin,
                     setLoadingState,
@@ -145,7 +143,7 @@ export default function CameraScreen() {
                 getMeatInfo(
                     scanText,
                     setGrade,
-                    setScanSpecie,
+                    setScanSpecies,
                     setGender,
                     setOrigin,
                     setLoadingState,
@@ -165,24 +163,33 @@ export default function CameraScreen() {
         switch (loadingState) {
             //초기화
             case 0: {
-                setLoadingInfo(false)
+                setShowLoading(false)
                 setButtonEnable(false)
                 break
             }
             //로딩중
             case 1: {
-                setLoadingInfo(true)
+                setShowLoading(true)
                 setButtonEnable(false)
                 break
             }
             //추가가능
             case 2: {
-                setLoadingInfo(false)
+                setShowLoading(false)
                 setButtonEnable(!wrongCut)
                 break
             }
         }
-    }, [loadingState, wrongCut])
+    }, [loadingState])
+
+    useEffect(() => {
+        setScanText("initial")
+        setScanSpecies(species ? species : "")
+        setGrade("-")
+        setGender("-")
+        setWrongCut(false)
+        setLoadingState(0)
+    }, [items])
 
     useEffect(() => {
         setWrongCut(scanSpecies !== species)
@@ -261,7 +268,7 @@ export default function CameraScreen() {
                     disabled={!isButtonEnabled || wrongCut}
                     onClick={onAddButtonClick}
                 >
-                    {loadingInfo ? (
+                    {showLoading ? (
                         <Spinner
                             animation='border'
                             size='sm'

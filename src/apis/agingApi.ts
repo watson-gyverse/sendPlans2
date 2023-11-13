@@ -1,26 +1,17 @@
 import {
     addDoc,
-    collection,
     deleteDoc,
     doc,
     getDocs,
-    orderBy,
     query,
     where,
 } from "firebase/firestore"
 import { MeatInfoWithEntry } from "../utils/types/meatTypes"
 import { firestoreDB } from "../utils/Firebase"
 import { fbCollections } from "../utils/consts/constants"
-import { parseToDate } from "../utils/consts/functions"
-import { FirestorePlace } from "../utils/types/otherTypes"
-
+import { getCollection, sortMeatInfoArray } from "../utils/consts/functions"
 const dbStorage = getCollection(fbCollections.sp2Storage)
 const dbAging = getCollection(fbCollections.sp2Aging)
-const dbPlace = getCollection(fbCollections.sp2Places)
-
-function getCollection(dbName: string) {
-    return collection(firestoreDB, dbName)
-}
 
 export async function fetchFromFirestore(
     setStoredItems: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
@@ -33,7 +24,6 @@ export async function fetchFromFirestore(
     var sArray: MeatInfoWithEntry[] = []
     sResult.forEach((doc: any) => {
         let data: MeatInfoWithEntry = doc.data()
-        console.log(doc.id, "=>", doc.data())
         const item: MeatInfoWithEntry = {
             storedDate: data.storedDate,
             species: data.species,
@@ -53,14 +43,12 @@ export async function fetchFromFirestore(
             docId: doc.id,
         }
         sArray.push(item)
-        console.log(item)
     })
     const aQuery = query(dbAging, where("place", "==", place))
     const aResult = await getDocs(aQuery)
     var aArray: MeatInfoWithEntry[] = []
     aResult.forEach((doc: any) => {
         let data: MeatInfoWithEntry = doc.data()
-        console.log(doc.id, "=>", doc.data())
         const item: MeatInfoWithEntry = {
             storedDate: data.storedDate,
             species: data.species,
@@ -81,8 +69,8 @@ export async function fetchFromFirestore(
         }
         aArray.push(item)
     })
-    setStoredItems(sortArray(sArray))
-    setAgingItems(sortArray(aArray))
+    setStoredItems(sortMeatInfoArray(sArray))
+    setAgingItems(sortMeatInfoArray(aArray))
 }
 
 export async function passToAgingCollection(
@@ -111,76 +99,25 @@ export async function passToAgingCollection(
             console.error("않되")
         })
 
-    await deleteDoc(doc(firestoreDB, fbCollections.sp2Storage, item.docId!!))
+    deleteFromStorage(item.docId!!)
+}
+
+export async function deleteFromStorage(id: string, thenWhat: void) {
+    await deleteDoc(doc(firestoreDB, fbCollections.sp2Storage, id))
         .then(async () => {
             console.warn("삭제도함")
-            // thenWhat()
         })
         .catch(() => {
             console.error("삭제하는데 문제생김")
         })
 }
 
-export async function getPlaces(
-    setPlaces: React.Dispatch<React.SetStateAction<FirestorePlace[]>>
-) {
-    const result = await getDocs(dbPlace)
-    var places: FirestorePlace[] = []
-    result.forEach((doc: any) => {
-        let data: FirestorePlace = {
-            id: doc.id,
-            name: doc.data().name,
-            count: doc.data().count,
-        }
-        places.push(data)
-    })
-
-    setPlaces(places)
-}
-
-function sortArray(array: MeatInfoWithEntry[]) {
-    return array.sort((a, b) => {
-        if (a.storedDate !== b.storedDate) {
-            return (
-                parseToDate(a.storedDate).getTime() -
-                parseToDate(b.storedDate).getTime()
-            )
-        } else {
-            if (a.meatNumber !== b.meatNumber) {
-                return Number(a.meatNumber) - Number(b.meatNumber)
-            } else {
-                return Number(a.entry) - Number(b.entry)
-            }
-        }
-    })
-}
-
-export async function addPlace(
-    placeName: string,
-    count: string,
-    setPlaces: React.Dispatch<React.SetStateAction<FirestorePlace[]>>
-) {
-    await addDoc(dbPlace, {
-        name: placeName,
-        count: count,
-    })
+export async function deleteFromAgingFridge(id: string, thenWhat: void) {
+    await deleteDoc(doc(firestoreDB, fbCollections.sp2Aging, id))
         .then(() => {
-            console.log("추가완료")
-            getPlaces(setPlaces)
+            console.log("제거완")
         })
         .catch(() => {
-            console.error("추가실패")
+            console.error("제거실패")
         })
-}
-
-export async function deletePlace(
-    placeId: string,
-    setPlaces: React.Dispatch<React.SetStateAction<FirestorePlace[]>>
-) {
-    await deleteDoc(doc(firestoreDB, fbCollections.sp2Places, placeId))
-        .then(() => {
-            console.log("장소 삭제됨")
-            getPlaces(setPlaces)
-        })
-        .catch(() => console.error("장소 삭제실패"))
 }

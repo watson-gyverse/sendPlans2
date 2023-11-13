@@ -23,6 +23,13 @@ export function PlaceCard(info: PlaceCardType) {
                 justifyContent: "space-around",
             }}
         >
+            <Button
+                key={placeItem.name + placeItem.count}
+                style={buttonStyle}
+                onClick={() => onPlaceClick(placeItem)}
+            >
+                {placeItem.name}
+            </Button>
             <TiDeleteOutline
                 style={{
                     display: isEditMode ? "flex" : "none",
@@ -32,13 +39,6 @@ export function PlaceCard(info: PlaceCardType) {
                 }}
                 onClick={() => onDeleteClick(placeItem.id!!)}
             />
-            <Button
-                key={placeItem.name + placeItem.count}
-                style={buttonStyle}
-                onClick={() => onPlaceClick(placeItem)}
-            >
-                {placeItem.name}
-            </Button>
         </div>
     )
 }

@@ -109,7 +109,7 @@ function App() {
                         style={{
                             width: "100%",
                             height: "100%",
-                            // backgroundColor: "#6d9985",
+                            backgroundColor: "#6d9985",
                         }}
                     >
                         <Container

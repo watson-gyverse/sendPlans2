@@ -3,6 +3,7 @@ import { Col, Row, Stack } from "react-bootstrap"
 import { MeatInfoWithCount } from "../../utils/types/meatTypes"
 import { BsDashSquareFill, BsFillPlusSquareFill } from "react-icons/bs"
 import _ from "lodash"
+import { TiDeleteOutline } from "react-icons/ti"
 
 type ScannedItemsAndCount = {
     // items: Map<string, MeatInfoWithCount>
@@ -51,8 +52,26 @@ const MeatCartItem = (props: CartItem) => {
             ])
         }
     }
+
+    const onClickDelete = () => {
+        const ok = window.confirm("장바구니에서 삭제합니다?")
+
+        if (ok) {
+            modifyItems((prev) => [
+                ...prev.filter((it) => it.meatNumber != meatNumber),
+            ])
+        }
+    }
     return (
         <div>
+            <TiDeleteOutline
+                style={{
+                    width: "30px",
+                    height: "30px",
+                    color: "#f74f32",
+                }}
+                onClick={onClickDelete}
+            />
             <ScanResultBox
                 meatNumber={meatNumber ? meatNumber : "null"}
                 species={meatInfo.species}
