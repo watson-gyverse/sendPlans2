@@ -29,12 +29,8 @@ function EditModal(props: ModalParams) {
         register,
         formState: { errors },
         watch,
-        reset,
         handleSubmit,
-        getValues,
-        setError,
         setFocus,
-        control,
     } = useForm<FormOptions>({
         mode: "onSubmit",
         defaultValues: {
@@ -56,11 +52,6 @@ function EditModal(props: ModalParams) {
             grade: data.grade,
             origin: data.origin,
         }
-        // meatInfo.price = data.price.toString()
-        // meatInfo.freeze = data.freeze
-        // meatInfo.gender = data.gender
-        // meatInfo.grade = data.grade
-        // meatInfo.origin = data.origin
         setMeatInfo(newInfo)
         setClose()
     }

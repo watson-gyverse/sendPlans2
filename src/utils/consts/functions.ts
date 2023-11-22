@@ -80,3 +80,9 @@ export const sortAgingItems = (
 export function getCollection(dbName: string) {
     return collection(firestoreDB, dbName)
 }
+
+export function makeStepArray(length: number): number[] {
+    return Array.from({ length: length }, (_, i) => {
+        return i + 1
+    }).sort()
+}

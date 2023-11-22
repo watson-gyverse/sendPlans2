@@ -12,6 +12,7 @@ type AgingFormOptions = {
     floor: number
     beforeWeight: number
     agingDate: string
+    ultraTime: number
 }
 
 type AgingModalParams = {
@@ -39,6 +40,7 @@ function AgingModal(props: AgingModalParams) {
             fridgeName: "",
             floor: undefined,
             beforeWeight: undefined,
+            ultraTime: 0,
         },
     })
     const onSubmit = (data: AgingFormOptions) => {
@@ -53,6 +55,7 @@ function AgingModal(props: AgingModalParams) {
             agingDate:
                 moment(date).format("YYYY-MM-DD ") +
                 time.toString().padStart(2, "0"),
+            ultraTime: data.ultraTime,
         }
         setMeatInfo(newInfo)
         setClose()
@@ -91,7 +94,10 @@ function AgingModal(props: AgingModalParams) {
                 </Col>
             </Row>
 
-            <Form.Group className='mb-3'>
+            <Form.Group
+                className='mb-3'
+                style={{ marginTop: "10px" }}
+            >
                 <FloatingLabel label='무게(g)'>
                     <Form.Control
                         type='number'
@@ -161,7 +167,25 @@ function AgingModal(props: AgingModalParams) {
                         <h6 style={{ color: "red" }}>※층을 입력해주세요</h6>
                     )}
             </Form.Group>
-
+            <Form.Group style={{ marginTop: "10px" }}>
+                <Form.Label style={{ marginRight: "12px" }}>
+                    초음파 가동 시간:
+                </Form.Label>
+                {Array.from({ length: 6 }, (_, i) => {
+                    let a = i
+                    return (
+                        <Form.Check
+                            inline
+                            type='radio'
+                            label={a}
+                            {...register("ultraTime", {})}
+                            value={a}
+                            name='ultraTime'
+                            id={"ultraTime" + a}
+                        />
+                    )
+                })}
+            </Form.Group>
             <Button
                 variant='primary'
                 type='submit'

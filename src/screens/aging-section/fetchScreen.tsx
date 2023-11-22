@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react"
-import { Button, ButtonGroup, Col, Modal, Row, Stack } from "react-bootstrap"
+import { useCallback, useEffect, useState } from "react"
+import { Button, Col, Modal, Stack, Tab, Tabs } from "react-bootstrap"
 import {
     deleteFromAgingFridge,
     deleteFromStorage,
@@ -14,6 +14,8 @@ import { sortAgingItems } from "../../utils/consts/functions"
 import { useLocation, useNavigate } from "react-router-dom"
 import { AgingFinishCard } from "../../components/aging-section/agingFinishCard"
 import { AiFillSetting } from "react-icons/ai"
+import FinishAgingModal from "../../components/aging-section/agingFinishModal"
+import _ from "lodash"
 
 export const FetchScreen = () => {
     const navigate = useNavigate()
@@ -22,14 +24,18 @@ export const FetchScreen = () => {
     const placeCount = location.state.placeCount
 
     const [isEditMode, setIsEditMode] = useState(false)
-    const [isStorageTap, setTap] = useState(true)
     const [storedItems, setStoredItems] = useState<MeatInfoWithEntry[]>([])
     const [agingItems, setAgingItems] = useState<MeatInfoWithEntry[]>([])
     const [editModalShow, setEditModalShow] = useState(false)
     const [finishModalShow, setFinishModalShow] = useState(false)
     const [recentMeatInfo, setRecentMeatInfo] = useState<MeatInfoWithEntry>()
 
+    const [checkedSList, setCheckedSList] = useState<Set<string>>(new Set())
+    const [checkedAList, setCheckedAList] = useState<Set<string>>(new Set())
+    const [whichTab, setWhichTab] = useState(true)
+
     function fetch() {
+        console.log("request fetch 했습니다요")
         fetchFromFirestore(
             setStoredItems,
             setAgingItems,
@@ -43,18 +49,38 @@ export const FetchScreen = () => {
         )
     }
 
+    //체크된 애들 중 숙성정보 입력을 다 안한 애들이 있는지 검증
+
+    const checkNullCheckedS = () => {
+        if (checkedSList.size === 0) {
+            return false
+        }
+        let a = true
+        checkedSList.forEach((item) => {
+            let it = _.find(storedItems, { docId: item })
+            if (it !== undefined) {
+                console.log(it)
+                if (
+                    it.agingDate === null ||
+                    it.beforeWeight === null ||
+                    it.fridgeName === null ||
+                    it.floor === null
+                ) {
+                    console.log("비활성화함?")
+                    a = false
+                } else {
+                    console.log("비활성화안함?")
+                }
+            }
+        })
+        return a
+    }
+
     useEffect(() => {
         fetch()
     }, [])
-
-    useEffect(() => {
-        console.log(storedItems)
-    }, [storedItems])
-
     useEffect(() => {
         if (recentMeatInfo === undefined) return
-        console.log("++meatinfo changed++")
-        console.log(recentMeatInfo)
         let tempList = [...storedItems].filter((item) => {
             if (
                 item.meatNumber !== recentMeatInfo.meatNumber ||
@@ -65,20 +91,25 @@ export const FetchScreen = () => {
             }
         })
         tempList.push(recentMeatInfo)
-        console.log("pushed")
-        console.log(storedItems)
-        console.log(tempList)
         const sorted = [...sortAgingItems(tempList)]
         setStoredItems(sorted)
     }, [recentMeatInfo])
 
+    useEffect(() => {
+        checkedSList.clear()
+    }, [storedItems])
     const onClickBack = () => {
         navigate("../")
     }
 
+    const onTabChanged = (key: string | null) => {
+        if (key === "storage") setWhichTab(true)
+        else setWhichTab(false)
+    }
+
     const onClickStartAging = async (item: MeatInfoWithEntry) => {
         const ok = window.confirm(
-            "이대로 숙성을 진행하시겠습니까? 취소할 수 없습니다"
+            "이대로 숙성을 진행하시겠습니까? 취소할 수 없습니다."
         )
         if (ok) {
             await passToAgingCollection(item)
@@ -88,6 +119,7 @@ export const FetchScreen = () => {
                 placeName,
                 () => {
                     console.log("fetch !@")
+                    fetch()
                 },
                 () => {
                     console.log("error !@")
@@ -96,11 +128,36 @@ export const FetchScreen = () => {
         }
     }
 
-    const onClickFinishAging = async (item: MeatInfoWithEntry) => {
-        toast("숙 성 종 료 하 려 고 ")
-        setFinishModalShow(true)
-    }
+    const onClickStartAgingSelected = useCallback(async () => {
+        const ok = window.confirm("선택한 아이템을 모두 숙성시작시킵니다.")
+        if (ok) {
+            checkedSList.forEach(async (item) => {
+                const a = _.find(storedItems, { docId: item })
+                await passToAgingCollection(a!!)
+                await fetchFromFirestore(
+                    setStoredItems,
+                    setAgingItems,
+                    placeName,
+                    () => {
+                        toast.success("숙성시작 ")
+                        console.log("fetch !@")
+                        fetch()
+                        checkedSList.clear()
+                    },
+                    () => {
+                        console.log("error !@")
+                    }
+                )
+            })
+        }
+    }, [checkedSList])
 
+    const onClickFinishAging = async (item: MeatInfoWithEntry) => {
+        const ok = window.confirm("숙성종료합니다?")
+        if (ok) {
+            setFinishModalShow(false)
+        }
+    }
     const onClickEditModeButton = () => {
         setIsEditMode(!isEditMode)
     }
@@ -110,7 +167,6 @@ export const FetchScreen = () => {
             "입고 중인 아이템입니다. 정말 삭제하시겠습니까?"
         )
         if (ok) {
-            toast.error("할까말까")
             deleteFromStorage(item.docId!!, fetch())
         }
     }
@@ -119,59 +175,147 @@ export const FetchScreen = () => {
             "숙성 중인 아이템입니다. 정말 삭제하시겠습니까?"
         )
         if (ok) {
-            toast.error("할까말까")
             deleteFromAgingFridge(item.docId!!, fetch())
         }
     }
+
+    const onCheckAll = useCallback(
+        (checked: boolean) => {
+            if (checked) {
+                const list: Set<string> = new Set()
+
+                if (whichTab) {
+                    storedItems.forEach((item: MeatInfoWithEntry) =>
+                        list.add(item.docId!!)
+                    )
+                    setCheckedSList(list)
+                } else {
+                    agingItems.forEach((item: MeatInfoWithEntry) =>
+                        list.add(item.docId!!)
+                    )
+                    setCheckedAList(list)
+                }
+            } else {
+                whichTab
+                    ? setCheckedSList(new Set())
+                    : setCheckedAList(new Set())
+            }
+        },
+        [whichTab ? storedItems : agingItems]
+    )
+
+    const onCheckElement = (checked: boolean, item: string) => {
+        if (checked) {
+            if (whichTab) {
+                setCheckedSList(new Set([...checkedSList, item]))
+            } else {
+                setCheckedAList(new Set([...checkedAList, item]))
+            }
+        } else {
+            if (whichTab) {
+                const newSSet = new Set(checkedSList)
+                newSSet.delete(item)
+                setCheckedSList(newSSet)
+            } else {
+                const newSet = new Set(checkedAList)
+                newSet.delete(item)
+                setCheckedAList(newSet)
+            }
+        }
+    }
+
     return (
         <div>
             <Toaster />
-            <Col>
-                <Row>
-                    <div>
-                        <Button onClick={onClickBack}>뒤로</Button>
-                        <h2
+            <div style={{ display: "flex", marginBottom: "12px" }}>
+                <Button onClick={onClickBack}>뒤로</Button>
+                <h2
+                    style={{
+                        border: "2px solid #0d1b09",
+                        borderRadius: "4px",
+                        marginLeft: "12px",
+                        marginBottom: "0px",
+                        color: "white",
+                        backgroundColor: "#144b1a",
+                    }}
+                >
+                    {placeName}
+                </h2>
+            </div>
+            <Tabs onSelect={(key) => onTabChanged(key)}>
+                <Tab
+                    eventKey='storage'
+                    title='입고중'
+                >
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "right",
+                        }}
+                    >
+                        <Col xs='auto'>
+                            <AiFillSetting
+                                style={{
+                                    width: "30px",
+                                    height: "30px",
+                                }}
+                                onClick={onClickEditModeButton}
+                            />
+                        </Col>
+                    </div>
+                    <Stack gap={2}>
+                        <div
                             style={{
-                                width: "auto",
-                                border: "2px solid #1f68f0",
-                                borderRadius: "4px",
-                                marginLeft: "12px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-around",
+                                marginTop: "10px",
                             }}
                         >
-                            {placeName}
-                        </h2>
-                    </div>
-
-                    <ButtonGroup>
-                        <Button onClick={() => setTap(true)}>입고됨</Button>
-                        <Button onClick={() => setTap(false)}>숙성중</Button>
-                    </ButtonGroup>
-                </Row>
-
-                <Row style={{ marginTop: "20px" }}>
-                    <div>
-                        <Row>
-                            <Col style={{ marginLeft: "10px" }}>
-                                {isStorageTap ? (
-                                    <h3>입고된 고기 목록</h3>
-                                ) : (
-                                    <h3>숙성 중인 고기 목록</h3>
-                                )}
-                            </Col>
-                            <Col xs='auto'>
-                                <AiFillSetting
-                                    style={{
-                                        width: "30px",
-                                        height: "30px",
-                                    }}
-                                    onClick={onClickEditModeButton}
+                            <div>
+                                <input
+                                    type='checkbox'
+                                    id='selectSAll'
+                                    onChange={(e) =>
+                                        onCheckAll(e.target.checked)
+                                    }
+                                    checked={
+                                        checkedSList.size === storedItems.length
+                                    }
                                 />
-                            </Col>
-                        </Row>
-                        {isStorageTap ? (
-                            <Stack gap={2}>
-                                {storedItems.map((item) => {
-                                    return (
+                                <label
+                                    style={{ marginLeft: "6px" }}
+                                    htmlFor='selectSAll'
+                                >
+                                    전체 선택
+                                </label>
+                            </div>
+
+                            <Button
+                                onClick={onClickStartAgingSelected}
+                                disabled={!checkNullCheckedS()}
+                                style={{ marginLeft: "20px", height: "3rem" }}
+                            >
+                                선택한 고기 숙성하기
+                            </Button>
+                        </div>
+                        {storedItems.map((item) => {
+                            return (
+                                <div>
+                                    <input
+                                        style={{ marginTop: "20px" }}
+                                        type='checkbox'
+                                        id={"Scheckbox" + item.docId}
+                                        onChange={(e) =>
+                                            onCheckElement(
+                                                e.target.checked,
+                                                item.docId!!
+                                            )
+                                        }
+                                        checked={checkedSList.has(item.docId!!)}
+                                    />
+                                    <label htmlFor={"Scheckbox" + item.docId}>
                                         <AgingEditCard
                                             key={item.docId}
                                             meatInfo={item}
@@ -187,13 +331,93 @@ export const FetchScreen = () => {
                                                 onClickStartAging(it)
                                             }}
                                         />
-                                    )
-                                })}
-                            </Stack>
-                        ) : (
-                            <Stack gap={2}>
-                                {agingItems.map((item) => {
-                                    return (
+                                    </label>
+                                </div>
+                            )
+                        })}
+                    </Stack>
+                </Tab>
+                <Tab
+                    eventKey='Aging'
+                    title='숙성중'
+                    onSelect={() => setWhichTab(false)}
+                >
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "right",
+                        }}
+                    >
+                        <Col xs='auto'>
+                            <AiFillSetting
+                                style={{
+                                    width: "30px",
+                                    height: "30px",
+                                }}
+                                onClick={onClickEditModeButton}
+                            />
+                        </Col>
+                    </div>
+                    <Stack gap={2}>
+                        <div
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-around",
+                                marginTop: "10px",
+                            }}
+                        >
+                            {/* <div>
+                                <input
+                                    type='checkbox'
+                                    id='selectAll'
+                                    onChange={(e) =>
+                                        onCheckAll(e.target.checked)
+                                    }
+                                    checked={
+                                        checkedAList.size === agingItems.length
+                                    }
+                                />
+                                <label
+                                    style={{ marginLeft: "6px" }}
+                                    htmlFor='selectAll'
+                                >
+                                    전체 선택
+                                </label>
+                            </div>
+
+                            <Button
+                                style={{ marginLeft: "20px", height: "3rem" }}
+                            >
+                                선택한 숙성 종료하기
+                            </Button> */}
+                        </div>
+
+                        {agingItems.map((item) => {
+                            return (
+                                <div>
+                                    {/* <input
+                                        style={{ marginTop: "20px" }}
+                                        type='checkbox'
+                                        id={"checkbox" + item.docId}
+                                        onChange={(e) =>
+                                            onCheckElement(
+                                                e.target.checked,
+                                                item.docId!!
+                                            )
+                                        }
+                                        checked={checkedAList.has(item.docId!!)}
+                                    />
+                                    <label
+                                        style={{ width: "200px" }}
+                                        htmlFor={"checkbox" + item.docId}
+                                    > */}
+                                    <div
+                                        style={{
+                                            width: "100%",
+                                        }}
+                                    >
                                         <AgingFinishCard
                                             key={item.docId}
                                             meatInfo={item}
@@ -205,17 +429,16 @@ export const FetchScreen = () => {
                                             onClickDelete={() =>
                                                 onClickAgingDeleteButton(item)
                                             }
-                                            finishAgingEvent={(it) => {
-                                                onClickFinishAging(it)
-                                            }}
                                         />
-                                    )
-                                })}
-                            </Stack>
-                        )}
-                    </div>
-                </Row>
-            </Col>
+                                    </div>
+                                    {/* </label> */}
+                                </div>
+                            )
+                        })}
+                    </Stack>
+                </Tab>
+            </Tabs>
+
             <Modal
                 show={editModalShow}
                 onHide={() => setEditModalShow(false)}
@@ -246,12 +469,11 @@ export const FetchScreen = () => {
                 </Modal.Header>
                 <Modal.Body>
                     {recentMeatInfo !== undefined ? (
-                        <AgingModal
+                        <FinishAgingModal
                             meatInfo={recentMeatInfo}
-                            placeName={placeName}
-                            placeCount={placeCount}
-                            setMeatInfo={setRecentMeatInfo}
-                            setClose={() => setEditModalShow(false)}
+                            finishAgingEvent={() => {
+                                onClickFinishAging(recentMeatInfo)
+                            }}
                         />
                     ) : (
                         <></>

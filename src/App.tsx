@@ -16,6 +16,7 @@ import EditScreen from "./screens/storage-section/editScreen"
 import { AgingMiddleWare, StorageMiddleWare } from "./utils/toLobbyMiddleware"
 import PlaceScreen from "./screens/aging-section/placeScreen"
 import { FetchScreen } from "./screens/aging-section/fetchScreen"
+import RecordScreen from "./screens/record-section/recordScreen"
 
 const router = createBrowserRouter([
     {
@@ -81,6 +82,10 @@ const router = createBrowserRouter([
                     },
                 ],
             },
+            {
+                path: "record",
+                element: <RecordScreen />,
+            },
         ],
     },
 ])
@@ -109,7 +114,6 @@ function App() {
                         style={{
                             width: "100%",
                             height: "100%",
-                            backgroundColor: "#6d9985",
                         }}
                     >
                         <Container
@@ -117,6 +121,7 @@ function App() {
                                 width: "380px",
                                 height: "auto",
                                 padding: "24px 20px 30px 20px",
+                                backgroundColor: "#6d9985",
                             }}
                         >
                             <RouterProvider

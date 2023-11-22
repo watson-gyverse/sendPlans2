@@ -8,17 +8,10 @@ type AgingCardType = {
     isEditMode: boolean
     clickEvent: () => void
     onClickDelete: (meatInfo: MeatInfoWithEntry) => void
-    finishAgingEvent: (meatInfo: MeatInfoWithEntry) => void
 }
 
 export const AgingFinishCard = (props: AgingCardType) => {
-    const {
-        meatInfo,
-        isEditMode,
-        clickEvent,
-        onClickDelete,
-        finishAgingEvent,
-    } = props
+    const { meatInfo, isEditMode, clickEvent, onClickDelete } = props
 
     return (
         <div>
@@ -26,9 +19,10 @@ export const AgingFinishCard = (props: AgingCardType) => {
                 <div
                     style={{
                         backgroundColor: "#b3d7ef",
+                        width: "320px",
                         padding: "10px",
                         alignItems: "center",
-                        justifyContent: "center",
+                        justifyContent: "space-between",
                         border: "1px solid #234234",
                         borderRadius: "5px",
                     }}
@@ -64,8 +58,8 @@ export const AgingFinishCard = (props: AgingCardType) => {
                         }}
                     >
                         <Stack
-                            style={{ width: "35%" }}
-                            gap={1}
+                            style={{ width: "40%" }}
+                            gap={2}
                         >
                             <h6>입고일:</h6>
                             <h6>{meatInfo.storedDate}</h6>
@@ -115,37 +109,28 @@ export const AgingFinishCard = (props: AgingCardType) => {
                                     ? meatInfo.beforeWeight
                                     : "-"}
                             </h6>
+                            <h6>초음파: {meatInfo.ultraTime}</h6>
                         </Stack>
-                        <Stack
+                        <div
                             style={{
                                 display: "flex",
-                                justifyContent: "space-around",
-                                alignItems: "right",
+                                justifyContent: "center",
                             }}
-                            gap={4}
                         >
-                            {/* <Button
-                                style={{ width: "100px", height: "80px" }}
-                                onClick={clickEvent}
-                            >
-                                숙성정보
-                                <br />
-                                입력
-                            </Button> */}
                             <Button
                                 disabled={checkNullAgingInfo(meatInfo)}
                                 style={{
-                                    width: "70px",
+                                    width: "60px",
                                     height: "80px",
                                     padding: 0,
                                 }}
-                                onClick={() => finishAgingEvent(meatInfo)}
+                                onClick={clickEvent}
                             >
-                                숙성
+                                결과
                                 <br />
-                                종료
+                                입력
                             </Button>
-                        </Stack>
+                        </div>
                     </div>
                 </div>
             )}

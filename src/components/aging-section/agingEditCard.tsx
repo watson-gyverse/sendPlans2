@@ -20,6 +20,7 @@ export const AgingEditCard = (props: AgingCardType) => {
                 <div
                     style={{
                         backgroundColor: "#b3d7ef",
+                        width: "320px",
                         padding: "10px",
                         alignItems: "center",
                         justifyContent: "center",
@@ -59,7 +60,7 @@ export const AgingEditCard = (props: AgingCardType) => {
                     >
                         <Stack
                             style={{ width: "35%" }}
-                            gap={1}
+                            gap={2}
                         >
                             <h6>입고일:</h6>
                             <h6>{meatInfo.storedDate}</h6>
@@ -106,6 +107,11 @@ export const AgingEditCard = (props: AgingCardType) => {
                                     ? meatInfo.beforeWeight
                                     : "-"}
                             </h6>
+                            {meatInfo.ultraTime ? (
+                                <h6>초음파: {meatInfo.ultraTime}</h6>
+                            ) : (
+                                <></>
+                            )}
                         </Stack>
                         <Stack
                             style={{
@@ -118,7 +124,7 @@ export const AgingEditCard = (props: AgingCardType) => {
                             <Button
                                 style={{
                                     width: "70px",
-                                    height: "80px",
+                                    height: "70px",
                                     padding: 0,
                                 }}
                                 onClick={clickEvent}
@@ -131,7 +137,7 @@ export const AgingEditCard = (props: AgingCardType) => {
                                 disabled={checkNullAgingInfo(meatInfo)}
                                 style={{
                                     width: "70px",
-                                    height: "80px",
+                                    height: "70px",
                                     padding: 0,
                                 }}
                                 onClick={() => startAgingEvent(meatInfo)}

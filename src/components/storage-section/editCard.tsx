@@ -1,6 +1,5 @@
 import { Button, Stack } from "react-bootstrap"
-import toast from "react-hot-toast"
-import { MeatInfo, MeatInfoWithCount } from "../../utils/types/meatTypes"
+import { MeatInfoWithCount } from "../../utils/types/meatTypes"
 
 type EditCardType = {
     meatInfo: MeatInfoWithCount
@@ -33,7 +32,7 @@ export const EditCard = (props: EditCardType) => {
                         }}
                     >
                         <Stack
-                            style={{ width: "30%" }}
+                            style={{ width: "35%" }}
                             gap={1}
                         >
                             <h6>입고일:</h6>

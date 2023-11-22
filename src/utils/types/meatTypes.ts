@@ -30,6 +30,15 @@ export type MeatInfoWithEntry = MeatInfo & {
     beforeWeight: number | null
     agingDate: string | null
     docId: string | null
+    ultraTime: number | null
+}
+
+//all in one
+export type MeatInfoAiO = MeatInfoWithEntry & {
+    finishDate: string
+    afterWeight: number
+    cutWeight: number
+    docId: string | null
 }
 
 // export type CSVType = {

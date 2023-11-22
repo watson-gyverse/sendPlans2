@@ -13,7 +13,7 @@ export function PlaceCard(info: PlaceCardType) {
     const { placeItem, isEditMode, onDeleteClick, onPlaceClick } = info
     const buttonStyle = {
         height: "4rem",
-        width: "260px",
+        width: "300px",
     }
     return (
         <div

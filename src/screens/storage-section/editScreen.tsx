@@ -16,18 +16,27 @@ export default function EditScreen() {
     const [items, setItems] = useState<MeatInfoWithCount[]>(
         JSON.parse(initItems ? initItems : "[]")
     )
+    //true : disable
+    const [disableButton, setButtonDisabled] = useState(true)
 
     const [recentMeatInfo, setRecentMeatInfo] = useState<
         MeatInfoWithCount | undefined
     >()
-    let [xlsxData, setXlsxData] = useState<XlsxType[]>([])
+    const [xlsxData, setXlsxData] = useState<XlsxType[]>([])
 
     const navigate = useNavigate()
 
     useEffect(() => {
         console.log("**init use effect**")
         console.log(items)
+        console.log(xlsxData)
+        console.log(dataNullChecker)
+        setButtonDisabled(dataNullChecker)
     }, [])
+    useEffect(() => {
+        console.log(dataNullChecker)
+        setButtonDisabled(dataNullChecker)
+    }, items)
 
     useEffect(() => {
         if (recentMeatInfo === undefined) {
@@ -95,12 +104,10 @@ export default function EditScreen() {
         })
     }
 
-    const dataNullChecker = xlsxData.some((item) => {
-        for (let key of Object.keys(item)) {
-            if (item[key] === null) return true
-        }
-        return false
-    })
+    //빈 게 있으면 null
+    const dataNullChecker = items.some((item) =>
+        Object.values(item).includes(null)
+    )
     return (
         <div>
             <Toaster />
@@ -131,27 +138,33 @@ export default function EditScreen() {
                     style={{
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "space-between",
+                        justifyContent: "space-evenly",
                     }}
                 >
                     <Button
-                        disabled={dataNullChecker}
+                        disabled={disableButton}
                         onClick={writeXlsx}
                     >
-                        엑셀로 추출하기
+                        엑셀로
+                        <br />
+                        추출하기
                     </Button>
                     <Button
-                        disabled={dataNullChecker}
+                        disabled={disableButton}
                         onClick={addDocumentToFirestore}
                     >
-                        DB에 저장하고 돌아가기
+                        DB에 저장하고
+                        <br />
+                        돌아가기
                     </Button>
                 </div>
             </Stack>
 
             <Modal
                 show={show}
-                onHide={() => setShow(false)}
+                onHide={() => {
+                    setShow(false)
+                }}
             >
                 <Modal.Header closeButton>
                     <Modal.Title>고기 정보 입력/수정</Modal.Title>

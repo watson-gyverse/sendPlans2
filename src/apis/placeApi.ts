@@ -1,4 +1,10 @@
-import { addDoc, deleteDoc, doc, getDocs } from "firebase/firestore"
+import {
+    DocumentData,
+    addDoc,
+    deleteDoc,
+    doc,
+    getDocs,
+} from "firebase/firestore"
 import { FirestorePlace } from "../utils/types/otherTypes"
 import { firestoreDB } from "../utils/Firebase"
 import { fbCollections } from "../utils/consts/constants"
@@ -10,7 +16,7 @@ export async function getPlaces(
 ) {
     const result = await getDocs(dbPlace)
     var places: FirestorePlace[] = []
-    result.forEach((doc: any) => {
+    result.forEach((doc: DocumentData) => {
         let data: FirestorePlace = {
             id: doc.id,
             name: doc.data().name,

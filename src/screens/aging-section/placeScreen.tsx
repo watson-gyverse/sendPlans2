@@ -70,10 +70,10 @@ export default function PlaceScreen() {
     return (
         <div
             style={{
+                width: "100%",
                 display: "flex",
                 flexDirection: "column",
                 padding: "30px 20px",
-                backgroundColor: "#dde7a4",
                 justifyContent: "center",
                 alignItems: "center",
             }}
@@ -87,6 +87,7 @@ export default function PlaceScreen() {
                     width: "100%",
                     alignItems: "center",
                     justifyContent: "space-between",
+                    // margin: "0 12px 10px 12px",
                     marginBottom: "10px",
                 }}
             >
@@ -130,7 +131,7 @@ export default function PlaceScreen() {
                     <Button
                         onClick={onAddButtonClick}
                         style={
-                            { height: "4rem", width: "260px" }
+                            { height: "4rem", width: "290px" }
                             // borderRadius: "20px",
                             // border: "1px solid black",
                         }

@@ -6,12 +6,13 @@ import {
     query,
     where,
 } from "firebase/firestore"
-import { MeatInfoWithEntry } from "../utils/types/meatTypes"
+import { MeatInfoAiO, MeatInfoWithEntry } from "../utils/types/meatTypes"
 import { firestoreDB } from "../utils/Firebase"
 import { fbCollections } from "../utils/consts/constants"
 import { getCollection, sortMeatInfoArray } from "../utils/consts/functions"
 const dbStorage = getCollection(fbCollections.sp2Storage)
 const dbAging = getCollection(fbCollections.sp2Aging)
+const dbRecord = getCollection(fbCollections.sp2Record)
 
 export async function fetchFromFirestore(
     setStoredItems: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
@@ -20,6 +21,7 @@ export async function fetchFromFirestore(
     thenWhat: () => void,
     catchWhat: () => void
 ) {
+    //storage
     const sResult = await getDocs(dbStorage)
     var sArray: MeatInfoWithEntry[] = []
     sResult.forEach((doc: any) => {
@@ -41,9 +43,11 @@ export async function fetchFromFirestore(
             beforeWeight: null,
             agingDate: null,
             docId: doc.id,
+            ultraTime: null,
         }
         sArray.push(item)
     })
+    //aging
     const aQuery = query(dbAging, where("place", "==", place))
     const aResult = await getDocs(aQuery)
     var aArray: MeatInfoWithEntry[] = []
@@ -66,6 +70,7 @@ export async function fetchFromFirestore(
             beforeWeight: data.beforeWeight,
             agingDate: data.agingDate,
             docId: doc.id,
+            ultraTime: data.ultraTime,
         }
         aArray.push(item)
     })
@@ -93,8 +98,9 @@ export async function passToAgingCollection(
         beforeWeight: item.beforeWeight,
         agingDate: item.agingDate,
         place: item.place,
+        ultraTime: item.ultraTime,
     })
-        .then(() => console.warn("오예"))
+        .then(() => console.warn("aging으로 넘김"))
         .catch(() => {
             console.error("않되")
         })
@@ -105,19 +111,43 @@ export async function passToAgingCollection(
 export async function deleteFromStorage(id: string, thenWhat: void) {
     await deleteDoc(doc(firestoreDB, fbCollections.sp2Storage, id))
         .then(async () => {
-            console.warn("삭제도함")
+            console.warn("storage에서 삭제 함")
         })
         .catch(() => {
-            console.error("삭제하는데 문제생김")
+            console.error("storage에서 삭제하는데 문제생김")
         })
 }
 
 export async function deleteFromAgingFridge(id: string, thenWhat: void) {
     await deleteDoc(doc(firestoreDB, fbCollections.sp2Aging, id))
         .then(() => {
-            console.log("제거완")
+            console.log("aging에서 제거완")
         })
         .catch(() => {
-            console.error("제거실패")
+            console.error("aging에서 제거실패")
         })
+}
+
+export async function finishAging(item: MeatInfoAiO, thenWhat: void) {
+    await addDoc(dbRecord, {
+        storedDate: item.storedDate,
+        species: item.species,
+        cut: item.cut,
+        meatNumber: item.meatNumber,
+        origin: item.origin,
+        gender: item.gender,
+        grade: item.grade,
+        freeze: item.freeze,
+        price: item.price,
+        entry: item.entry,
+        fridgeName: item.fridgeName,
+        floor: item.floor,
+        beforeWeight: item.beforeWeight,
+        agingDate: item.agingDate,
+        place: item.place,
+        ultraTime: item.ultraTime,
+        finishDate: item.finishDate,
+        afterWeight: item.afterWeight,
+        cutWeight: item.cutWeight,
+    }).then(() => deleteFromAgingFridge(item.docId!!).then(() => thenWhat))
 }

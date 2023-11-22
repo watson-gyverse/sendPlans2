@@ -1,10 +1,5 @@
 import { Button, Stack } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
-import {
-    CurrentMeatLineContext,
-    TotalMeatLineContext,
-} from "../contexts/meatLineContext"
-import { useContext, useEffect, useState } from "react"
 import toast, { Toaster } from "react-hot-toast"
 
 export default function MainScreen() {
@@ -14,33 +9,15 @@ export default function MainScreen() {
         navigate("/storage/preset")
     }
     const naviToAgingScreen = () => {
-        toast("숙성반드시해야지")
-        // toast.remove()
+        toast.remove()
         navigate("/aging/")
     }
     const naviToHistoryScreen = () => {
         // toast.remove()
-        toast("입고/숙성기록")
+        toast("입고/숙성기록\n업데이트 예정")
 
-        // navigate("/storage/preset")
+        navigate("/record")
     }
-
-    const { totalContext, setTotalContext } = useContext(TotalMeatLineContext)
-    const { currentContext, setCurrentContext } = useContext(
-        CurrentMeatLineContext
-    )
-
-    useEffect(() => {
-        console.log(totalContext)
-        console.log(currentContext)
-    }, [])
-
-    useEffect(() => {
-        console.log(totalContext)
-    }, [totalContext])
-    useEffect(() => {
-        console.log(currentContext)
-    }, [currentContext])
 
     const samples = (
         <Stack>
@@ -72,7 +49,8 @@ export default function MainScreen() {
         <div>
             <Toaster />
             <Stack gap={3}>
-                <h1>SendPlans</h1>
+                <h1>미트가이버</h1>
+                <h2>입고/숙성 관리</h2>
                 <Button
                     variant='primary'
                     onClick={naviToDateScreen}
