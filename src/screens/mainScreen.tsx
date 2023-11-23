@@ -1,7 +1,8 @@
 import { Button, Stack } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
 import toast, { Toaster } from "react-hot-toast"
-
+import { GiCardboardBoxClosed, GiTemporaryShield } from "react-icons/gi"
+import { RiTimer2Line, RiHistoryFill } from "react-icons/ri"
 export default function MainScreen() {
     const navigate = useNavigate()
     const naviToDateScreen = () => {
@@ -49,26 +50,52 @@ export default function MainScreen() {
         <div>
             <Toaster />
             <Stack gap={3}>
-                <h1>미트가이버</h1>
-                <h2>입고/숙성 관리</h2>
-                <Button
-                    variant='primary'
-                    onClick={naviToDateScreen}
+                <b style={{ fontSize: "3rem" }}>미트가이버</b>
+                <p style={{ fontSize: "2.2rem" }}>입고/숙성 관리</p>
+                <div
+                    style={{ display: "flex", justifyContent: "space-evenly" }}
                 >
-                    입고하기
-                </Button>
-                <Button
-                    variant='danger'
-                    onClick={naviToAgingScreen}
+                    <Button
+                        style={{ height: "140px", width: "140px" }}
+                        variant='primary'
+                        onClick={naviToDateScreen}
+                    >
+                        <GiCardboardBoxClosed
+                            style={{ height: "60px", width: "60px" }}
+                        />
+                        <br />
+                        입고하기
+                    </Button>
+                    <Button
+                        style={{ height: "140px", width: "140px" }}
+                        variant='danger'
+                        onClick={naviToAgingScreen}
+                    >
+                        <RiTimer2Line
+                            style={{ height: "60px", width: "60px" }}
+                        />
+                        <br />
+                        숙성하기
+                    </Button>
+                </div>
+
+                <div
+                    style={{ display: "flex", justifyContent: "space-evenly" }}
                 >
-                    숙성하기
-                </Button>
-                <Button
-                    variant='warning'
-                    onClick={naviToHistoryScreen}
-                >
-                    조회하기
-                </Button>
+                    <Button
+                        style={{ height: "140px", width: "140px" }}
+                        variant='warning'
+                        onClick={naviToHistoryScreen}
+                    >
+                        <RiHistoryFill
+                            style={{ height: "60px", width: "60px" }}
+                        />
+                        <br />
+                        조회하기
+                    </Button>
+                    <div style={{ height: "140px", width: "140px" }}></div>
+                </div>
+
                 {/* {samples} */}
             </Stack>
         </div>

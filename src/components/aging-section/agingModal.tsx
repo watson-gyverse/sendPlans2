@@ -1,11 +1,11 @@
-import { Col, Dropdown, FloatingLabel, Row } from "react-bootstrap"
+import { FloatingLabel } from "react-bootstrap"
 import Button from "react-bootstrap/Button"
 import Form from "react-bootstrap/Form"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
 import { MeatInfoWithEntry } from "../../utils/types/meatTypes"
-import DatePickerComponent from "../storage-section/datePicker"
 import moment from "moment"
+import { DatePickerSet } from "../common/datePickerSet"
 
 type AgingFormOptions = {
     fridgeName: string
@@ -27,6 +27,17 @@ function AgingModal(props: AgingModalParams) {
     const { meatInfo, placeName, placeCount, setMeatInfo, setClose } = props
     const [date, setDate] = useState<Date>(new Date())
     const [time, setTime] = useState<number>(new Date().getHours())
+    const [amPm, setAmPm] = useState(false) //true : am , false : pm
+
+    const dateData = {
+        date: date,
+        setDate: setDate,
+        time: time,
+        setTime: setTime,
+        amPm: amPm,
+        setAmPm: setAmPm,
+        variant: "danger",
+    }
 
     const {
         register,
@@ -54,7 +65,7 @@ function AgingModal(props: AgingModalParams) {
             place: placeName,
             agingDate:
                 moment(date).format("YYYY-MM-DD ") +
-                time.toString().padStart(2, "0"),
+                (amPm ? time : time + 12).toString().padStart(2, "0"),
             ultraTime: data.ultraTime,
         }
         setMeatInfo(newInfo)
@@ -67,32 +78,8 @@ function AgingModal(props: AgingModalParams) {
 
     return (
         <Form onSubmit={handleSubmit(onSubmit, onError)}>
-            <h6>숙성 시작 시각</h6>
-            <Row>
-                <Col>
-                    <DatePickerComponent
-                        targetDate={date}
-                        setTargetDate={setDate}
-                    />
-                </Col>
-                <Col>
-                    <Dropdown>
-                        <Dropdown.Toggle
-                            style={{
-                                fontSize: "1.5rem",
-                            }}
-                            id='dropdown-hour'
-                        >{`${time}시`}</Dropdown.Toggle>
-                        <Dropdown.Menu>
-                            {Array.from({ length: 24 }, (_, i) => (
-                                <Dropdown.Item onClick={() => setTime(i)}>
-                                    {i}
-                                </Dropdown.Item>
-                            ))}
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </Col>
-            </Row>
+            <h4 style={{ fontWeight: "800" }}>숙성 시작 시각</h4>
+            <DatePickerSet dateData={dateData} />
 
             <Form.Group
                 className='mb-3'
@@ -120,7 +107,7 @@ function AgingModal(props: AgingModalParams) {
                             marginRight: "12px",
                         }}
                     >
-                        냉장고 번호:
+                        <p style={{ fontWeight: "800" }}> 냉장고 번호:</p>
                     </Form.Label>
                     {Array.from({ length: placeCount }, (_, i) => {
                         let a = i + 1
@@ -148,7 +135,7 @@ function AgingModal(props: AgingModalParams) {
                 </Form.Group>
             </Form.Group>
             <Form.Group>
-                <h6>층</h6>
+                <p style={{ fontWeight: "800" }}> 냉장고 층:</p>
                 <Form.Select
                     aria-label='floor'
                     {...register("floor", { required: true })}
@@ -169,7 +156,7 @@ function AgingModal(props: AgingModalParams) {
             </Form.Group>
             <Form.Group style={{ marginTop: "10px" }}>
                 <Form.Label style={{ marginRight: "12px" }}>
-                    초음파 가동 시간:
+                    <p style={{ fontWeight: "800" }}> 초음파 가동 시간:</p>
                 </Form.Label>
                 {Array.from({ length: 6 }, (_, i) => {
                     let a = i
@@ -186,12 +173,23 @@ function AgingModal(props: AgingModalParams) {
                     )
                 })}
             </Form.Group>
-            <Button
-                variant='primary'
-                type='submit'
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "right",
+                }}
             >
-                적용
-            </Button>
+                <Button
+                    variant='danger'
+                    type='submit'
+                    style={{
+                        width: "157px",
+                        height: "50px",
+                    }}
+                >
+                    적용
+                </Button>
+            </div>
         </Form>
     )
 }

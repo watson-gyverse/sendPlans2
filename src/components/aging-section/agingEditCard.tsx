@@ -19,7 +19,7 @@ export const AgingEditCard = (props: AgingCardType) => {
             {meatInfo && (
                 <div
                     style={{
-                        backgroundColor: "#b3d7ef",
+                        backgroundColor: "#fff7f7",
                         width: "320px",
                         padding: "10px",
                         alignItems: "center",
@@ -128,6 +128,7 @@ export const AgingEditCard = (props: AgingCardType) => {
                                     padding: 0,
                                 }}
                                 onClick={clickEvent}
+                                variant='danger'
                             >
                                 숙성정보
                                 <br />
@@ -140,6 +141,7 @@ export const AgingEditCard = (props: AgingCardType) => {
                                     height: "70px",
                                     padding: 0,
                                 }}
+                                variant='danger'
                                 onClick={() => startAgingEvent(meatInfo)}
                             >
                                 숙성

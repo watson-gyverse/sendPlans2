@@ -13,10 +13,11 @@ import {
 } from "./contexts/meatLineContext"
 import { MeatInfo } from "./utils/types/meatTypes"
 import EditScreen from "./screens/storage-section/editScreen"
-import { AgingMiddleWare, StorageMiddleWare } from "./utils/toLobbyMiddleware"
+import { StorageMiddleWare } from "./utils/toLobbyMiddleware"
 import PlaceScreen from "./screens/aging-section/placeScreen"
 import { FetchScreen } from "./screens/aging-section/fetchScreen"
 import RecordScreen from "./screens/record-section/recordScreen"
+import { backgroundColors } from "./utils/consts/colors"
 
 const router = createBrowserRouter(
     [
@@ -124,7 +125,7 @@ function App() {
                                 width: "380px",
                                 height: "auto",
                                 padding: "24px 20px 30px 20px",
-                                backgroundColor: "#6d9985",
+                                backgroundColor: backgroundColors.storedCard,
                             }}
                         >
                             <RouterProvider

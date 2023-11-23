@@ -13,6 +13,7 @@ import DatePickerComponent from "../storage-section/datePicker"
 import { finishAging } from "../../apis/agingApi"
 import { MeatInfoAiO, MeatInfoWithEntry } from "../../utils/types/meatTypes"
 import moment from "moment"
+import { DatePickerSet } from "../common/datePickerSet"
 
 type FinishAgingFormOptions = {
     finishDate: string
@@ -30,6 +31,17 @@ export default function FinishAgingModal(props: FinishAgingParams) {
 
     const [date, setDate] = useState<Date>(new Date())
     const [time, setTime] = useState<number>(new Date().getHours())
+    const [amPm, setAmPm] = useState(false) //true : am , false : pm
+
+    const dateData = {
+        date: date,
+        setDate: setDate,
+        time: time,
+        setTime: setTime,
+        amPm: amPm,
+        setAmPm: setAmPm,
+        variant: "danger",
+    }
     const {
         register,
         formState: { errors },
@@ -61,31 +73,8 @@ export default function FinishAgingModal(props: FinishAgingParams) {
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
             <h6>숙성 종료 시각</h6>
-            <Row>
-                <Col>
-                    <DatePickerComponent
-                        targetDate={date}
-                        setTargetDate={setDate}
-                    />
-                </Col>
-                <Col>
-                    <Dropdown>
-                        <Dropdown.Toggle
-                            style={{
-                                fontSize: "1.5rem",
-                            }}
-                            id='dropdown-hour'
-                        >{`${time}시`}</Dropdown.Toggle>
-                        <Dropdown.Menu>
-                            {Array.from({ length: 24 }, (_, i) => (
-                                <Dropdown.Item onClick={() => setTime(i)}>
-                                    {i}
-                                </Dropdown.Item>
-                            ))}
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </Col>
-            </Row>
+            <DatePickerSet dateData={dateData} />
+
             <Form.Group style={{ marginTop: "10px", marginBottom: "10px" }}>
                 <Stack gap={2}>
                     <FloatingLabel label='숙성 후 무게(g)'>
@@ -122,12 +111,23 @@ export default function FinishAgingModal(props: FinishAgingParams) {
                     </FloatingLabel>
                 </Stack>
             </Form.Group>
-            <Button
-                variant='primary'
-                type='submit'
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "right",
+                }}
             >
-                적용
-            </Button>
+                <Button
+                    variant='danger'
+                    type='submit'
+                    style={{
+                        width: "157px",
+                        height: "50px",
+                    }}
+                >
+                    적용
+                </Button>
+            </div>
         </Form>
     )
 }

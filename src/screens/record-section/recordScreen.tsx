@@ -87,13 +87,7 @@ export default function RecordScreen() {
             </div>
 
             <div style={{ height: "2000px", backgroundColor: "#fa6969" }}>
-                {/* <h6>{activeFridge}</h6>
-                <h6>{activeFloor}</h6>
-                <h6>{activeSpecies}</h6> */}
                 {showingRecords.map((item) => (
-                    // <div>
-                    //     <h6 key={item.docId}>{item.docId}</h6>
-                    // </div>
                     <div>
                         <RecordCard item={item} />
                     </div>

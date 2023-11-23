@@ -7,6 +7,7 @@ import { AiFillSetting } from "react-icons/ai"
 import { CgAdd } from "react-icons/cg"
 import toast, { Toaster } from "react-hot-toast"
 import { PlaceCard } from "../../components/aging-section/placeCard"
+import { backgroundColors } from "../../utils/consts/colors"
 export default function PlaceScreen() {
     const navigate = useNavigate()
     const [places, setPlaces] = useState<FirestorePlace[]>([])
@@ -70,6 +71,8 @@ export default function PlaceScreen() {
     return (
         <div
             style={{
+                backgroundColor: backgroundColors.aging,
+                borderRadius: "20px",
                 width: "100%",
                 display: "flex",
                 flexDirection: "column",
@@ -94,6 +97,7 @@ export default function PlaceScreen() {
                 <Button
                     style={{ width: "60px", height: "40px" }}
                     onClick={onBackButtonClick}
+                    variant='danger'
                 >
                     뒤로
                 </Button>

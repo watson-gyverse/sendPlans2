@@ -1,20 +1,13 @@
-import {
-    Button,
-    ButtonGroup,
-    Col,
-    Dropdown,
-    Row,
-    Stack,
-    ToggleButton,
-} from "react-bootstrap"
+import { Button, ButtonGroup, Stack, ToggleButton } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
 import { useContext, useEffect, useState } from "react"
 import { BeefCuts, PorkCuts } from "../../utils/consts/meat"
-import DatePickerComponent from "../../components/storage-section/datePicker"
 import toast, { Toaster } from "react-hot-toast"
 import { sessionKeys } from "../../utils/consts/constants"
 import { CurrentScanTextContext } from "../../contexts/meatLineContext"
 import moment from "moment"
+import { backgroundColors, fontColors } from "../../utils/consts/colors"
+import { DatePickerSet } from "../../components/common/datePickerSet"
 
 export default function PresetScreen() {
     const { scanText, setScanText } = useContext(CurrentScanTextContext)
@@ -23,21 +16,28 @@ export default function PresetScreen() {
     const [species, setSpecies] = useState("돼지")
     const [cutList, setCutList] = useState<string[]>(PorkCuts)
     const [cut, setCut] = useState("")
+    const [amPm, setAmPm] = useState(false) //true : am , false : pm
 
+    const dateData = {
+        date: date,
+        setDate: setDate,
+        time: time,
+        setTime: setTime,
+        amPm: amPm,
+        setAmPm: setAmPm,
+        variant: "primary",
+    }
     const session = sessionStorage
     const navigate = useNavigate()
 
     const goToCameraScreen = () => {
         if (cut == "") {
-            console.log("안돼요")
             toast("부위도 골라주세요")
         } else {
-            console.log(date + "카메라로" + species + " " + cut)
-
             session.setItem(
                 sessionKeys.storageDate,
                 moment(date).format("YYYY-MM-DD ") +
-                    time.toString().padStart(2, "0")
+                    (amPm ? time : time + 12).toString().padStart(2, "0")
                 // date.toLocaleDateString("ko-KR")
             )
             session.setItem(sessionKeys.storageSpecies, species)
@@ -50,11 +50,9 @@ export default function PresetScreen() {
     const onSpeciesChanged = (e: any) => {
         setSpecies(e.target.value)
         setCut("")
-        console.log(e.target.value)
     }
     const onCutChanged = (e: any) => {
         setCut(e.target.value)
-        console.log(e.target.value)
     }
 
     useEffect(() => {
@@ -88,11 +86,7 @@ export default function PresetScreen() {
                 reverseOrder={false}
             />
             <Button
-                // style={{
-                //     backgroundColor: "white",
-                // }}
-                // variant='outlined-success'
-                variant='success'
+                variant='primary'
                 onClick={() => navigate("../../")}
             >
                 뒤로
@@ -104,38 +98,14 @@ export default function PresetScreen() {
                     marginTop: "20px",
                     zIndex: "2",
                     position: "relative",
-                    backgroundColor: "#b6d3b8",
+                    backgroundColor: backgroundColors.storage,
                     borderRadius: "20px",
                     padding: "12px",
                 }}
             >
                 <h2>언제 입고되었나요?</h2>
-                <Row>
-                    <Col>
-                        <DatePickerComponent
-                            targetDate={date}
-                            setTargetDate={setDate}
-                        />
-                    </Col>
-                    <Col>
-                        <Dropdown>
-                            <Dropdown.Toggle
-                                style={{
-                                    fontSize: "1.5rem",
-                                }}
-                                variant='success'
-                                id='dropdown-hour'
-                            >{`${time}시`}</Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                {Array.from({ length: 24 }, (_, i) => (
-                                    <Dropdown.Item onClick={() => setTime(i)}>
-                                        {i}
-                                    </Dropdown.Item>
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown>
-                    </Col>
-                </Row>
+
+                <DatePickerSet dateData={dateData} />
             </Stack>
             <div style={{ height: "1rem" }}></div>
             <Stack
@@ -143,7 +113,7 @@ export default function PresetScreen() {
                 style={{
                     zIndex: "1",
                     position: "relative",
-                    backgroundColor: "#b6d3b8",
+                    backgroundColor: backgroundColors.storage,
                     borderRadius: "20px",
                     padding: "12px",
                 }}
@@ -156,7 +126,7 @@ export default function PresetScreen() {
                             id={`species-${idx}`}
                             value={radio}
                             type='radio'
-                            variant='outline-success'
+                            variant='primary'
                             checked={radio === species}
                             onChange={onSpeciesChanged}
                             style={{
@@ -178,13 +148,13 @@ export default function PresetScreen() {
                             id={`cut-${idx}`}
                             value={radio}
                             type='radio'
-                            variant=' success'
+                            variant='outline-primary'
                             checked={radio === cut}
                             onChange={onCutChanged}
                             style={{
                                 fontSize: "1.3rem",
-
-                                backgroundColor: "white",
+                                color: fontColors.storage,
+                                // backgroundColor: "white",
                             }}
                         >
                             {radio}
@@ -199,7 +169,7 @@ export default function PresetScreen() {
                     height: "3rem",
                     fontSize: "1.2rem",
                 }}
-                variant='success'
+                variant='primary'
                 onClick={goToCameraScreen}
             >
                 다음

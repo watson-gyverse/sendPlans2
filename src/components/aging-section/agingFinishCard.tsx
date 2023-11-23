@@ -2,6 +2,7 @@ import { Button, Stack } from "react-bootstrap"
 import toast from "react-hot-toast"
 import { MeatInfoWithEntry } from "../../utils/types/meatTypes"
 import { TiDeleteOutline } from "react-icons/ti"
+import { backgroundColors } from "../../utils/consts/colors"
 
 type AgingCardType = {
     meatInfo: MeatInfoWithEntry
@@ -18,7 +19,7 @@ export const AgingFinishCard = (props: AgingCardType) => {
             {meatInfo && (
                 <div
                     style={{
-                        backgroundColor: "#b3d7ef",
+                        backgroundColor: backgroundColors.agedCard,
                         width: "320px",
                         padding: "10px",
                         alignItems: "center",
@@ -125,6 +126,7 @@ export const AgingFinishCard = (props: AgingCardType) => {
                                     padding: 0,
                                 }}
                                 onClick={clickEvent}
+                                variant='danger'
                             >
                                 결과
                                 <br />

@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useState } from "react"
-import { Button, Col, Modal, Stack, Tab, Tabs } from "react-bootstrap"
+import {
+    Button,
+    ButtonGroup,
+    Modal,
+    Stack,
+    ToggleButton,
+} from "react-bootstrap"
 import {
     deleteFromAgingFridge,
     deleteFromStorage,
@@ -16,6 +22,7 @@ import { AgingFinishCard } from "../../components/aging-section/agingFinishCard"
 import { AiFillSetting } from "react-icons/ai"
 import FinishAgingModal from "../../components/aging-section/agingFinishModal"
 import _ from "lodash"
+import { backgroundColors } from "../../utils/consts/colors"
 
 export const FetchScreen = () => {
     const navigate = useNavigate()
@@ -98,6 +105,11 @@ export const FetchScreen = () => {
     useEffect(() => {
         checkedSList.clear()
     }, [storedItems])
+
+    useEffect(() => {
+        console.log(whichTab)
+    }, [whichTab])
+
     const onClickBack = () => {
         navigate("../")
     }
@@ -155,6 +167,7 @@ export const FetchScreen = () => {
     const onFinishedAging = async (item: MeatInfoWithEntry) => {
         setFinishModalShow(false)
         fetch()
+        toast.success("숙성종료 완료")
     }
     const onClickEditModeButton = () => {
         setIsEditMode(!isEditMode)
@@ -223,188 +236,242 @@ export const FetchScreen = () => {
     }
 
     return (
-        <div>
+        <div
+            style={{
+                backgroundColor: backgroundColors.aging,
+                padding: "20px 10px",
+            }}
+        >
             <Toaster />
-            {"작은"}
-            <div style={{ display: "flex", marginBottom: "12px" }}>
-                <Button onClick={onClickBack}>뒤로</Button>
+            <div
+                style={{
+                    display: "flex",
+                    marginBottom: "12px",
+                    justifyContent: "space-between",
+                }}
+            >
+                <Button
+                    style={{ width: "60px", height: "50px", padding: "0" }}
+                    variant='danger'
+                    onClick={onClickBack}
+                >
+                    뒤로
+                </Button>
                 <h2
                     style={{
-                        border: "2px solid #0d1b09",
+                        // border: "2px solid #ff0000",
                         borderRadius: "4px",
-                        marginLeft: "12px",
-                        marginBottom: "0px",
+                        marginBottom: "8px",
                         color: "white",
-                        backgroundColor: "#144b1a",
+                        padding: "8px",
+                        backgroundColor: "#3f2c2c",
+                        height: "50px",
+                        width: "157px",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
                     }}
                 >
                     {placeName}
                 </h2>
-            </div>
-            <Tabs onSelect={(key) => onTabChanged(key)}>
-                <Tab
-                    eventKey='storage'
-                    title='입고중'
+                <div
+                    style={{
+                        width: "60px",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        display: "flex",
+                    }}
                 >
+                    <AiFillSetting
+                        style={{
+                            width: "30px",
+                            height: "30px",
+                        }}
+                        onClick={onClickEditModeButton}
+                    />
+                </div>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "center" }}>
+                <ButtonGroup>
+                    <ToggleButton
+                        id='storage'
+                        value='storage'
+                        variant='danger'
+                        onClick={() => setWhichTab(true)}
+                        style={{
+                            display: "flex",
+                            width: "157px",
+                            height: "50px",
+                            backgroundColor: whichTab ? "#ff3d3d" : "",
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <p
+                            style={{
+                                color: "white",
+                                margin: "0",
+                            }}
+                        >
+                            입고중
+                        </p>
+                    </ToggleButton>
+                    <ToggleButton
+                        id='aging'
+                        value='aging'
+                        variant='danger'
+                        onClick={() => setWhichTab(false)}
+                        style={{
+                            width: "157px",
+                            height: "50px",
+                            display: "flex",
+                            backgroundColor: whichTab ? "" : "#ff3d3d",
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <p
+                            style={{
+                                color: "white",
+                                margin: "0",
+                            }}
+                        >
+                            숙성중
+                        </p>
+                    </ToggleButton>
+                </ButtonGroup>
+            </div>
+            {whichTab ? (
+                <Stack gap={2}>
                     <div
                         style={{
                             display: "flex",
                             alignItems: "center",
-                            justifyContent: "right",
+                            justifyContent: "space-between",
+                            marginTop: "10px",
                         }}
                     >
-                        <Col xs='auto'>
-                            <AiFillSetting
-                                style={{
-                                    width: "30px",
-                                    height: "30px",
-                                }}
-                                onClick={onClickEditModeButton}
+                        <div>
+                            <input
+                                type='checkbox'
+                                id='selectSAll'
+                                onChange={(e) => onCheckAll(e.target.checked)}
+                                checked={
+                                    checkedSList.size === storedItems.length
+                                }
                             />
-                        </Col>
-                    </div>
-                    <Stack gap={2}>
-                        <div
+                            <label
+                                style={{ marginLeft: "6px" }}
+                                htmlFor='selectSAll'
+                            >
+                                전체 선택
+                            </label>
+                        </div>
+
+                        <Button
+                            onClick={onClickStartAgingSelected}
+                            disabled={!checkNullCheckedS()}
                             style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-around",
-                                marginTop: "10px",
+                                marginLeft: "20px",
+                                height: "3rem",
                             }}
+                            variant='danger'
                         >
+                            선택한 고기 숙성하기
+                        </Button>
+                    </div>
+                    {storedItems.map((item) => {
+                        return (
                             <div>
                                 <input
                                     type='checkbox'
-                                    id='selectSAll'
+                                    id={"Scheckbox" + item.docId}
                                     onChange={(e) =>
-                                        onCheckAll(e.target.checked)
+                                        onCheckElement(
+                                            e.target.checked,
+                                            item.docId!!
+                                        )
                                     }
-                                    checked={
-                                        checkedSList.size === storedItems.length
-                                    }
+                                    checked={checkedSList.has(item.docId!!)}
                                 />
-                                <label
-                                    style={{ marginLeft: "6px" }}
-                                    htmlFor='selectSAll'
-                                >
-                                    전체 선택
+                                <label htmlFor={"Scheckbox" + item.docId}>
+                                    <AgingEditCard
+                                        key={item.docId}
+                                        meatInfo={item}
+                                        isEditMode={isEditMode}
+                                        clickEvent={() => {
+                                            setRecentMeatInfo(item)
+                                            setEditModalShow(true)
+                                        }}
+                                        onClickDelete={(it) => {
+                                            onClickDeleteButton(it)
+                                        }}
+                                        startAgingEvent={(it) => {
+                                            onClickStartAging(it)
+                                        }}
+                                    />
                                 </label>
                             </div>
-
-                            <Button
-                                onClick={onClickStartAgingSelected}
-                                disabled={!checkNullCheckedS()}
-                                style={{ marginLeft: "20px", height: "3rem" }}
-                            >
-                                선택한 고기 숙성하기
-                            </Button>
-                        </div>
-                        {storedItems.map((item) => {
-                            return (
-                                <div>
-                                    <input
-                                        style={{ marginTop: "20px" }}
-                                        type='checkbox'
-                                        id={"Scheckbox" + item.docId}
-                                        onChange={(e) =>
-                                            onCheckElement(
-                                                e.target.checked,
-                                                item.docId!!
-                                            )
-                                        }
-                                        checked={checkedSList.has(item.docId!!)}
-                                    />
-                                    <label htmlFor={"Scheckbox" + item.docId}>
-                                        <AgingEditCard
-                                            key={item.docId}
-                                            meatInfo={item}
-                                            isEditMode={isEditMode}
-                                            clickEvent={() => {
-                                                setRecentMeatInfo(item)
-                                                setEditModalShow(true)
-                                            }}
-                                            onClickDelete={(it) => {
-                                                onClickDeleteButton(it)
-                                            }}
-                                            startAgingEvent={(it) => {
-                                                onClickStartAging(it)
-                                            }}
-                                        />
-                                    </label>
-                                </div>
-                            )
-                        })}
-                    </Stack>
-                </Tab>
-                <Tab
-                    eventKey='Aging'
-                    title='숙성중'
-                    onSelect={() => setWhichTab(false)}
-                >
+                        )
+                    })}
+                </Stack>
+            ) : (
+                <Stack gap={2}>
                     <div
                         style={{
                             display: "flex",
                             alignItems: "center",
-                            justifyContent: "right",
+                            justifyContent: "space-around",
+                            marginTop: "10px",
                         }}
-                    >
-                        <Col xs='auto'>
-                            <AiFillSetting
-                                style={{
-                                    width: "30px",
-                                    height: "30px",
-                                }}
-                                onClick={onClickEditModeButton}
-                            />
-                        </Col>
-                    </div>
-                    <Stack gap={2}>
-                        <div
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-around",
-                                marginTop: "10px",
-                            }}
-                        ></div>
+                    ></div>
 
-                        {agingItems.map((item) => {
-                            return (
-                                <div>
-                                    <div
-                                        style={{
-                                            width: "100%",
+                    {agingItems.map((item) => {
+                        return (
+                            <div>
+                                <div
+                                    style={{
+                                        width: "100%",
+                                    }}
+                                >
+                                    <AgingFinishCard
+                                        key={item.docId}
+                                        meatInfo={item}
+                                        isEditMode={isEditMode}
+                                        clickEvent={() => {
+                                            setRecentMeatInfo(item)
+                                            setFinishModalShow(true)
                                         }}
-                                    >
-                                        <AgingFinishCard
-                                            key={item.docId}
-                                            meatInfo={item}
-                                            isEditMode={isEditMode}
-                                            clickEvent={() => {
-                                                setRecentMeatInfo(item)
-                                                setFinishModalShow(true)
-                                            }}
-                                            onClickDelete={() =>
-                                                onClickAgingDeleteButton(item)
-                                            }
-                                        />
-                                    </div>
-                                    {/* </label> */}
+                                        onClickDelete={() =>
+                                            onClickAgingDeleteButton(item)
+                                        }
+                                    />
                                 </div>
-                            )
-                        })}
-                    </Stack>
-                </Tab>
-            </Tabs>
+                                {/* </label> */}
+                            </div>
+                        )
+                    })}
+                </Stack>
+            )}
 
             <Modal
                 show={editModalShow}
                 onHide={() => setEditModalShow(false)}
             >
-                <Modal.Header closeButton>
-                    <Modal.Title>고기 정보 입력/수정</Modal.Title>
+                <Modal.Header
+                    style={{ backgroundColor: backgroundColors.storedCard }}
+                    closeButton
+                >
+                    <Modal.Title>
+                        <p style={{ fontWeight: "800", marginBottom: "0" }}>
+                            고기 정보 입력/수정
+                        </p>
+                    </Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
+                <Modal.Body
+                    style={{ backgroundColor: backgroundColors.storedCard }}
+                >
                     {recentMeatInfo !== undefined ? (
                         <AgingModal
                             meatInfo={recentMeatInfo}

@@ -10,10 +10,11 @@ type DatePickerInputProps = {
 type DatePickerProps = {
     targetDate: Date
     setTargetDate: (arg0: Date) => void
+    variant: string
 }
 
 const DatePickerComponent = (props: DatePickerProps) => {
-    const { targetDate, setTargetDate } = props
+    const { targetDate, setTargetDate, variant } = props
 
     useEffect(() => {}, [props.targetDate])
     const CustomInput = forwardRef(
@@ -22,7 +23,7 @@ const DatePickerComponent = (props: DatePickerProps) => {
                 style={{
                     fontSize: "1.5rem",
                 }}
-                variant='success'
+                variant={variant}
                 onClick={onClick}
                 ref={ref}
             >

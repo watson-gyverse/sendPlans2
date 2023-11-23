@@ -14,6 +14,7 @@ export function PlaceCard(info: PlaceCardType) {
     const buttonStyle = {
         height: "4rem",
         width: "300px",
+        // backgroundColor: "#df415b",
     }
     return (
         <div
@@ -26,6 +27,7 @@ export function PlaceCard(info: PlaceCardType) {
             <Button
                 key={placeItem.name + placeItem.count}
                 style={buttonStyle}
+                variant='danger'
                 onClick={() => onPlaceClick(placeItem)}
             >
                 {placeItem.name}
