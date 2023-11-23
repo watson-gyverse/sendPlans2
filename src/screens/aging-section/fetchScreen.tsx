@@ -35,7 +35,6 @@ export const FetchScreen = () => {
     const [whichTab, setWhichTab] = useState(true)
 
     function fetch() {
-        console.log("request fetch 했습니다요")
         fetchFromFirestore(
             setStoredItems,
             setAgingItems,
@@ -79,6 +78,7 @@ export const FetchScreen = () => {
     useEffect(() => {
         fetch()
     }, [])
+
     useEffect(() => {
         if (recentMeatInfo === undefined) return
         let tempList = [...storedItems].filter((item) => {
@@ -142,7 +142,7 @@ export const FetchScreen = () => {
                         toast.success("숙성시작 ")
                         console.log("fetch !@")
                         fetch()
-                        checkedSList.clear()
+                        setCheckedSList(new Set())
                     },
                     () => {
                         console.log("error !@")
@@ -152,11 +152,9 @@ export const FetchScreen = () => {
         }
     }, [checkedSList])
 
-    const onClickFinishAging = async (item: MeatInfoWithEntry) => {
-        const ok = window.confirm("숙성종료합니다?")
-        if (ok) {
-            setFinishModalShow(false)
-        }
+    const onFinishedAging = async (item: MeatInfoWithEntry) => {
+        setFinishModalShow(false)
+        fetch()
     }
     const onClickEditModeButton = () => {
         setIsEditMode(!isEditMode)
@@ -227,6 +225,7 @@ export const FetchScreen = () => {
     return (
         <div>
             <Toaster />
+            {"작은"}
             <div style={{ display: "flex", marginBottom: "12px" }}>
                 <Button onClick={onClickBack}>뒤로</Button>
                 <h2
@@ -367,52 +366,11 @@ export const FetchScreen = () => {
                                 justifyContent: "space-around",
                                 marginTop: "10px",
                             }}
-                        >
-                            {/* <div>
-                                <input
-                                    type='checkbox'
-                                    id='selectAll'
-                                    onChange={(e) =>
-                                        onCheckAll(e.target.checked)
-                                    }
-                                    checked={
-                                        checkedAList.size === agingItems.length
-                                    }
-                                />
-                                <label
-                                    style={{ marginLeft: "6px" }}
-                                    htmlFor='selectAll'
-                                >
-                                    전체 선택
-                                </label>
-                            </div>
-
-                            <Button
-                                style={{ marginLeft: "20px", height: "3rem" }}
-                            >
-                                선택한 숙성 종료하기
-                            </Button> */}
-                        </div>
+                        ></div>
 
                         {agingItems.map((item) => {
                             return (
                                 <div>
-                                    {/* <input
-                                        style={{ marginTop: "20px" }}
-                                        type='checkbox'
-                                        id={"checkbox" + item.docId}
-                                        onChange={(e) =>
-                                            onCheckElement(
-                                                e.target.checked,
-                                                item.docId!!
-                                            )
-                                        }
-                                        checked={checkedAList.has(item.docId!!)}
-                                    />
-                                    <label
-                                        style={{ width: "200px" }}
-                                        htmlFor={"checkbox" + item.docId}
-                                    > */}
                                     <div
                                         style={{
                                             width: "100%",
@@ -472,7 +430,7 @@ export const FetchScreen = () => {
                         <FinishAgingModal
                             meatInfo={recentMeatInfo}
                             finishAgingEvent={() => {
-                                onClickFinishAging(recentMeatInfo)
+                                onFinishedAging(recentMeatInfo)
                             }}
                         />
                     ) : (

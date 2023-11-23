@@ -4,11 +4,12 @@ import {
     FilterProperties,
 } from "../../components/record-section/filter"
 import { useEffect, useState } from "react"
-import { MeatInfo, MeatInfoAiO } from "../../utils/types/meatTypes"
+import { MeatInfoAiO } from "../../utils/types/meatTypes"
 import { useNavigate } from "react-router-dom"
 import _ from "lodash"
 import useFBFetch from "../../hooks/useFetch"
 import { fbCollections } from "../../utils/consts/constants"
+import { RecordCard } from "../../components/record-section/recordCard"
 
 export default function RecordScreen() {
     const navigate = useNavigate()
@@ -93,55 +94,8 @@ export default function RecordScreen() {
                     // <div>
                     //     <h6 key={item.docId}>{item.docId}</h6>
                     // </div>
-                    <div
-                        style={{
-                            backgroundColor: "#ffdaec",
-                            width: "100%",
-                        }}
-                    >
-                        <div
-                            style={{
-                                display: "flex",
-                                flexDirection: "row",
-                                justifyContent: "space-between",
-                            }}
-                        >
-                            <h6>이력번호: {item.meatNumber}</h6>
-                            <button>자세히</button>
-                        </div>
-
-                        <div
-                            style={{
-                                display: "flex",
-                                flexDirection: "row",
-
-                                justifyContent: "space-evenly",
-                            }}
-                        >
-                            <div>
-                                <h6>입고시각 </h6>
-                                <h6>{item.storedDate}</h6>
-                                <h6>숙성시작 </h6>
-                                <h6>{item.agingDate}</h6>
-                                <h6>숙성종료 </h6>
-                                <h6>{item.finishDate}</h6>
-                            </div>
-                            <div>
-                                <h6>
-                                    {item.species} / {item.cut}
-                                </h6>
-                                <h6>
-                                    {item.origin} / {item.grade}
-                                </h6>
-                                <h6>무게(입고/숙성/손질)</h6>
-                                <h6>
-                                    {item.beforeWeight} / {item.afterWeight} /{" "}
-                                    {item.cutWeight}
-                                </h6>
-                                <h6>무게변화율</h6>
-                                <h6> -10% / -6%</h6>
-                            </div>
-                        </div>
+                    <div>
+                        <RecordCard item={item} />
                     </div>
                 ))}
             </div>

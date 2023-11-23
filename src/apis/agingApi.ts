@@ -149,5 +149,12 @@ export async function finishAging(item: MeatInfoAiO, thenWhat: void) {
         finishDate: item.finishDate,
         afterWeight: item.afterWeight,
         cutWeight: item.cutWeight,
-    }).then(() => deleteFromAgingFridge(item.docId!!).then(() => thenWhat))
+    })
+        .then(() => {
+            console.log("숙성종료처리 완료")
+        })
+        .catch(() => {
+            console.log("숙성종료처리 실패패")
+        })
+    deleteFromAgingFridge(item.docId!!).then(() => thenWhat)
 }

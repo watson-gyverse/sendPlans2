@@ -47,13 +47,16 @@ export default function FinishAgingModal(props: FinishAgingParams) {
     })
 
     const onSubmit = (data: FinishAgingFormOptions) => {
-        let aIO: MeatInfoAiO = {
-            ...meatInfo,
-            finishDate: data.finishDate,
-            afterWeight: data.afterWeight,
-            cutWeight: data.cutWeight,
+        const ok = window.confirm("정말 숙성 종료합니다?")
+        if (ok) {
+            let aIO: MeatInfoAiO = {
+                ...meatInfo,
+                finishDate: data.finishDate,
+                afterWeight: data.afterWeight,
+                cutWeight: data.cutWeight,
+            }
+            finishAging(aIO, finishAgingEvent(meatInfo))
         }
-        finishAging(aIO, finishAgingEvent(meatInfo))
     }
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>

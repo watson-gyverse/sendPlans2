@@ -18,77 +18,80 @@ import PlaceScreen from "./screens/aging-section/placeScreen"
 import { FetchScreen } from "./screens/aging-section/fetchScreen"
 import RecordScreen from "./screens/record-section/recordScreen"
 
-const router = createBrowserRouter([
-    {
-        path: "/",
-        // loader: async () => {
-        //     return new Promise((res) => {
-        //         setTimeout(() => {
-        //             return res("finish!")
-        //         }, 3000)
-        //     })
-        // },
-        element: <Outlet />,
-        errorElement: <ErrorScreen />,
-        children: [
-            {
-                index: true,
-                // path: "main",
-                element: <MainScreen />,
-            },
-            {
-                path: "storage",
-                element: (
-                    <div>
-                        <Outlet />
-                    </div>
-                ),
-                children: [
-                    {
-                        path: "preset",
+const router = createBrowserRouter(
+    [
+        {
+            path: "/",
+            // loader: async () => {
+            //     return new Promise((res) => {
+            //         setTimeout(() => {
+            //             return res("finish!")
+            //         }, 3000)
+            //     })
+            // },
+            element: <Outlet />,
+            errorElement: <ErrorScreen />,
+            children: [
+                {
+                    index: true,
+                    // path: "main",
+                    element: <MainScreen />,
+                },
+                {
+                    path: "storage",
+                    element: (
+                        <div>
+                            <Outlet />
+                        </div>
+                    ),
+                    children: [
+                        {
+                            path: "preset",
 
-                        element: <PresetScreen />,
-                    },
-                    {
-                        path: "camera",
-                        element: (
-                            <StorageMiddleWare>
-                                <CameraScreen />
-                            </StorageMiddleWare>
-                        ),
-                    },
-                    {
-                        path: "edit",
-                        element: (
-                            <StorageMiddleWare>
-                                <EditScreen />
-                            </StorageMiddleWare>
-                        ),
-                    },
-                ],
-            },
-            {
-                path: "aging",
-                element: (
-                    <div>
-                        <Outlet />
-                    </div>
-                ),
-                children: [
-                    { index: true, element: <PlaceScreen /> },
-                    {
-                        path: "fetch/",
-                        element: <FetchScreen />,
-                    },
-                ],
-            },
-            {
-                path: "record",
-                element: <RecordScreen />,
-            },
-        ],
-    },
-])
+                            element: <PresetScreen />,
+                        },
+                        {
+                            path: "camera",
+                            element: (
+                                <StorageMiddleWare>
+                                    <CameraScreen />
+                                </StorageMiddleWare>
+                            ),
+                        },
+                        {
+                            path: "edit",
+                            element: (
+                                <StorageMiddleWare>
+                                    <EditScreen />
+                                </StorageMiddleWare>
+                            ),
+                        },
+                    ],
+                },
+                {
+                    path: "aging",
+                    element: (
+                        <div>
+                            <Outlet />
+                        </div>
+                    ),
+                    children: [
+                        { index: true, element: <PlaceScreen /> },
+                        {
+                            path: "fetch/",
+                            element: <FetchScreen />,
+                        },
+                    ],
+                },
+                {
+                    path: "record",
+                    element: <RecordScreen />,
+                },
+            ],
+        },
+    ],
+    { basename: process.env.PUBLIC_URL }
+)
 
 function App() {
     const [isLoading, setLoading] = useState(true)

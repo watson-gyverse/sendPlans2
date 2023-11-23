@@ -93,9 +93,9 @@ export default function EditScreen() {
                 item,
                 () => {
                     toast.success("DB에 등록 성공")
-                    setTimeout(() => {
-                        navigate("../preset")
-                    }, 1000)
+                    // setTimeout(() => {
+                    //     navigate("../preset")
+                    // }, 1000)
                 },
                 () => {
                     toast.error("실패했다..!")
@@ -153,9 +153,7 @@ export default function EditScreen() {
                         disabled={disableButton}
                         onClick={addDocumentToFirestore}
                     >
-                        DB에 저장하고
-                        <br />
-                        돌아가기
+                        DB에 저장하기
                     </Button>
                 </div>
             </Stack>
