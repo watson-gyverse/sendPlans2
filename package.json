@@ -36,6 +36,7 @@
         "xlsx": "^0.18.5"
     },
     "scripts": {
+        "postbuild": "cp build/index.html build/404.html",
         "start": "react-scripts start",
         "build": "react-scripts build",
         "test": "react-scripts test",

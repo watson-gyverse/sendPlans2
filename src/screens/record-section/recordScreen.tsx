@@ -62,17 +62,24 @@ export default function RecordScreen() {
     }, [records, activeFridge, activeFloor, activeSpecies, currentPlace])
 
     return (
-        <div style={{ backgroundColor: "#f0c861" }}>
-            <Button onClick={onClickBack}>뒤로</Button>
-            <p>recordScreen</p>
+        <div style={{ backgroundColor: "#f0d286", padding: "20px 10px" }}>
             <div
                 style={{
                     position: "sticky",
                     top: 0,
-                    backgroundColor: "#aaaaf7",
+                    backgroundColor: "#f0d286ba",
+                    padding: "6px 4px",
                 }}
             >
                 <Button
+                    variant='warning'
+                    onClick={onClickBack}
+                >
+                    뒤로
+                </Button>
+                <Button
+                    variant='warning'
+                    style={{ marginLeft: "20px" }}
                     onClick={onfilterOpenClick}
                     aria-controls='filterCollapse'
                     // aria-expanded={filterOpen}
@@ -80,13 +87,20 @@ export default function RecordScreen() {
                     필터
                 </Button>
                 <Collapse in={filterOpen}>
-                    <div id='filterCollapse'>
+                    <div
+                        id='filterCollapse'
+                        style={{
+                            backgroundColor: "#edc86c",
+                            padding: "6px 4px",
+                            marginTop: "10px",
+                        }}
+                    >
                         <Filter package={filterSet} />
                     </div>
                 </Collapse>
             </div>
 
-            <div style={{ height: "2000px", backgroundColor: "#fa6969" }}>
+            <div style={{ height: "2000px" }}>
                 {showingRecords.map((item) => (
                     <div>
                         <RecordCard item={item} />

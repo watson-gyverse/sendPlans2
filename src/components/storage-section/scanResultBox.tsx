@@ -12,7 +12,6 @@ export const ScanResultBox = (props: ScanResult) => {
     return (
         <div
             style={{
-                backgroundColor: "white",
                 width: "100%",
                 height: "auto",
                 padding: "10px 20px",

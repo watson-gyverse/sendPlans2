@@ -6,7 +6,7 @@ import {
     QrcodeSuccessCallback,
 } from "html5-qrcode/esm/core"
 import { Html5QrcodeScannerConfig } from "html5-qrcode/esm/html5-qrcode-scanner"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 
 const qrcodeRegionId = "html5qr-code-full-region"
 type scanProps = Html5QrcodeScannerConfig & {
@@ -37,6 +37,7 @@ const createConfig = (props: Html5QrcodeScannerConfig) => {
 
 const Html5QrcodePlugin = (props: scanProps) => {
     const scanRef = useRef<Html5QrcodeScanner | null>(null)
+
     useEffect(() => {
         const config = createConfig(props)
         const verbose = props.verbose === true
@@ -58,7 +59,6 @@ const Html5QrcodePlugin = (props: scanProps) => {
             props.qrCodeSuccessCallback,
             props.qrCodeErrorCallback
         )
-
         // cleanup function when component will unmount
         return () => {
             html5QrcodeScanner.clear().catch((error) => {

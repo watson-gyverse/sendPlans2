@@ -12,11 +12,18 @@ import { DatePickerSet } from "../../components/common/datePickerSet"
 export default function PresetScreen() {
     const { scanText, setScanText } = useContext(CurrentScanTextContext)
     const [date, setDate] = useState(new Date())
-    const [time, setTime] = useState(new Date().getHours())
+    const [time, setTime] = useState(
+        // new Date().getHours() >= 12
+        //     ? new Date().getHours() - 12:
+        new Date().getHours()
+    )
     const [species, setSpecies] = useState("돼지")
     const [cutList, setCutList] = useState<string[]>(PorkCuts)
     const [cut, setCut] = useState("")
-    const [amPm, setAmPm] = useState(false) //true : am , false : pm
+    const [amPm, setAmPm] = useState(
+        // new Date().getHours() < 12 ? true     :
+        false
+    ) //true : am , false : pm
 
     const dateData = {
         date: date,
@@ -79,6 +86,7 @@ export default function PresetScreen() {
         <div
             style={{
                 padding: "1rem",
+                backgroundColor: backgroundColors.storage_back,
             }}
         >
             <Toaster
@@ -148,12 +156,14 @@ export default function PresetScreen() {
                             id={`cut-${idx}`}
                             value={radio}
                             type='radio'
-                            variant='outline-primary'
+                            variant={
+                                radio === cut ? "primary" : "outline-primary"
+                            }
                             checked={radio === cut}
                             onChange={onCutChanged}
                             style={{
                                 fontSize: "1.3rem",
-                                color: fontColors.storage,
+                                // color: fontColors.storage,
                                 // backgroundColor: "white",
                             }}
                         >

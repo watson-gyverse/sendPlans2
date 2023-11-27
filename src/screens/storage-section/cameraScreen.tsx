@@ -11,9 +11,13 @@ import { sessionKeys } from "../../utils/consts/constants"
 import * as _ from "lodash"
 import { ScanResultCart } from "../../components/storage-section/scanResultCart"
 import { CurrentScanTextContext } from "../../contexts/meatLineContext"
+import { backgroundColors } from "../../utils/consts/colors"
 
 export default function CameraScreen() {
     const { scanText, setScanText } = useContext(CurrentScanTextContext)
+
+    const [showScanner, setShowScanner] = useState(true)
+    const [manualNumber, setManualNumber] = useState("")
 
     const [failToGetMeatInfo, setFailedGetMeatInfo] = useState(false)
     const [wrongCut, setWrongCut] = useState(false)
@@ -38,7 +42,7 @@ export default function CameraScreen() {
 
     const onScanSuccess = (
         decodedText: string,
-        decodedResult: Html5QrcodeResult
+        decodedResult?: Html5QrcodeResult
     ) => {
         toast.success("스캔 성공")
         console.log("before: " + scanText)
@@ -199,27 +203,65 @@ export default function CameraScreen() {
         navigate("/storage/preset")
     }
     return (
-        <div>
+        <div
+            style={{
+                backgroundColor: backgroundColors.storage_back,
+                padding: "20px 10px",
+            }}
+        >
             <Toaster />
             <div
                 style={{
-                    display: "center",
-                    alignItems: "start",
+                    display: "flex",
+                    // alignItems: "start",
                     marginBottom: "2rem",
+                    justifyContent: "space-between",
                 }}
             >
                 <Button onClick={goToPreset}>뒤로</Button>
+                <Button onClick={() => setShowScanner(!showScanner)}>
+                    직접 입력
+                </Button>
             </div>
-            <Html5QrcodePlugin
-                fps={1}
-                qrbox={{ width: 250, height: 250 }}
-                disableFlip={false}
-                verbose={false}
-                qrCodeSuccessCallback={onScanSuccess}
-                qrCodeErrorCallback={onScanFailure}
-                showTorchButtonIfSupported={true}
-            />
-            <h6>같은 번호는 아래에서 수량을 조절해주세요.</h6>
+            {showScanner ? (
+                <div style={{ backgroundColor: "#fafafa" }}>
+                    {" "}
+                    <Html5QrcodePlugin
+                        fps={1}
+                        qrbox={{ width: 250, height: 250 }}
+                        disableFlip={false}
+                        verbose={false}
+                        qrCodeSuccessCallback={onScanSuccess}
+                        qrCodeErrorCallback={onScanFailure}
+                        showTorchButtonIfSupported={true}
+                    />
+                </div>
+            ) : (
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-evenly",
+                        alignItems: "center",
+                    }}
+                >
+                    <label htmlFor='뽀삐'>이력번호</label>
+                    <input
+                        type='text'
+                        name='뽀삐'
+                        value={manualNumber}
+                        onChange={(e) => setManualNumber(e.target.value)}
+                    />
+                    <Button
+                        onClick={() => {
+                            console.log(manualNumber)
+                            onScanSuccess(manualNumber)
+                        }}
+                    >
+                        제출
+                    </Button>
+                </div>
+            )}
+            <h6>같은 번호는 바구니에서 수량을 조절해주세요.</h6>
             <hr style={{ height: "2px" }} />
             <h4> {"조회내역: "}</h4>
             <ScanResultBox
@@ -244,7 +286,7 @@ export default function CameraScreen() {
             >
                 <h6 style={{ color: "red" }}>
                     ※선택한 부위가 <br />
-                    스캔한 육종과 맞지 않습니다!
+                    이력번호의 육종과 맞지 않습니다!
                     <br />
                     다시 확인해주세요!!
                 </h6>

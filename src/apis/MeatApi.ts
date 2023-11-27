@@ -6,6 +6,7 @@ import {
     meatInfoUrl,
 } from "../utils/consts/urls"
 import { xmlThatIWannaKill } from "../utils/consts/functions"
+// import _ from "lodash"
 
 export async function getMeatInfo(
     meatNumber: string,
@@ -28,7 +29,7 @@ export async function getMeatInfo(
             .then((response) => {
                 console.log(response)
                 var a = response["data"]["response"]["body"]["items"]["item"]
-                var index = -1
+                // var index = -1
                 switch (a[0]["traceNoType"]) {
                     case "CATTLE|CATTLE_NO": {
                         //소 개체 (소, 국산, 성별, 등급)
@@ -44,7 +45,7 @@ export async function getMeatInfo(
                         for (let i = 0; i < a.length; i++) {
                             if (a[i].hasOwnProperty("gradeNm")) {
                                 let g = a[i].gradeNm
-                                index = i
+                                // index = i
                                 console.log("grade" + g)
                                 setGrade(g + "")
                                 break
@@ -59,23 +60,31 @@ export async function getMeatInfo(
                         for (let i = 1; i < Object.keys(a).length; i++) {
                             set.add(a[i]["cattleNo"])
                         }
+                        setGrade("-")
+                        setGender("-")
                         break
                     }
                     case "PIG|PIG_NO": {
                         setScanSpecies("돼지")
+                        setGrade("-")
+                        setGender("-")
                         break
                     }
                     case "PIG|LOT_NO": {
                         // 얘는 걍 돼지임
                         setScanSpecies("돼지")
+                        setGrade("-")
+                        setGender("-")
                     }
                 }
-                console.log(a)
-                let s = a[0]["sexNm"]
-                console.log(s)
-                let g = a[index]["gradeNm"]
-                console.log(g)
-                setGrade(g)
+                // console.log(a)
+                // let s = a[0]["sexNm"]
+                // console.log(s)
+                // let g = _.get(a[index], "gradeNm", "-")
+                // console.log(g)
+
+                // setGrade(g)
+
                 setOrigin("국산")
                 setLoadingState(2)
             })
@@ -107,9 +116,9 @@ export async function getForeignMeatInfo(
                 console.log(response)
                 const species = xmlThatIWannaKill(response.data, "kprodNm")
                 console.log(species)
-                if (species.substring(0, 1) == "소") {
+                if (species.substring(0, 1) === "소") {
                     setScanSpecies("소")
-                } else if (species.substring(0, 1) == "돼") {
+                } else if (species.substring(0, 1) === "돼") {
                     setScanSpecies("돼지")
                 }
                 setGrade("-")

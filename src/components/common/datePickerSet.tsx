@@ -1,5 +1,6 @@
 import { Button, Col, Dropdown, Row, Stack } from "react-bootstrap"
 import DatePickerComponent from "../storage-section/datePicker"
+import { useEffect } from "react"
 
 interface IDatePickerSet {
     date: Date
@@ -19,6 +20,16 @@ export const DatePickerSet = (props: DatePickerProps) => {
     const { date, setDate, amPm, setAmPm, time, setTime, variant } =
         props.dateData
 
+    useEffect(() => {
+        if (date.getHours() >= 12) {
+            // pm
+            setAmPm(false)
+            setTime(time - 12)
+        } else if (date.getHours() < 12) {
+            setAmPm(true)
+            setTime(time)
+        }
+    }, [])
     return (
         <div>
             <Stack gap={1}>

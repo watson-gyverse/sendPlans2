@@ -12,24 +12,17 @@ import {
     TotalMeatLineContext,
 } from "./contexts/meatLineContext"
 import { MeatInfo } from "./utils/types/meatTypes"
-import EditScreen from "./screens/storage-section/editScreen"
 import { StorageMiddleWare } from "./utils/toLobbyMiddleware"
 import PlaceScreen from "./screens/aging-section/placeScreen"
 import { FetchScreen } from "./screens/aging-section/fetchScreen"
 import RecordScreen from "./screens/record-section/recordScreen"
 import { backgroundColors } from "./utils/consts/colors"
+import EditScreen from "./screens/storage-section/editScreen"
 
 const router = createBrowserRouter(
     [
         {
             path: "/",
-            // loader: async () => {
-            //     return new Promise((res) => {
-            //         setTimeout(() => {
-            //             return res("finish!")
-            //         }, 3000)
-            //     })
-            // },
             element: <Outlet />,
             errorElement: <ErrorScreen />,
             children: [
@@ -47,7 +40,7 @@ const router = createBrowserRouter(
                     ),
                     children: [
                         {
-                            path: "preset",
+                            index: true,
 
                             element: <PresetScreen />,
                         },
@@ -88,6 +81,10 @@ const router = createBrowserRouter(
                     path: "record",
                     element: <RecordScreen />,
                 },
+                {
+                    path: "*",
+                    element: <>Not Found 051</>,
+                },
             ],
         },
     ],
@@ -118,6 +115,7 @@ function App() {
                         style={{
                             width: "100%",
                             height: "100%",
+                            backgroundColor: backgroundColors.base,
                         }}
                     >
                         <Container
@@ -125,7 +123,6 @@ function App() {
                                 width: "380px",
                                 height: "auto",
                                 padding: "24px 20px 30px 20px",
-                                backgroundColor: backgroundColors.storedCard,
                             }}
                         >
                             <RouterProvider

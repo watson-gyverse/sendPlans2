@@ -11,17 +11,18 @@ type DatePickerProps = {
     targetDate: Date
     setTargetDate: (arg0: Date) => void
     variant: string
+    fontSize?: string
 }
 
 const DatePickerComponent = (props: DatePickerProps) => {
-    const { targetDate, setTargetDate, variant } = props
+    const { targetDate, setTargetDate, variant, fontSize } = props
 
     useEffect(() => {}, [props.targetDate])
     const CustomInput = forwardRef(
         ({ value, onClick }: DatePickerInputProps, ref: ForwardedRef<any>) => (
             <Button
                 style={{
-                    fontSize: "1.5rem",
+                    fontSize: fontSize ? fontSize : "1.5rem",
                 }}
                 variant={variant}
                 onClick={onClick}
@@ -37,10 +38,6 @@ const DatePickerComponent = (props: DatePickerProps) => {
             onChange={(date: Date) => setTargetDate(date)}
             customInput={React.createElement(CustomInput)}
             dateFormat='yyyy/MM/dd'
-            // showTimeSelect
-            // timeIntervals={60}
-            // minTime={setHours(setMinutes(new Date(), 0), 0)}
-            // maxTime={setHours(setMinutes(new Date(), 30), 23)}
         />
     )
 }

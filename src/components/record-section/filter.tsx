@@ -4,15 +4,8 @@ import _ from "lodash"
 import useFBFetch from "../../hooks/useFetch"
 import { fbCollections } from "../../utils/consts/constants"
 import { makeStepArray } from "../../utils/consts/functions"
-
-type RecordFilter = {
-    place: string
-    fridge: string
-    floor: string
-    species: boolean
-    isGooksan: boolean
-    sortStoredDateIncrease: boolean
-}
+import { Button } from "react-bootstrap"
+import DatePickerComponent from "../storage-section/datePicker"
 
 export type FilterProperties = {
     currentPlace: string
@@ -43,6 +36,15 @@ export const Filter = (props: FilterPackage) => {
     const places = useFBFetch<FirestorePlace>(fbCollections.sp2Places).data
     const [currentFirebasePlace, setFbPlace] = useState(places[0])
     const [currentFridges, setFridges] = useState<number[]>([]) //깔아줄 냉장고, active와 비교
+
+    const now = new Date()
+
+    const [storageFromDate, setSFDate] = useState(new Date())
+    const [storageToDate, setSTDate] = useState(new Date())
+    const [agingFromDate, setAFDate] = useState(new Date())
+    const [agingToDate, setATDate] = useState(new Date())
+    const [finishFromDate, setFFDate] = useState(new Date())
+    const [finishToDate, setFTDate] = useState(new Date())
 
     useEffect(() => {
         if (places.length !== 0) {
@@ -87,6 +89,7 @@ export const Filter = (props: FilterPackage) => {
         return _.isEqual(a, b)
     }
 
+    const categoryStyle = { margin: "4px 0 2px 2px" }
     return (
         <div style={{ display: "flex", flexDirection: "column" }}>
             <div
@@ -96,7 +99,7 @@ export const Filter = (props: FilterPackage) => {
                     flexDirection: "column",
                 }}
             >
-                <h6>장소</h6>
+                <h6 style={categoryStyle}>장소</h6>
                 <div style={{ display: "flex", flexWrap: "wrap" }}>
                     {places.map((place) => {
                         return (
@@ -104,8 +107,8 @@ export const Filter = (props: FilterPackage) => {
                                 style={{
                                     backgroundColor:
                                         place.name === currentPlace
-                                            ? "#55c551"
-                                            : "",
+                                            ? "#cc81f2"
+                                            : "#eabcff",
                                 }}
                                 value={place.count}
                                 onClick={() => {
@@ -118,7 +121,7 @@ export const Filter = (props: FilterPackage) => {
                         )
                     })}
                 </div>
-                <h6>냉장고</h6>
+                <h6 style={categoryStyle}>냉장고</h6>
                 <div>
                     <button
                         style={{
@@ -126,8 +129,8 @@ export const Filter = (props: FilterPackage) => {
                                 activeFridge,
                                 currentFridges
                             )
-                                ? "#55c551"
-                                : "",
+                                ? "#cc81f2"
+                                : "#eabcff",
                         }}
                         onClick={() => {
                             setActiveFridge(
@@ -144,8 +147,8 @@ export const Filter = (props: FilterPackage) => {
                         <button
                             style={{
                                 backgroundColor: isActive(i, activeFridge)
-                                    ? "#55c551"
-                                    : "",
+                                    ? "#cc81f2"
+                                    : "#eabcff",
                             }}
                             onClick={() => {
                                 onClickFridge(i)
@@ -155,12 +158,14 @@ export const Filter = (props: FilterPackage) => {
                         </button>
                     ))}
                 </div>
-                <h6>층</h6>
+                <h6 style={categoryStyle}>층</h6>
                 <div style={{ display: "flex", flexWrap: "wrap" }}>
                     <button
                         style={{
                             backgroundColor:
-                                activeFloor.length === 5 ? "#55c551" : "",
+                                activeFloor.length === 5
+                                    ? "#cc81f2"
+                                    : "#eabcff",
                         }}
                         onClick={() => {
                             setActiveFloor(
@@ -174,8 +179,8 @@ export const Filter = (props: FilterPackage) => {
                         <button
                             style={{
                                 backgroundColor: isActive(i, activeFloor)
-                                    ? "#55c551"
-                                    : "",
+                                    ? "#cc81f2"
+                                    : "#eabcff",
                             }}
                             onClick={() => {
                                 onClickFloor(i)
@@ -185,12 +190,14 @@ export const Filter = (props: FilterPackage) => {
                         </button>
                     ))}
                 </div>
-                <h6>육종</h6>
+                <h6 style={{ margin: "4px 0 2px 0" }}>육종</h6>
                 <div style={{ display: "flex", flexWrap: "wrap" }}>
                     <button
                         style={{
                             backgroundColor:
-                                activeSpecies.length === 2 ? "#55c551" : "",
+                                activeSpecies.length === 2
+                                    ? "#cc81f2"
+                                    : "#eabcff",
                         }}
                         onClick={() => {
                             setActiveSpecies(
@@ -203,8 +210,8 @@ export const Filter = (props: FilterPackage) => {
                     <button
                         style={{
                             backgroundColor: _.includes(activeSpecies, "소")
-                                ? "#55c551"
-                                : "",
+                                ? "#cc81f2"
+                                : "#eabcff",
                         }}
                         onClick={() => onClickSpecies("소")}
                     >
@@ -213,13 +220,79 @@ export const Filter = (props: FilterPackage) => {
                     <button
                         style={{
                             backgroundColor: _.includes(activeSpecies, "돼지")
-                                ? "#55c551"
-                                : "",
+                                ? "#cc81f2"
+                                : "#eabcff",
                         }}
                         onClick={() => onClickSpecies("돼지")}
                     >
                         돼지
                     </button>
+                </div>
+                <h6 style={categoryStyle}>입고일</h6>
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-around",
+                    }}
+                >
+                    <DatePickerComponent
+                        targetDate={storageFromDate}
+                        setTargetDate={setSFDate}
+                        variant='warning'
+                        fontSize='1rem'
+                    />
+                    <>~</>
+                    <DatePickerComponent
+                        targetDate={storageToDate}
+                        setTargetDate={setSTDate}
+                        variant='warning'
+                        fontSize='1rem'
+                    />
+                </div>
+                <h6 style={categoryStyle}>숙성시작일</h6>
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-around",
+                    }}
+                >
+                    <DatePickerComponent
+                        targetDate={agingFromDate}
+                        setTargetDate={setAFDate}
+                        variant='warning'
+                        fontSize='1rem'
+                    />
+                    <>~</>
+                    <DatePickerComponent
+                        targetDate={agingToDate}
+                        setTargetDate={setATDate}
+                        variant='warning'
+                        fontSize='1rem'
+                    />
+                </div>
+                <h6 style={categoryStyle}>숙성종료일</h6>
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-around",
+                    }}
+                >
+                    <DatePickerComponent
+                        targetDate={finishFromDate}
+                        setTargetDate={setFFDate}
+                        variant='warning'
+                        fontSize='1rem'
+                    />
+                    <>~</>
+                    <DatePickerComponent
+                        targetDate={finishToDate}
+                        setTargetDate={setFTDate}
+                        variant='warning'
+                        fontSize='1rem'
+                    />
                 </div>
             </div>
         </div>

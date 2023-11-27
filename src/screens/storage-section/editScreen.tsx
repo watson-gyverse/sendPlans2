@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react"
 import toast, { Toaster } from "react-hot-toast"
 import { EditCard } from "../../components/storage-section/editCard"
 import { Button, Modal, Stack } from "react-bootstrap"
@@ -8,6 +7,9 @@ import { sessionKeys, xlsxHeaders } from "../../utils/consts/constants"
 import * as xlsx from "xlsx"
 import { useNavigate } from "react-router-dom"
 import { addToFirestore } from "../../apis/storageApi"
+import { backgroundColors } from "../../utils/consts/colors"
+import _ from "lodash"
+import { useCallback, useEffect, useMemo, useState } from "react"
 export default function EditScreen() {
     const [show, setShow] = useState(false)
 
@@ -17,6 +19,7 @@ export default function EditScreen() {
         JSON.parse(initItems ? initItems : "[]")
     )
     //true : disable
+    const [disableXlsxButton, setXlsxButtonDisabled] = useState(true)
     const [disableButton, setButtonDisabled] = useState(true)
 
     const [recentMeatInfo, setRecentMeatInfo] = useState<
@@ -27,14 +30,11 @@ export default function EditScreen() {
     const navigate = useNavigate()
 
     useEffect(() => {
-        console.log("**init use effect**")
-        console.log(items)
-        console.log(xlsxData)
-        console.log(dataNullChecker)
+        setXlsxButtonDisabled(dataNullChecker)
         setButtonDisabled(dataNullChecker)
     }, [])
     useEffect(() => {
-        console.log(dataNullChecker)
+        setXlsxButtonDisabled(dataNullChecker)
         setButtonDisabled(dataNullChecker)
     }, items)
 
@@ -79,23 +79,21 @@ export default function EditScreen() {
     }
 
     const writeXlsx = () => {
+        console.log("디바운스좀해주세요")
         const book = xlsx.utils.book_new()
         const xlsxLetsgo = xlsx.utils.json_to_sheet(xlsxData, {
             header: xlsxHeaders,
         })
         xlsx.utils.book_append_sheet(book, xlsxLetsgo, "DGAZA")
-        xlsx.writeFile(book, "storedInfo.xlsx")
+        xlsx.writeFile(book, "storedInsfo.xlsx")
     }
-
-    const addDocumentToFirestore = () => {
+    const sendFirestore = () => {
         xlsxData.forEach((item) => {
             addToFirestore(
                 item,
                 () => {
                     toast.success("DB에 등록 성공")
-                    // setTimeout(() => {
-                    //     navigate("../preset")
-                    // }, 1000)
+                    setButtonDisabled(true)
                 },
                 () => {
                     toast.error("실패했다..!")
@@ -104,12 +102,21 @@ export default function EditScreen() {
         })
     }
 
+    const write = useCallback(_.debounce(writeXlsx, 1000), [xlsxData])
+
+    const send = useCallback(_.debounce(sendFirestore, 1000), [xlsxData])
+
     //빈 게 있으면 null
     const dataNullChecker = items.some((item) =>
         Object.values(item).includes(null)
     )
     return (
-        <div>
+        <div
+            style={{
+                backgroundColor: backgroundColors.storage_back,
+                padding: "20px 10px",
+            }}
+        >
             <Toaster />
             <Stack gap={2}>
                 <Button
@@ -142,8 +149,8 @@ export default function EditScreen() {
                     }}
                 >
                     <Button
-                        disabled={disableButton}
-                        onClick={writeXlsx}
+                        disabled={disableXlsxButton}
+                        onClick={write}
                     >
                         엑셀로
                         <br />
@@ -151,9 +158,11 @@ export default function EditScreen() {
                     </Button>
                     <Button
                         disabled={disableButton}
-                        onClick={addDocumentToFirestore}
+                        onClick={send}
                     >
-                        DB에 저장하기
+                        DB에
+                        <br />
+                        저장하기
                     </Button>
                 </div>
             </Stack>
