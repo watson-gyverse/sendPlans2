@@ -1,16 +1,14 @@
 import { Button, ButtonGroup, Stack, ToggleButton } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { BeefCuts, PorkCuts } from "../../utils/consts/meat"
 import toast, { Toaster } from "react-hot-toast"
 import { sessionKeys } from "../../utils/consts/constants"
-import { CurrentScanTextContext } from "../../contexts/meatLineContext"
 import moment from "moment"
-import { backgroundColors, fontColors } from "../../utils/consts/colors"
+import { backgroundColors } from "../../utils/consts/colors"
 import { DatePickerSet } from "../../components/common/datePickerSet"
 
 export default function PresetScreen() {
-    const { scanText, setScanText } = useContext(CurrentScanTextContext)
     const [date, setDate] = useState(new Date())
     const [time, setTime] = useState(
         // new Date().getHours() >= 12
@@ -50,7 +48,7 @@ export default function PresetScreen() {
             session.setItem(sessionKeys.storageSpecies, species)
             session.setItem(sessionKeys.storageCut, cut)
 
-            navigate("../camera")
+            navigate("camera")
         }
     }
 
@@ -71,7 +69,7 @@ export default function PresetScreen() {
         if (tempSpecies != null) setSpecies(tempSpecies)
         if (tempCut != null) setCut(tempCut)
         session.setItem("scanText", "undefined")
-        setScanText("undefined")
+
         session.setItem(sessionKeys.storageItems, "")
     }, [])
 

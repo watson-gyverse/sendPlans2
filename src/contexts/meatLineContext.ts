@@ -1,36 +1,13 @@
-import { createContext, useState } from "react"
-import { MeatInfo, MeatInfoWithCount } from "../utils/types/meatTypes"
-
-type SetCurrentContextType = {
-    currentContext: MeatInfo | null
-    setCurrentContext: React.Dispatch<React.SetStateAction<MeatInfo | null>>
-}
-type SetTotalContextType = {
-    totalContext: Map<string, MeatInfoWithCount>
-    setTotalContext: React.Dispatch<
-        React.SetStateAction<Map<string, MeatInfoWithCount>>
-    >
-}
-type SetScanTextContextType = {
+import { createContext } from "react"
+type SetStorageContextType = {
     scanText: string
     setScanText: React.Dispatch<React.SetStateAction<string>>
 }
-const CurrentMeatLine = {
-    currentContext: null,
-    setCurrentContext: () => {},
+
+const storageContext = {
+    scanText: "init_scanText",
+    setScanText: () => {},
 }
 
-const TotalMeatLine = {
-    totalContext: new Map(),
-    setTotalContext: () => {},
-}
-
-const CurrentScanText = { scanText: "init_scanText", setScanText: () => {} }
-
-export const CurrentMeatLineContext =
-    createContext<SetCurrentContextType>(CurrentMeatLine)
-export const TotalMeatLineContext =
-    createContext<SetTotalContextType>(TotalMeatLine)
-
-export const CurrentScanTextContext =
-    createContext<SetScanTextContextType>(CurrentScanText)
+export const StorageContext =
+    createContext<SetStorageContextType>(storageContext)

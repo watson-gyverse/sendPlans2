@@ -5,7 +5,7 @@ export type MeatPreset = {
 }
 
 export type MeatScanned = MeatPreset & {
-    meatNumber: string | null
+    meatNumber: string
     //국산/수입
     origin: string | null
     //아래는 소만 조회되고 돼지는 직접 기입
@@ -41,23 +41,26 @@ export type MeatInfoAiO = MeatInfoWithEntry & {
     docId: string | null
 }
 
-// export type CSVType = {
-//     [index: string]: string
-//     storedDate: string
-//     meatNumber: string
-//     entryNumber: string
-//     species: string
-//     origin: string
-//     gender: string
-//     grade: string
-//     cut: string
-//     freeze: string
-//     price: string
-// }
-
-export type XlsxType = {
+export type XlsxStoreType = {
     [index: string]: string
     입고일: string
+    이력번호: string
+    순번: string
+    육종: string
+    원산지: string
+    암수: string
+    등급: string
+    부위: string
+    보관: string
+    단가: string
+}
+export type XlsxAgingType = {
+    [index: string]: string
+    입고일: string
+    숙성시작일: string
+    숙성전무게: string
+    냉장고번호: string
+    냉장고층: string
     이력번호: string
     순번: string
     육종: string

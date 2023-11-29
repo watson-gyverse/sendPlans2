@@ -7,7 +7,7 @@ import {
     PorkOriginAndGrades,
 } from "../../utils/consts/meat"
 import { useEffect } from "react"
-import { MeatInfo, MeatInfoWithCount } from "../../utils/types/meatTypes"
+import { MeatInfoWithCount } from "../../utils/types/meatTypes"
 
 type FormOptions = {
     price: number
@@ -188,11 +188,11 @@ function EditModal(props: ModalParams) {
                 <Form.Check
                     inline
                     type='radio'
-                    label='알수없음'
+                    label='암수불명'
                     {...register("gender", {
                         required: "성별을 입력해주세요",
                     })}
-                    value='알수없음'
+                    value='암수불명'
                     name='gender'
                     id='genderX'
                 />

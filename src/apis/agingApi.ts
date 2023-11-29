@@ -74,6 +74,14 @@ export async function fetchFromFirestore(
         }
         aArray.push(item)
     })
+    // let init: { [index: string]: Array<MeatInfoWithEntry> } = {}
+    // const reducedS = sArray.reduce((acc, cur) => {
+    //     let key = cur.meatNumber
+    //     acc[key] ? acc[key].push(cur) : (acc[key] = [cur])
+    //     return acc
+    // }, init)
+
+    // const sArrayArray = Object.values(reducedS)
     setStoredItems(sortMeatInfoArray(sArray))
     setAgingItems(sortMeatInfoArray(aArray))
 }

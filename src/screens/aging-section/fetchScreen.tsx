@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { createContext, useCallback, useEffect, useState } from "react"
 import {
     Button,
     ButtonGroup,
@@ -23,6 +23,8 @@ import { AiFillSetting } from "react-icons/ai"
 import FinishAgingModal from "../../components/aging-section/agingFinishModal"
 import _ from "lodash"
 import { backgroundColors } from "../../utils/consts/colors"
+import { NewAgingCard } from "../../components/aging-section/agingEditNewCard"
+import { AgingEditContextType } from "../../contexts/agingEditContext"
 
 export const FetchScreen = () => {
     const navigate = useNavigate()
@@ -32,6 +34,7 @@ export const FetchScreen = () => {
 
     const [isEditMode, setIsEditMode] = useState(false)
     const [storedItems, setStoredItems] = useState<MeatInfoWithEntry[]>([])
+    const [storedItemsS, setStoredItemsS] = useState<MeatInfoWithEntry[][]>([])
     const [agingItems, setAgingItems] = useState<MeatInfoWithEntry[]>([])
     const [editModalShow, setEditModalShow] = useState(false)
     const [finishModalShow, setFinishModalShow] = useState(false)
@@ -56,6 +59,33 @@ export const FetchScreen = () => {
     }
 
     //체크된 애들 중 숙성정보 입력을 다 안한 애들이 있는지 검증
+
+    const onClickStartAging = async (item: MeatInfoWithEntry) => {
+        const ok = window.confirm(
+            "이대로 숙성을 진행하시겠습니까? 취소할 수 없습니다."
+        )
+        if (ok)
+            await startAging(
+                item,
+                setStoredItems,
+                setAgingItems,
+                placeName,
+                fetch
+            )
+    }
+
+    const agingEditProps: AgingEditContextType = {
+        isEditMode: isEditMode,
+        setEditMode: setIsEditMode,
+        recentMeatInfo: recentMeatInfo,
+        setRecentMeatInfo: setRecentMeatInfo,
+        setModalShow: setEditModalShow,
+        fetch: fetch,
+        onClickStartAging: onClickStartAging,
+    }
+    // const AgingEditContext = createContext<AgingEditContextType>(
+    //     agingEditProps
+    // )
 
     const checkNullCheckedS = () => {
         if (checkedSList.size === 0) {
@@ -104,6 +134,15 @@ export const FetchScreen = () => {
 
     useEffect(() => {
         checkedSList.clear()
+        let init: { [index: string]: Array<MeatInfoWithEntry> } = {}
+        const reducedS = storedItems.reduce((acc, cur) => {
+            let key = cur.meatNumber
+            acc[key] ? acc[key].push(cur) : (acc[key] = [cur])
+            return acc
+        }, init)
+
+        const sArrayArray = Object.values(reducedS)
+        setStoredItemsS(sArrayArray)
     }, [storedItems])
 
     useEffect(() => {
@@ -114,52 +153,20 @@ export const FetchScreen = () => {
         navigate("../")
     }
 
-    const onTabChanged = (key: string | null) => {
-        if (key === "storage") setWhichTab(true)
-        else setWhichTab(false)
-    }
-
-    const onClickStartAging = async (item: MeatInfoWithEntry) => {
-        const ok = window.confirm(
-            "이대로 숙성을 진행하시겠습니까? 취소할 수 없습니다."
-        )
-        if (ok) {
-            await passToAgingCollection(item)
-            await fetchFromFirestore(
-                setStoredItems,
-                setAgingItems,
-                placeName,
-                () => {
-                    console.log("fetch !@")
-                    fetch()
-                },
-                () => {
-                    console.log("error !@")
-                }
-            )
-        }
-    }
-
     const onClickStartAgingSelected = useCallback(async () => {
         const ok = window.confirm("선택한 아이템을 모두 숙성시작시킵니다.")
         if (ok) {
             checkedSList.forEach(async (item) => {
                 const a = _.find(storedItems, { docId: item })
-                await passToAgingCollection(a!!)
-                await fetchFromFirestore(
-                    setStoredItems,
-                    setAgingItems,
-                    placeName,
-                    () => {
-                        toast.success("숙성시작 ")
-                        console.log("fetch !@")
-                        fetch()
-                        setCheckedSList(new Set())
-                    },
-                    () => {
-                        console.log("error !@")
-                    }
-                )
+                if (a) {
+                    await startAging(
+                        a,
+                        setStoredItems,
+                        setAgingItems,
+                        placeName,
+                        fetch
+                    )
+                }
             })
         }
     }, [checkedSList])
@@ -173,14 +180,14 @@ export const FetchScreen = () => {
         setIsEditMode(!isEditMode)
     }
 
-    const onClickDeleteButton = (item: MeatInfoWithEntry) => {
-        const ok = window.confirm(
-            "입고 중인 아이템입니다. 정말 삭제하시겠습니까?"
-        )
-        if (ok) {
-            deleteFromStorage(item.docId!!, fetch())
-        }
-    }
+    // const onClickDeleteButton = (item: MeatInfoWithEntry) => {
+    //     const ok = window.confirm(
+    //         "입고 중인 아이템입니다. 정말 삭제하시겠습니까?"
+    //     )
+    //     if (ok) {
+    //         deleteFromStorage(item.docId!!, fetch())
+    //     }
+    // }
     const onClickAgingDeleteButton = (item: MeatInfoWithEntry) => {
         const ok = window.confirm(
             "숙성 중인 아이템입니다. 정말 삭제하시겠습니까?"
@@ -296,6 +303,7 @@ export const FetchScreen = () => {
                 <ButtonGroup>
                     <ToggleButton
                         id='storage'
+                        className='shadow-none'
                         value='storage'
                         variant='danger'
                         onClick={() => setWhichTab(true)}
@@ -319,6 +327,7 @@ export const FetchScreen = () => {
                     </ToggleButton>
                     <ToggleButton
                         id='aging'
+                        className='shadow-none'
                         value='aging'
                         variant='danger'
                         onClick={() => setWhichTab(false)}
@@ -381,6 +390,15 @@ export const FetchScreen = () => {
                             선택한 고기 숙성하기
                         </Button>
                     </div>
+                    {storedItemsS.map((ss) => {
+                        return (
+                            <NewAgingCard
+                                items={ss}
+                                agingEditProps={agingEditProps}
+                            />
+                        )
+                    })}
+
                     {storedItems.map((item) => {
                         return (
                             <div>
@@ -404,9 +422,9 @@ export const FetchScreen = () => {
                                             setRecentMeatInfo(item)
                                             setEditModalShow(true)
                                         }}
-                                        onClickDelete={(it) => {
-                                            onClickDeleteButton(it)
-                                        }}
+                                        // onClickDelete={(it) => {
+                                        //     onClickDeleteButton(it)
+                                        // }}
                                         startAgingEvent={(it) => {
                                             onClickStartAging(it)
                                         }}
@@ -448,7 +466,6 @@ export const FetchScreen = () => {
                                         }
                                     />
                                 </div>
-                                {/* </label> */}
                             </div>
                         )
                     })}
@@ -507,4 +524,27 @@ export const FetchScreen = () => {
             </Modal>
         </div>
     )
+}
+async function startAging(
+    item: MeatInfoWithEntry,
+    setStoredItems: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
+    setAgingItems: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
+    placeName: any,
+    fetch: () => void
+) {
+    {
+        await passToAgingCollection(item)
+        await fetchFromFirestore(
+            setStoredItems,
+            setAgingItems,
+            placeName,
+            () => {
+                console.log("fetch !@")
+                fetch()
+            },
+            () => {
+                console.log("error !@")
+            }
+        )
+    }
 }

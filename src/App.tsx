@@ -6,12 +6,7 @@ import MainScreen from "./screens/mainScreen"
 import ErrorScreen from "./screens/errorScreen"
 import CameraScreen from "./screens/storage-section/cameraScreen"
 import { Container } from "react-bootstrap"
-import {
-    CurrentMeatLineContext,
-    CurrentScanTextContext,
-    TotalMeatLineContext,
-} from "./contexts/meatLineContext"
-import { MeatInfo } from "./utils/types/meatTypes"
+import { StorageContext } from "./contexts/meatLineContext"
 import { StorageMiddleWare } from "./utils/toLobbyMiddleware"
 import PlaceScreen from "./screens/aging-section/placeScreen"
 import { FetchScreen } from "./screens/aging-section/fetchScreen"
@@ -98,42 +93,36 @@ function App() {
         setLoading(false)
     }
     init()
-    const [currentContext, setCurrentContext] = useState<MeatInfo | null>(null)
-    const [totalContext, setTotalContext] = useState(new Map())
+
     const [scanText, setScanText] = useState<string>("undefined")
     return (
-        <TotalMeatLineContext.Provider
-            value={{ totalContext, setTotalContext }}
+        <StorageContext.Provider
+            value={{
+                scanText,
+                setScanText,
+            }}
         >
-            <CurrentMeatLineContext.Provider
-                value={{ currentContext, setCurrentContext }}
+            <div
+                style={{
+                    width: "100%",
+                    height: "100%",
+                    backgroundColor: backgroundColors.base,
+                }}
             >
-                <CurrentScanTextContext.Provider
-                    value={{ scanText, setScanText }}
+                <Container
+                    style={{
+                        width: "380px",
+                        height: "auto",
+                        padding: "24px 20px 30px 20px",
+                    }}
                 >
-                    <div
-                        style={{
-                            width: "100%",
-                            height: "100%",
-                            backgroundColor: backgroundColors.base,
-                        }}
-                    >
-                        <Container
-                            style={{
-                                width: "380px",
-                                height: "auto",
-                                padding: "24px 20px 30px 20px",
-                            }}
-                        >
-                            <RouterProvider
-                                router={router}
-                                // fallbackElement={<div>로딩</div>}
-                            />
-                        </Container>
-                    </div>
-                </CurrentScanTextContext.Provider>
-            </CurrentMeatLineContext.Provider>
-        </TotalMeatLineContext.Provider>
+                    <RouterProvider
+                        router={router}
+                        // fallbackElement={<div>로딩</div>}
+                    />
+                </Container>
+            </div>
+        </StorageContext.Provider>
     )
 }
 

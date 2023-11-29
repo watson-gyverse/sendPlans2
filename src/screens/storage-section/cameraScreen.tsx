@@ -10,11 +10,11 @@ import toast, { Toaster } from "react-hot-toast"
 import { sessionKeys } from "../../utils/consts/constants"
 import * as _ from "lodash"
 import { ScanResultCart } from "../../components/storage-section/scanResultCart"
-import { CurrentScanTextContext } from "../../contexts/meatLineContext"
+import { StorageContext } from "../../contexts/meatLineContext"
 import { backgroundColors } from "../../utils/consts/colors"
 
 export default function CameraScreen() {
-    const { scanText, setScanText } = useContext(CurrentScanTextContext)
+    const { scanText, setScanText } = useContext(StorageContext)
 
     const [showScanner, setShowScanner] = useState(true)
     const [manualNumber, setManualNumber] = useState("")
@@ -200,7 +200,7 @@ export default function CameraScreen() {
     }, [scanSpecies])
 
     const goToPreset = () => {
-        navigate("/storage/preset")
+        navigate("/storage")
     }
     return (
         <div

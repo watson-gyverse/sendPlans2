@@ -1,10 +1,10 @@
 import { Firestore, addDoc, collection, getFirestore } from "firebase/firestore"
-import { MeatInfoWithCount, XlsxType } from "../utils/types/meatTypes"
+import { MeatInfoWithCount, XlsxStoreType } from "../utils/types/meatTypes"
 import { fbCollections } from "../utils/consts/constants"
 import { firestoreDB } from "../utils/Firebase"
 
 export async function addToFirestore(
-    data: XlsxType,
+    data: XlsxStoreType,
     thenWhat: () => void,
     catchWhat: () => void
 ) {

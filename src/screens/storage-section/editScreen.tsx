@@ -2,14 +2,14 @@ import toast, { Toaster } from "react-hot-toast"
 import { EditCard } from "../../components/storage-section/editCard"
 import { Button, Modal, Stack } from "react-bootstrap"
 import EditModal from "../../components/storage-section/editModal"
-import { MeatInfoWithCount, XlsxType } from "../../utils/types/meatTypes"
+import { MeatInfoWithCount, XlsxStoreType } from "../../utils/types/meatTypes"
 import { sessionKeys, xlsxHeaders } from "../../utils/consts/constants"
 import * as xlsx from "xlsx"
 import { useNavigate } from "react-router-dom"
 import { addToFirestore } from "../../apis/storageApi"
 import { backgroundColors } from "../../utils/consts/colors"
 import _ from "lodash"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 export default function EditScreen() {
     const [show, setShow] = useState(false)
 
@@ -25,7 +25,7 @@ export default function EditScreen() {
     const [recentMeatInfo, setRecentMeatInfo] = useState<
         MeatInfoWithCount | undefined
     >()
-    const [xlsxData, setXlsxData] = useState<XlsxType[]>([])
+    const [xlsxData, setXlsxData] = useState<XlsxStoreType[]>([])
 
     const navigate = useNavigate()
 
@@ -36,7 +36,7 @@ export default function EditScreen() {
     useEffect(() => {
         setXlsxButtonDisabled(dataNullChecker)
         setButtonDisabled(dataNullChecker)
-    }, items)
+    }, [items])
 
     useEffect(() => {
         if (recentMeatInfo === undefined) {
@@ -55,9 +55,9 @@ export default function EditScreen() {
     }, [recentMeatInfo])
 
     const makeXlsxData = (items: MeatInfoWithCount[]) => {
-        let list: XlsxType[] = []
+        let list: XlsxStoreType[] = []
         for (let item of items) {
-            for (let i = 0; i < item.count; i++) {
+            for (let i = 1; i <= item.count; i++) {
                 list = [
                     ...list,
                     {

@@ -6,13 +6,12 @@ type AgingCardType = {
     meatInfo: MeatInfoWithEntry
     isEditMode: boolean
     clickEvent: () => void
-    onClickDelete: (meatInfo: MeatInfoWithEntry) => void
+    // onClickDelete: (meatInfo: MeatInfoWithEntry) => void
     startAgingEvent: (meatInfo: MeatInfoWithEntry) => void
 }
 
 export const AgingEditCard = (props: AgingCardType) => {
-    const { meatInfo, isEditMode, clickEvent, startAgingEvent, onClickDelete } =
-        props
+    const { meatInfo, isEditMode, clickEvent, startAgingEvent } = props
 
     return (
         <div>
@@ -46,7 +45,7 @@ export const AgingEditCard = (props: AgingCardType) => {
                                 height: "30px",
                                 color: "#f74f32",
                             }}
-                            onClick={() => onClickDelete(meatInfo)}
+                            // onClick={() => onClickDelete(meatInfo)}
                         />
                     </div>
 
