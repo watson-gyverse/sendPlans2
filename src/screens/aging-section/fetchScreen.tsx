@@ -39,8 +39,8 @@ export const FetchScreen = () => {
     const [finishModalShow, setFinishModalShow] = useState(false)
     const [recentMeatInfo, setRecentMeatInfo] = useState<MeatInfoWithEntry>()
 
-    const [checkedSList, setCheckedSList] = useState<Set<string>>(new Set())
-    const [checkedAList, setCheckedAList] = useState<Set<string>>(new Set())
+    const [checkedSList, setCheckedSList] = useState<string[]>([])
+    const [checkedAList, setCheckedAList] = useState<string[]>([])
     const [whichTab, setWhichTab] = useState(true)
 
     function fetch() {
@@ -81,10 +81,12 @@ export const FetchScreen = () => {
         setModalShow: setEditModalShow,
         fetch: fetch,
         onClickStartAging: onClickStartAging,
+        checkedSList: checkedSList,
+        setCheckedSList: setCheckedSList,
     }
 
     const checkNullCheckedS = () => {
-        if (checkedSList.size === 0) {
+        if (checkedSList.length === 0) {
             return false
         }
         let a = true
@@ -131,7 +133,7 @@ export const FetchScreen = () => {
 
     useEffect(() => {
         console.log("stored변경", storedItems)
-        checkedSList.clear()
+        setCheckedSList([])
         let init: { [index: string]: Array<MeatInfoWithEntry> } = {}
         const reducedS = storedItems.reduce((acc, cur) => {
             let key = cur.meatNumber
@@ -207,23 +209,21 @@ export const FetchScreen = () => {
     const onCheckAll = useCallback(
         (checked: boolean) => {
             if (checked) {
-                const list: Set<string> = new Set()
+                const list: string[] = []
 
                 if (whichTab) {
                     storedItems.forEach((item: MeatInfoWithEntry) =>
-                        list.add(item.docId!!)
+                        list.push(item.docId!!)
                     )
                     setCheckedSList(list)
                 } else {
                     agingItems.forEach((item: MeatInfoWithEntry) =>
-                        list.add(item.docId!!)
+                        list.push(item.docId!!)
                     )
                     setCheckedAList(list)
                 }
             } else {
-                whichTab
-                    ? setCheckedSList(new Set())
-                    : setCheckedAList(new Set())
+                whichTab ? setCheckedSList([]) : setCheckedAList([])
             }
         },
         [whichTab ? storedItems : agingItems]
@@ -232,19 +232,17 @@ export const FetchScreen = () => {
     const onCheckElement = (checked: boolean, item: string) => {
         if (checked) {
             if (whichTab) {
-                setCheckedSList(new Set([...checkedSList, item]))
+                setCheckedSList([...checkedSList, item])
             } else {
-                setCheckedAList(new Set([...checkedAList, item]))
+                setCheckedAList([...checkedAList, item])
             }
         } else {
             if (whichTab) {
-                const newSSet = new Set(checkedSList)
-                newSSet.delete(item)
-                setCheckedSList(newSSet)
+                const newList = _.pull(checkedSList, item)
+                setCheckedSList(newList)
             } else {
-                const newSet = new Set(checkedAList)
-                newSet.delete(item)
-                setCheckedAList(newSet)
+                const newList = _.pull(checkedAList, item)
+                setCheckedAList(newList)
             }
         }
     }
@@ -374,7 +372,7 @@ export const FetchScreen = () => {
                                 id='selectSAll'
                                 onChange={(e) => onCheckAll(e.target.checked)}
                                 checked={
-                                    checkedSList.size === storedItems.length
+                                    checkedSList.length === storedItems.length
                                 }
                             />
                             <label
@@ -418,7 +416,10 @@ export const FetchScreen = () => {
                                             item.docId!!
                                         )
                                     }
-                                    checked={checkedSList.has(item.docId!!)}
+                                    checked={_.includes(
+                                        checkedSList,
+                                        item.docId!!
+                                    )}
                                 />
                                 <label htmlFor={"Scheckbox" + item.docId}>
                                     <AgingEditCard

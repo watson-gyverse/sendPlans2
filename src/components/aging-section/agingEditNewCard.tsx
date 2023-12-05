@@ -4,6 +4,7 @@ import { useState } from "react"
 import { TiDeleteOutline } from "react-icons/ti"
 import { deleteFromStorage } from "../../apis/agingApi"
 import { AgingEditContextType } from "../../contexts/agingEditContext"
+import _ from "lodash"
 
 interface IAgingCardProps {
     items: MeatInfoWithEntry[]
@@ -12,15 +13,35 @@ interface IAgingCardProps {
 
 export const NewAgingCard = (props: IAgingCardProps) => {
     const items = props.items
-    const {
-        isEditMode,
-        setRecentMeatInfo,
-        setModalShow,
-        fetch,
-        onClickStartAging,
-    } = props.agingEditProps
+    const { checkedSList, setCheckedSList } = props.agingEditProps
 
     const [show, setShow] = useState(false)
+
+    const onCheckAll = (checked: boolean) => {
+        const mapped: string[] = _.map(items, "docId")
+        if (checked) {
+            const union = _.union(checkedSList, mapped)
+            setCheckedSList(union)
+        } else {
+            const deleted = _.remove(checkedSList, (item) => {
+                return _.includes(mapped, item)
+            })
+            console.log(deleted)
+            console.log(checkedSList)
+            setCheckedSList([...checkedSList])
+        }
+    }
+
+    const checkAllChecked = () => {
+        let allChecked = true
+        items.forEach((item) => {
+            if (!_.includes(checkedSList, item.docId)) {
+                allChecked = false
+            }
+        })
+
+        return allChecked
+    }
 
     return (
         <Stack gap={2}>
@@ -33,8 +54,10 @@ export const NewAgingCard = (props: IAgingCardProps) => {
                 <input
                     type='checkbox'
                     id={"Sche" + items[0].meatNumber}
+                    onChange={(e) => onCheckAll(e.target.checked)}
+                    checked={checkAllChecked()}
                 />
-                <label htmlFor='Sche'>
+                <label htmlFor={"Sche" + items[0].meatNumber}>
                     <AgingEditCardHeader
                         item={items[0]}
                         show={show}
@@ -68,6 +91,8 @@ const NewAgingCardItem = (props: INewAgingCardItem) => {
         setModalShow,
         fetch,
         onClickStartAging,
+        checkedSList,
+        setCheckedSList,
     } = props.agingEditProps
 
     const onClickDeleteButton = (item: MeatInfoWithEntry) => {
@@ -79,11 +104,23 @@ const NewAgingCardItem = (props: INewAgingCardItem) => {
         }
     }
 
+    const onCheckElement = (checked: boolean, item: string) => {
+        console.log(checked)
+        if (checked) {
+            setCheckedSList([...checkedSList, item])
+        } else {
+            const newList = _.without(checkedSList, item)
+            setCheckedSList(newList)
+        }
+    }
+
     return (
         <div style={{ display: "flex", justifyContent: "right" }}>
             <input
                 type='checkbox'
                 id={"Sche" + item.docId}
+                onChange={(e) => onCheckElement(e.target.checked, item.docId!!)}
+                checked={_.includes(checkedSList, item.docId!!)}
             />
             <label htmlFor={"Sche" + item.docId}>
                 <div

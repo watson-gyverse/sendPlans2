@@ -8,4 +8,6 @@ export type AgingEditContextType = {
     setModalShow: (showModal: boolean) => void
     fetch: () => void
     onClickStartAging: (meatInfo: MeatInfoWithEntry) => Promise<void>
+    checkedSList: string[]
+    setCheckedSList: (list: string[]) => void
 }

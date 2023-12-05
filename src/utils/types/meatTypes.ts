@@ -29,7 +29,7 @@ export type MeatInfoWithEntry = MeatInfo & {
     floor: number | null
     beforeWeight: number | null
     agingDate: string | null
-    docId: string | null
+    docId: string
     ultraTime: number | null
 }
 

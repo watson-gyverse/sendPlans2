@@ -69,12 +69,12 @@ const router = createBrowserRouter(
                         { index: true, element: <PlaceScreen /> },
                         {
                             path: "fetch/",
-                            element: <FetchScreen />,
-                        },
-                        {
-                            path: "fetch2/",
                             element: <FetchScreen2 />,
                         },
+                        // {
+                        //     path: "fetch2/",
+                        //     element: <FetchScreen2 />,
+                        // },
                     ],
                 },
                 {

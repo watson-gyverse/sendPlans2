@@ -30,8 +30,8 @@ export const FetchScreen2 = () => {
     const [agingItems, setAgingItems] = useState<MeatInfoWithEntry[]>([])
     const [recentMeatInfo, setRecentMeatInfo] = useState<MeatInfoWithEntry>()
 
-    const [checkedSList, setCheckedSList] = useState<Set<string>>(new Set())
-    const [checkedAList, setCheckedAList] = useState<Set<string>>(new Set())
+    const [checkedSList, setCheckedSList] = useState<string[]>([])
+    const [checkedAList, setCheckedAList] = useState<string[]>([])
 
     const [whichTab, setWhichTab] = useState(true)
     const [editModalShow, setEditModalShow] = useState(false)
@@ -67,16 +67,18 @@ export const FetchScreen2 = () => {
         setModalShow: setEditModalShow,
         fetch: fetch,
         onClickStartAging: onClickStartAging,
+        checkedSList: checkedSList,
+        setCheckedSList: setCheckedSList,
     }
 
     //true null없음
     const checkNullCheckedS = () => {
-        if (checkedSList.size === 0) {
+        if (checkedSList.length === 0) {
             return false
         }
         let isClean = true
         checkedSList.forEach((item) => {
-            let it = _.find(_.flatten(storedItems), { docId: item })
+            let it = _.find(rawItems, { docId: item })
             if (it !== undefined) {
                 console.log(it)
                 if (
@@ -85,10 +87,10 @@ export const FetchScreen2 = () => {
                     it.fridgeName === null ||
                     it.floor === null
                 ) {
-                    console.log("비활성화함?")
+                    console.log("null 있음")
                     isClean = false
                 } else {
-                    console.log("비활성화안함?")
+                    console.log("null 없음")
                 }
             }
         })
@@ -158,18 +160,18 @@ export const FetchScreen2 = () => {
     const onClickStartAgingSelected = useCallback(async () => {
         const ok = window.confirm("선택한 아이템을 모두 숙성시작시킵니다.")
         if (ok) {
-            // checkedSList.forEach(async (item) => {
-            //     const a = _.find(storedItems, { docId: item })
-            //     if (a) {
-            //         await startAging(
-            //             a,
-            //             setStoredItems,
-            //             setAgingItems,
-            //             placeName,
-            //             fetch
-            //         )
-            //     }
-            // })
+            checkedSList.forEach(async (item) => {
+                const a = _.find(rawItems, { docId: item })
+                if (a) {
+                    await startAging(
+                        a,
+                        setRawItems,
+                        setAgingItems,
+                        placeName,
+                        fetch
+                    )
+                }
+            })
         }
     }, [checkedSList])
 
@@ -201,25 +203,16 @@ export const FetchScreen2 = () => {
 
     const onCheckAll = useCallback(
         (checked: boolean) => {
-            console.log(storedItems)
             if (checked) {
-                const list: Set<string> = new Set()
-
                 if (whichTab) {
-                    // storedItems.forEach((item: MeatInfoWithEntry) =>
-                    //     list.add(item.docId!!)
-                    // )
-                    // setCheckedSList(list)
+                    const mapped = _.map(rawItems, "docId")
+                    setCheckedSList(mapped)
                 } else {
-                    agingItems.forEach((item: MeatInfoWithEntry) =>
-                        list.add(item.docId!!)
-                    )
-                    setCheckedAList(list)
+                    const mapped = _.map(agingItems, "docId")
+                    setCheckedAList(mapped)
                 }
             } else {
-                whichTab
-                    ? setCheckedSList(new Set())
-                    : setCheckedAList(new Set())
+                whichTab ? setCheckedSList([]) : setCheckedAList([])
             }
         },
         [whichTab ? storedItems : agingItems]
@@ -228,19 +221,17 @@ export const FetchScreen2 = () => {
     const onCheckElement = (checked: boolean, item: string) => {
         if (checked) {
             if (whichTab) {
-                setCheckedSList(new Set([...checkedSList, item]))
+                setCheckedSList([...checkedSList, item])
             } else {
-                setCheckedAList(new Set([...checkedAList, item]))
+                setCheckedAList([...checkedAList, item])
             }
         } else {
             if (whichTab) {
-                const newSSet = new Set(checkedSList)
-                newSSet.delete(item)
-                setCheckedSList(newSSet)
+                const newList = _.pull(checkedSList, item)
+                setCheckedSList(newList)
             } else {
-                const newSet = new Set(checkedAList)
-                newSet.delete(item)
-                setCheckedAList(newSet)
+                const newList = _.pull(checkedAList, item)
+                setCheckedAList(newList)
             }
         }
     }
@@ -370,7 +361,7 @@ export const FetchScreen2 = () => {
                                 id='selectSAll'
                                 onChange={(e) => onCheckAll(e.target.checked)}
                                 checked={
-                                    checkedSList.size === storedItems.length
+                                    checkedSList.length === rawItems.length
                                 }
                             />
                             <label

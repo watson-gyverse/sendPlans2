@@ -181,7 +181,7 @@ export async function passToAgingCollection(
             console.error("않되")
         })
 
-    deleteFromStorage(item.docId!!)
+    deleteFromStorage(item.docId)
 }
 
 export async function deleteFromStorage(id: string, thenWhat: void) {
@@ -232,5 +232,5 @@ export async function finishAging(item: MeatInfoAiO, thenWhat: void) {
         .catch(() => {
             console.log("숙성종료처리 실패패")
         })
-    deleteFromAgingFridge(item.docId!!).then(() => thenWhat)
+    deleteFromAgingFridge(item.docId).then(() => thenWhat)
 }
