@@ -1,21 +1,13 @@
 import { useCallback, useEffect, useState } from "react"
-import {
-    Button,
-    ButtonGroup,
-    Modal,
-    Stack,
-    ToggleButton,
-} from "react-bootstrap"
+import { Button, ButtonGroup, Stack, ToggleButton } from "react-bootstrap"
 import {
     deleteFromAgingFridge,
-    fetchFromFirestore,
+    fetchFromFirestore2,
     passToAgingCollection,
 } from "../../apis/agingApi"
 import { MeatInfoWithEntry } from "../../utils/types/meatTypes"
-import { AgingEditCard } from "../../components/aging-section/agingEditCard"
 import toast, { Toaster } from "react-hot-toast"
 import AgingModal from "../../components/aging-section/agingModal"
-import { sortAgingItems } from "../../utils/consts/functions"
 import { useLocation, useNavigate } from "react-router-dom"
 import { AgingFinishCard } from "../../components/aging-section/agingFinishCard"
 import { AiFillSetting } from "react-icons/ai"
@@ -24,28 +16,30 @@ import _ from "lodash"
 import { backgroundColors } from "../../utils/consts/colors"
 import { NewAgingCard } from "../../components/aging-section/agingEditNewCard"
 import { AgingEditContextType } from "../../contexts/agingEditContext"
+import { sortAgingItems } from "../../utils/consts/functions"
 
-export const FetchScreen = () => {
+export const FetchScreen2 = () => {
     const navigate = useNavigate()
     const location = useLocation()
-    const placeName = location.state.placeName
-    const placeCount = location.state.placeCount
+    const placeName = "매장"
+    const placeCount = 2
 
     const [isEditMode, setIsEditMode] = useState(false)
-    const [storedItems, setStoredItems] = useState<MeatInfoWithEntry[]>([])
-    const [storedItemsS, setStoredItemsS] = useState<MeatInfoWithEntry[][]>([])
+    const [rawItems, setRawItems] = useState<MeatInfoWithEntry[]>([])
+    const [storedItems, setStoredItems] = useState<MeatInfoWithEntry[][]>([])
     const [agingItems, setAgingItems] = useState<MeatInfoWithEntry[]>([])
-    const [editModalShow, setEditModalShow] = useState(false)
-    const [finishModalShow, setFinishModalShow] = useState(false)
     const [recentMeatInfo, setRecentMeatInfo] = useState<MeatInfoWithEntry>()
 
     const [checkedSList, setCheckedSList] = useState<Set<string>>(new Set())
     const [checkedAList, setCheckedAList] = useState<Set<string>>(new Set())
+
     const [whichTab, setWhichTab] = useState(true)
+    const [editModalShow, setEditModalShow] = useState(false)
+    const [finishModalShow, setFinishModalShow] = useState(false)
 
     function fetch() {
-        fetchFromFirestore(
-            setStoredItems,
+        fetchFromFirestore2(
+            setRawItems,
             setAgingItems,
             placeName,
             () => {
@@ -57,20 +51,12 @@ export const FetchScreen = () => {
         )
     }
 
-    //체크된 애들 중 숙성정보 입력을 다 안한 애들이 있는지 검증
-
     const onClickStartAging = async (item: MeatInfoWithEntry) => {
         const ok = window.confirm(
             "이대로 숙성을 진행하시겠습니까? 취소할 수 없습니다."
         )
         if (ok)
-            await startAging(
-                item,
-                setStoredItems,
-                setAgingItems,
-                placeName,
-                fetch
-            )
+            await startAging(item, setRawItems, setAgingItems, placeName, fetch)
     }
 
     const agingEditProps: AgingEditContextType = {
@@ -83,13 +69,14 @@ export const FetchScreen = () => {
         onClickStartAging: onClickStartAging,
     }
 
+    //true null없음
     const checkNullCheckedS = () => {
         if (checkedSList.size === 0) {
             return false
         }
-        let a = true
+        let isClean = true
         checkedSList.forEach((item) => {
-            let it = _.find(storedItems, { docId: item })
+            let it = _.find(_.flatten(storedItems), { docId: item })
             if (it !== undefined) {
                 console.log(it)
                 if (
@@ -99,13 +86,13 @@ export const FetchScreen = () => {
                     it.floor === null
                 ) {
                     console.log("비활성화함?")
-                    a = false
+                    isClean = false
                 } else {
                     console.log("비활성화안함?")
                 }
             }
         })
-        return a
+        return isClean
     }
 
     useEffect(() => {
@@ -113,8 +100,22 @@ export const FetchScreen = () => {
     }, [])
 
     useEffect(() => {
+        let init: { [index: string]: Array<MeatInfoWithEntry> } = {}
+        const reducedS = rawItems.reduce((acc, cur) => {
+            let key = cur.meatNumber
+            acc[key] ? acc[key].push(cur) : (acc[key] = [cur])
+            return acc
+        }, init)
+        const converted = sortArray(Object.values(reducedS))
+        console.log(converted)
+        setStoredItems([...converted])
+    }, [rawItems])
+
+    useEffect(() => {
         if (recentMeatInfo === undefined) return
-        let tempList = [...storedItems].filter((item) => {
+        console.log("@@@@@@@@@@@@@@@@@@@")
+        console.log(recentMeatInfo)
+        let tempList = [...rawItems].filter((item) => {
             if (
                 item.meatNumber !== recentMeatInfo.meatNumber ||
                 (item.meatNumber === recentMeatInfo.meatNumber &&
@@ -124,32 +125,26 @@ export const FetchScreen = () => {
             }
         })
         tempList.push(recentMeatInfo)
-        const sorted = [...sortAgingItems(tempList)]
-        setStoredItems(sorted)
-        console.log("recent변경")
+        const sorted = sortAgingItems(tempList)
+        console.log(sorted)
+        setRawItems(sorted)
     }, [recentMeatInfo])
 
     useEffect(() => {
-        console.log("stored변경", storedItems)
-        checkedSList.clear()
-        let init: { [index: string]: Array<MeatInfoWithEntry> } = {}
-        const reducedS = storedItems.reduce((acc, cur) => {
-            let key = cur.meatNumber
-            acc[key] ? acc[key].push(cur) : (acc[key] = [cur])
-            return acc
-        }, init)
-
-        const sArrayArray = Object.values(reducedS)
-
-        setStoredItemsS(sortArray(sArrayArray))
+        console.log(storedItems)
     }, [storedItems])
 
     function sortArray(oArray: MeatInfoWithEntry[][]): MeatInfoWithEntry[][] {
+        const newArray: MeatInfoWithEntry[][] = []
         oArray.forEach((array) => {
-            _.sortBy(array, "entry")
-            console.log(array)
+            const converted = _.sortBy(
+                array,
+                (item) => item.entry.split("/")[0]
+            )
+            console.log(converted)
+            newArray.push(converted)
         })
-        return oArray
+        return newArray
     }
 
     useEffect(() => {
@@ -163,18 +158,18 @@ export const FetchScreen = () => {
     const onClickStartAgingSelected = useCallback(async () => {
         const ok = window.confirm("선택한 아이템을 모두 숙성시작시킵니다.")
         if (ok) {
-            checkedSList.forEach(async (item) => {
-                const a = _.find(storedItems, { docId: item })
-                if (a) {
-                    await startAging(
-                        a,
-                        setStoredItems,
-                        setAgingItems,
-                        placeName,
-                        fetch
-                    )
-                }
-            })
+            // checkedSList.forEach(async (item) => {
+            //     const a = _.find(storedItems, { docId: item })
+            //     if (a) {
+            //         await startAging(
+            //             a,
+            //             setStoredItems,
+            //             setAgingItems,
+            //             placeName,
+            //             fetch
+            //         )
+            //     }
+            // })
         }
     }, [checkedSList])
 
@@ -206,14 +201,15 @@ export const FetchScreen = () => {
 
     const onCheckAll = useCallback(
         (checked: boolean) => {
+            console.log(storedItems)
             if (checked) {
                 const list: Set<string> = new Set()
 
                 if (whichTab) {
-                    storedItems.forEach((item: MeatInfoWithEntry) =>
-                        list.add(item.docId!!)
-                    )
-                    setCheckedSList(list)
+                    // storedItems.forEach((item: MeatInfoWithEntry) =>
+                    //     list.add(item.docId!!)
+                    // )
+                    // setCheckedSList(list)
                 } else {
                     agingItems.forEach((item: MeatInfoWithEntry) =>
                         list.add(item.docId!!)
@@ -397,47 +393,12 @@ export const FetchScreen = () => {
                             선택한 고기 숙성하기
                         </Button>
                     </div>
-                    {storedItemsS.map((ss) => {
+                    {storedItems.map((ss) => {
                         return (
                             <NewAgingCard
                                 items={ss}
                                 agingEditProps={agingEditProps}
                             />
-                        )
-                    })}
-
-                    {storedItems.map((item) => {
-                        return (
-                            <div>
-                                <input
-                                    type='checkbox'
-                                    id={"Scheckbox" + item.docId}
-                                    onChange={(e) =>
-                                        onCheckElement(
-                                            e.target.checked,
-                                            item.docId!!
-                                        )
-                                    }
-                                    checked={checkedSList.has(item.docId!!)}
-                                />
-                                <label htmlFor={"Scheckbox" + item.docId}>
-                                    <AgingEditCard
-                                        key={item.docId}
-                                        meatInfo={item}
-                                        isEditMode={isEditMode}
-                                        clickEvent={() => {
-                                            setRecentMeatInfo(item)
-                                            setEditModalShow(true)
-                                        }}
-                                        // onClickDelete={(it) => {
-                                        //     onClickDeleteButton(it)
-                                        // }}
-                                        startAgingEvent={(it) => {
-                                            onClickStartAging(it)
-                                        }}
-                                    />
-                                </label>
-                            </div>
                         )
                     })}
                 </Stack>
@@ -510,19 +471,19 @@ export const FetchScreen = () => {
 }
 async function startAging(
     item: MeatInfoWithEntry,
-    setStoredItems: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
+    setRawItems: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
     setAgingItems: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
     placeName: any,
     fetch: () => void
 ) {
     {
         await passToAgingCollection(item)
-        await fetchFromFirestore(
-            setStoredItems,
+        await fetchFromFirestore2(
+            setRawItems,
             setAgingItems,
             placeName,
             () => {
-                console.log("fetch !@")
+                console.log("success and fetch")
                 fetch()
             },
             () => {

@@ -59,6 +59,25 @@ export function sortMeatInfoArray(array: MeatInfoWithEntry[]) {
     })
 }
 
+export function sortMeatInfoArray2(array: MeatInfoWithEntry[][]) {
+    return array.sort((a, b) => {
+        let a0 = a[0]
+        let b0 = b[0]
+        if (a0.storedDate !== b0.storedDate) {
+            return (
+                parseToDate(a0.storedDate).getTime() -
+                parseToDate(b0.storedDate).getTime()
+            )
+        } else {
+            if (a0.meatNumber !== b0.meatNumber) {
+                return Number(a0.meatNumber) - Number(b0.meatNumber)
+            } else {
+                return Number(a0.entry) - Number(b0.entry)
+            }
+        }
+    })
+}
+
 export const sortAgingItems = (
     array: MeatInfoWithEntry[]
 ): MeatInfoWithEntry[] => {

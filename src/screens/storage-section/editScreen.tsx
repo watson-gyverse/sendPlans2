@@ -63,7 +63,10 @@ export default function EditScreen() {
                     {
                         입고일: item.storedDate,
                         이력번호: item.meatNumber!!,
-                        순번: String(i).padStart(3, "0"),
+                        순번:
+                            String(i).padStart(2, "0") +
+                            "/" +
+                            String(item.count).padStart(2, "0"),
                         육종: item.species,
                         원산지: item.origin!!,
                         암수: item.gender!!,
@@ -167,27 +170,17 @@ export default function EditScreen() {
                 </div>
             </Stack>
 
-            <Modal
-                show={show}
-                onHide={() => {
-                    setShow(false)
-                }}
-            >
-                <Modal.Header closeButton>
-                    <Modal.Title>고기 정보 입력/수정</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {recentMeatInfo !== undefined ? (
-                        <EditModal
-                            meatInfo={recentMeatInfo}
-                            setMeatInfo={setRecentMeatInfo}
-                            setClose={() => setShow(false)}
-                        />
-                    ) : (
-                        <></>
-                    )}
-                </Modal.Body>
-            </Modal>
+            {recentMeatInfo ? (
+                <EditModal
+                    meatInfo={recentMeatInfo}
+                    setMeatInfo={setRecentMeatInfo}
+                    setClose={() => setShow(false)}
+                    show={show}
+                    setShow={setShow}
+                />
+            ) : (
+                <></>
+            )}
         </div>
     )
 }

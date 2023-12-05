@@ -48,7 +48,7 @@ export default function PresetScreen() {
             session.setItem(sessionKeys.storageSpecies, species)
             session.setItem(sessionKeys.storageCut, cut)
 
-            navigate("camera")
+            navigate("/storage/camera")
         }
     }
 

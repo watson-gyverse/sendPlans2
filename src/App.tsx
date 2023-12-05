@@ -13,6 +13,7 @@ import { FetchScreen } from "./screens/aging-section/fetchScreen"
 import RecordScreen from "./screens/record-section/recordScreen"
 import { backgroundColors } from "./utils/consts/colors"
 import EditScreen from "./screens/storage-section/editScreen"
+import { FetchScreen2 } from "./screens/aging-section/fetchScreen2"
 
 const router = createBrowserRouter(
     [
@@ -69,6 +70,10 @@ const router = createBrowserRouter(
                         {
                             path: "fetch/",
                             element: <FetchScreen />,
+                        },
+                        {
+                            path: "fetch2/",
+                            element: <FetchScreen2 />,
                         },
                     ],
                 },

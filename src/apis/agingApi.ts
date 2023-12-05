@@ -9,7 +9,12 @@ import {
 import { MeatInfoAiO, MeatInfoWithEntry } from "../utils/types/meatTypes"
 import { firestoreDB } from "../utils/Firebase"
 import { fbCollections } from "../utils/consts/constants"
-import { getCollection, sortMeatInfoArray } from "../utils/consts/functions"
+import {
+    getCollection,
+    sortMeatInfoArray,
+    sortMeatInfoArray2,
+} from "../utils/consts/functions"
+import _ from "lodash"
 const dbStorage = getCollection(fbCollections.sp2Storage)
 const dbAging = getCollection(fbCollections.sp2Aging)
 const dbRecord = getCollection(fbCollections.sp2Record)
@@ -74,16 +79,79 @@ export async function fetchFromFirestore(
         }
         aArray.push(item)
     })
-    // let init: { [index: string]: Array<MeatInfoWithEntry> } = {}
-    // const reducedS = sArray.reduce((acc, cur) => {
-    //     let key = cur.meatNumber
-    //     acc[key] ? acc[key].push(cur) : (acc[key] = [cur])
-    //     return acc
-    // }, init)
-
-    // const sArrayArray = Object.values(reducedS)
     setStoredItems(sortMeatInfoArray(sArray))
     setAgingItems(sortMeatInfoArray(aArray))
+}
+
+export async function fetchFromFirestore2(
+    setStoredItems: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
+    setAgingItems: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
+    place: string,
+    thenWhat: () => void,
+    catchWhat: () => void
+) {
+    try {
+        //storage
+        const sResult = await getDocs(dbStorage)
+        var sArray: MeatInfoWithEntry[] = []
+        sResult.forEach((doc: any) => {
+            let data: MeatInfoWithEntry = doc.data()
+            const item: MeatInfoWithEntry = {
+                storedDate: data.storedDate,
+                species: data.species,
+                cut: data.cut,
+                meatNumber: data.meatNumber,
+                origin: data.origin,
+                gender: data.gender,
+                grade: data.grade,
+                freeze: data.freeze,
+                price: data.price,
+                entry: data.entry,
+                place: null,
+                fridgeName: null,
+                floor: null,
+                beforeWeight: null,
+                agingDate: null,
+                docId: doc.id,
+                ultraTime: null,
+            }
+            sArray.push(item)
+        })
+        //aging
+        const aQuery = query(dbAging, where("place", "==", place))
+        const aResult = await getDocs(aQuery)
+        var aArray: MeatInfoWithEntry[] = []
+        aResult.forEach((doc: any) => {
+            let data: MeatInfoWithEntry = doc.data()
+            const item: MeatInfoWithEntry = {
+                storedDate: data.storedDate,
+                species: data.species,
+                cut: data.cut,
+                meatNumber: data.meatNumber,
+                origin: data.origin,
+                gender: data.gender,
+                grade: data.grade,
+                freeze: data.freeze,
+                price: data.price,
+                entry: data.entry,
+                place: data.place,
+                fridgeName: data.fridgeName,
+                floor: data.floor,
+                beforeWeight: data.beforeWeight,
+                agingDate: data.agingDate,
+                docId: doc.id,
+                ultraTime: data.ultraTime,
+            }
+            aArray.push(item)
+        })
+
+        setStoredItems(sortMeatInfoArray(sArray))
+        setAgingItems(sortMeatInfoArray(aArray))
+
+        thenWhat()
+    } catch {
+        catchWhat()
+    }
 }
 
 export async function passToAgingCollection(

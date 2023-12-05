@@ -1,6 +1,7 @@
 import { MeatInfoWithCount } from "../types/meatTypes"
 
 export const BeefCuts = [
+    "살치",
     "윗등심",
     "아랫등심",
     "토마호크",

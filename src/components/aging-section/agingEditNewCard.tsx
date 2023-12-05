@@ -135,7 +135,12 @@ const NewAgingCardItem = (props: INewAgingCardItem) => {
                         >
                             정보입력
                         </Button>
-                        <Button variant='danger'>숙성시작</Button>
+                        <Button
+                            variant='danger'
+                            onClick={() => onClickStartAging(item)}
+                        >
+                            숙성시작
+                        </Button>
                     </div>
                 </div>
             </label>
