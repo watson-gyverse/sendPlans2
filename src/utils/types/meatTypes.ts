@@ -61,6 +61,7 @@ export type XlsxAgingType = {
     숙성전무게: string
     냉장고번호: string
     냉장고층: string
+    초음파: string
     이력번호: string
     순번: string
     육종: string

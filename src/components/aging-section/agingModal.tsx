@@ -73,6 +73,7 @@ function AgingModal(props: AgingModalParams) {
             ultraTime: 0,
         },
     })
+
     const onSubmit = (data: AgingFormOptions) => {
         console.log("data submitted")
         const newInfo = {
@@ -88,6 +89,9 @@ function AgingModal(props: AgingModalParams) {
         }
         console.log(newInfo)
         setMeatInfo(newInfo)
+        setDate(new Date())
+        setTime(new Date().getHours())
+        setAmPm(false)
         setClose()
     }
 
@@ -98,7 +102,12 @@ function AgingModal(props: AgingModalParams) {
     return (
         <Modal
             show={show}
-            onHide={() => setShow(false)}
+            onHide={() => {
+                setDate(new Date())
+                setTime(new Date().getHours())
+                setAmPm(false)
+                setShow(false)
+            }}
         >
             <Modal.Header
                 style={{ backgroundColor: backgroundColors.storedCard }}
@@ -106,7 +115,7 @@ function AgingModal(props: AgingModalParams) {
             >
                 <Modal.Title>
                     <p style={{ fontWeight: "800", marginBottom: "0" }}>
-                        고기 정보 입력/수정
+                        숙성 전 정보 입력/수정
                     </p>
                 </Modal.Title>
             </Modal.Header>
@@ -116,7 +125,13 @@ function AgingModal(props: AgingModalParams) {
                 <Form onSubmit={handleSubmit(onSubmit, onError)}>
                     <h4 style={{ fontWeight: "800" }}>숙성 시작 시각</h4>
                     <DatePickerSet dateData={dateData} />
-
+                    <h6>
+                        {" "}
+                        {moment(date).format("YYYY-MM-DD ") +
+                            (amPm ? time : time + 12)
+                                .toString()
+                                .padStart(2, "0")}
+                    </h6>
                     <Form.Group
                         className='mb-3'
                         style={{ marginTop: "10px" }}

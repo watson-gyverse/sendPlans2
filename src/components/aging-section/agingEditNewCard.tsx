@@ -122,6 +122,18 @@ const NewAgingCardItem = (props: INewAgingCardItem) => {
         }
     }
 
+    const isEmpty = () => {
+        const a = _.isNull(
+            item.agingDate ||
+                item.beforeWeight ||
+                item.fridgeName ||
+                item.floor ||
+                item.ultraTime
+        )
+        console.log(item.docId, a)
+        return a
+    }
+
     return (
         <div style={{ display: "flex", justifyContent: "right" }}>
             <input
@@ -190,6 +202,7 @@ const NewAgingCardItem = (props: INewAgingCardItem) => {
                         <Button
                             variant='danger'
                             onClick={() => onClickStartAging(item)}
+                            disabled={isEmpty()}
                         >
                             숙성시작
                         </Button>
