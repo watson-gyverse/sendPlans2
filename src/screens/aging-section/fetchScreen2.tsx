@@ -5,7 +5,8 @@ import {
     fetchFromFirestore2,
     passToAgingCollection,
 } from "../../apis/agingApi"
-import { MeatInfoWithEntry } from "../../utils/types/meatTypes"
+import { MeatInfoWithEntry, XlsxAgingType } from "../../utils/types/meatTypes"
+import * as xlsx from "xlsx"
 import toast, { Toaster } from "react-hot-toast"
 import AgingModal from "../../components/aging-section/agingModal"
 import { useLocation, useNavigate } from "react-router-dom"
@@ -17,12 +18,16 @@ import { backgroundColors } from "../../utils/consts/colors"
 import { NewAgingCard } from "../../components/aging-section/agingEditNewCard"
 import { AgingEditContextType } from "../../contexts/agingEditContext"
 import { sortAgingItems } from "../../utils/consts/functions"
+import { xlsxAgingHeaders } from "../../utils/consts/constants"
 
 export const FetchScreen2 = () => {
     const navigate = useNavigate()
     const location = useLocation()
-    const placeName = "매장"
-    const placeCount = 2
+    const placeName = location.state.placeName
+    const placeCount = location.state.placeCount
+
+    const agingKey = "RecentAging"
+    const dateKey = "RecentDate"
 
     const [isEditMode, setIsEditMode] = useState(false)
     const [rawItems, setRawItems] = useState<MeatInfoWithEntry[]>([])
@@ -36,6 +41,10 @@ export const FetchScreen2 = () => {
     const [whichTab, setWhichTab] = useState(true)
     const [editModalShow, setEditModalShow] = useState(false)
     const [finishModalShow, setFinishModalShow] = useState(false)
+
+    const recentAging = localStorage.getItem(agingKey)
+    const lastXlsxDate = localStorage.getItem(dateKey)
+    const [xlsxData, setXlsxData] = useState<XlsxAgingType[]>([])
 
     function fetch() {
         fetchFromFirestore2(
@@ -55,8 +64,11 @@ export const FetchScreen2 = () => {
         const ok = window.confirm(
             "이대로 숙성을 진행하시겠습니까? 취소할 수 없습니다."
         )
-        if (ok)
-            await startAging(item, setRawItems, setAgingItems, placeName, fetch)
+        if (ok) {
+            makeXlsx([item])
+            await startAging(item)
+            //이거 다음에 write
+        }
     }
 
     const agingEditProps: AgingEditContextType = {
@@ -80,14 +92,12 @@ export const FetchScreen2 = () => {
         checkedSList.forEach((item) => {
             let it = _.find(rawItems, { docId: item })
             if (it !== undefined) {
-                console.log(it)
                 if (
                     it.agingDate === null ||
                     it.beforeWeight === null ||
                     it.fridgeName === null ||
                     it.floor === null
                 ) {
-                    console.log("null 있음")
                     isClean = false
                 } else {
                     console.log("null 없음")
@@ -98,25 +108,31 @@ export const FetchScreen2 = () => {
     }
 
     useEffect(() => {
+        console.log("INITIAL LOAD")
         fetch()
+        console.log(recentAging)
+        if (recentAging !== null && recentAging !== "") {
+            const data: XlsxAgingType[] = JSON.parse(recentAging)
+            if (!_.some(data, _.isUndefined)) {
+                console.log(data)
+                setXlsxData(data)
+            }
+        }
     }, [])
 
     useEffect(() => {
         let init: { [index: string]: Array<MeatInfoWithEntry> } = {}
         const reducedS = rawItems.reduce((acc, cur) => {
-            let key = cur.meatNumber
+            let key = cur.meatNumber + cur.storedDate
             acc[key] ? acc[key].push(cur) : (acc[key] = [cur])
             return acc
         }, init)
         const converted = sortArray(Object.values(reducedS))
-        console.log(converted)
         setStoredItems([...converted])
     }, [rawItems])
 
     useEffect(() => {
         if (recentMeatInfo === undefined) return
-        console.log("@@@@@@@@@@@@@@@@@@@")
-        console.log(recentMeatInfo)
         let tempList = [...rawItems].filter((item) => {
             if (
                 item.meatNumber !== recentMeatInfo.meatNumber ||
@@ -128,13 +144,8 @@ export const FetchScreen2 = () => {
         })
         tempList.push(recentMeatInfo)
         const sorted = sortAgingItems(tempList)
-        console.log(sorted)
         setRawItems(sorted)
     }, [recentMeatInfo])
-
-    useEffect(() => {
-        console.log(storedItems)
-    }, [storedItems])
 
     function sortArray(oArray: MeatInfoWithEntry[][]): MeatInfoWithEntry[][] {
         const newArray: MeatInfoWithEntry[][] = []
@@ -160,20 +171,86 @@ export const FetchScreen2 = () => {
     const onClickStartAgingSelected = useCallback(async () => {
         const ok = window.confirm("선택한 아이템을 모두 숙성시작시킵니다.")
         if (ok) {
+            let list: MeatInfoWithEntry[] = []
             checkedSList.forEach(async (item) => {
                 const a = _.find(rawItems, { docId: item })
                 if (a) {
-                    await startAging(
-                        a,
-                        setRawItems,
-                        setAgingItems,
-                        placeName,
-                        fetch
-                    )
+                    list.push(a)
                 }
+            })
+            console.log("SELECTED AGING")
+            console.log(list)
+            makeXlsx(list)
+            list.forEach(async (item) => {
+                await startAging(item)
             })
         }
     }, [checkedSList])
+
+    async function startAging(item: MeatInfoWithEntry) {
+        {
+            await passToAgingCollection(item)
+            await fetchFromFirestore2(
+                setRawItems,
+                setAgingItems,
+                placeName,
+                () => {
+                    console.log("success and fetch")
+                    fetch()
+                    toast.success("숙성시작")
+                },
+                () => {
+                    console.log("error !@")
+                }
+            )
+        }
+    }
+
+    const makeXlsx = (items: MeatInfoWithEntry[]) => {
+        let xlsxs: XlsxAgingType[] = []
+        items.map((item) => {
+            let dataRow: XlsxAgingType = {
+                입고일: item.storedDate,
+                숙성시작일: item.agingDate!!,
+                숙성전무게: String(item.beforeWeight),
+                냉장고번호: item.fridgeName!!,
+                냉장고층: String(item.floor),
+                이력번호: item.meatNumber!!,
+                순번: item.entry,
+                육종: item.species,
+                원산지: item.origin!!,
+                암수: item.gender!!,
+                등급: item.grade!!,
+                부위: item.cut!!,
+                보관: item.freeze!!,
+                단가: item.price!!,
+            }
+            xlsxs.push(dataRow)
+        })
+        setXlsxData(xlsxs)
+        const json = JSON.stringify(xlsxs)
+        console.log(json)
+        const date = new Date()
+        localStorage.setItem(agingKey, json)
+        localStorage.setItem(dateKey, date.toLocaleString("ko-KR"))
+    }
+
+    const writeXlsx = () => {
+        console.log(xlsxData)
+        const book = xlsx.utils.book_new()
+        const xlsxLetsgo = xlsx.utils.json_to_sheet(xlsxData, {
+            header: xlsxAgingHeaders,
+        })
+        xlsx.utils.book_append_sheet(book, xlsxLetsgo, "StoreSheet")
+        if (xlsxData.length > 0) {
+            const time = `${new Date().getHours()}:${new Date().getMinutes()}`
+            xlsx.writeFile(
+                book,
+                xlsxData[0].숙성시작일 + " " + time + " aging.xlsx"
+            )
+        }
+    }
+    const write = useCallback(_.debounce(writeXlsx, 2000), [xlsxData])
 
     const onFinishedAging = async (item: MeatInfoWithEntry) => {
         setFinishModalShow(false)
@@ -184,14 +261,6 @@ export const FetchScreen2 = () => {
         setIsEditMode(!isEditMode)
     }
 
-    // const onClickDeleteButton = (item: MeatInfoWithEntry) => {
-    //     const ok = window.confirm(
-    //         "입고 중인 아이템입니다. 정말 삭제하시겠습니까?"
-    //     )
-    //     if (ok) {
-    //         deleteFromStorage(item.docId!!, fetch())
-    //     }
-    // }
     const onClickAgingDeleteButton = (item: MeatInfoWithEntry) => {
         const ok = window.confirm(
             "숙성 중인 아이템입니다. 정말 삭제하시겠습니까?"
@@ -218,24 +287,6 @@ export const FetchScreen2 = () => {
         [whichTab ? storedItems : agingItems]
     )
 
-    const onCheckElement = (checked: boolean, item: string) => {
-        if (checked) {
-            if (whichTab) {
-                setCheckedSList([...checkedSList, item])
-            } else {
-                setCheckedAList([...checkedAList, item])
-            }
-        } else {
-            if (whichTab) {
-                const newList = _.pull(checkedSList, item)
-                setCheckedSList(newList)
-            } else {
-                const newList = _.pull(checkedAList, item)
-                setCheckedAList(newList)
-            }
-        }
-    }
-
     return (
         <div
             style={{
@@ -244,6 +295,7 @@ export const FetchScreen2 = () => {
             }}
         >
             <Toaster />
+            {/* 뒤로 매장명 톱니 */}
             <div
                 style={{
                     display: "flex",
@@ -292,7 +344,7 @@ export const FetchScreen2 = () => {
                     />
                 </div>
             </div>
-
+            {/* 탭 */}
             <div style={{ display: "flex", justifyContent: "center" }}>
                 <ButtonGroup>
                     <ToggleButton
@@ -355,7 +407,7 @@ export const FetchScreen2 = () => {
                             marginTop: "10px",
                         }}
                     >
-                        <div>
+                        <div style={{ display: "flex" }}>
                             <input
                                 type='checkbox'
                                 id='selectSAll'
@@ -365,10 +417,25 @@ export const FetchScreen2 = () => {
                                 }
                             />
                             <label
-                                style={{ marginLeft: "6px" }}
+                                style={{
+                                    display: "flex",
+                                    marginLeft: "6px",
+                                    height: "4rem",
+                                    backgroundColor: "#bcb7ad",
+                                    borderRadius: "6px",
+                                }}
                                 htmlFor='selectSAll'
                             >
-                                전체 선택
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        padding: "4px",
+                                    }}
+                                >
+                                    <>전체 선택</>
+                                </div>
                             </label>
                         </div>
 
@@ -376,18 +443,38 @@ export const FetchScreen2 = () => {
                             onClick={onClickStartAgingSelected}
                             disabled={!checkNullCheckedS()}
                             style={{
-                                marginLeft: "20px",
-                                height: "3rem",
+                                height: "4rem",
                             }}
                             variant='danger'
                         >
-                            선택한 고기 숙성하기
+                            선택
+                            <br />
+                            숙성하기
+                        </Button>
+                        <Button
+                            style={{
+                                height: "4rem",
+                                backgroundColor: "#217346",
+                                border: "none",
+                            }}
+                            disabled={
+                                recentAging === null || recentAging === ""
+                            }
+                            onClick={write}
+                        >
+                            최근 숙성
+                            <br /> 추출
                         </Button>
                     </div>
-                    {storedItems.map((ss) => {
+                    <h6>
+                        엑셀 데이터 생성 시각: <br />
+                        {lastXlsxDate}
+                    </h6>
+                    {storedItems.map((list) => {
                         return (
                             <NewAgingCard
-                                items={ss}
+                                key={"storedCard" + list[0].docId}
+                                items={list}
                                 agingEditProps={agingEditProps}
                             />
                         )
@@ -459,27 +546,4 @@ export const FetchScreen2 = () => {
             )}
         </div>
     )
-}
-async function startAging(
-    item: MeatInfoWithEntry,
-    setRawItems: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
-    setAgingItems: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
-    placeName: any,
-    fetch: () => void
-) {
-    {
-        await passToAgingCollection(item)
-        await fetchFromFirestore2(
-            setRawItems,
-            setAgingItems,
-            placeName,
-            () => {
-                console.log("success and fetch")
-                fetch()
-            },
-            () => {
-                console.log("error !@")
-            }
-        )
-    }
 }

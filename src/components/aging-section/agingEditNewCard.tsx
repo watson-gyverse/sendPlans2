@@ -69,6 +69,7 @@ export const NewAgingCard = (props: IAgingCardProps) => {
                 items.map((item) => {
                     return (
                         <NewAgingCardItem
+                            key={"storedCardItem" + item.docId}
                             item={item}
                             agingEditProps={props.agingEditProps}
                         />
@@ -100,7 +101,14 @@ const NewAgingCardItem = (props: INewAgingCardItem) => {
             "입고 중인 아이템입니다. 정말 삭제하시겠습니까?"
         )
         if (ok) {
-            deleteFromStorage(item.docId!!, fetch())
+            setTimeout(() => {
+                const rOk = window.confirm(
+                    "복구 안됩니다. 진짜진짜삭제합니까??"
+                )
+                if (rOk) {
+                    deleteFromStorage(item.docId!!, fetch())
+                }
+            }, 2000)
         }
     }
 
@@ -156,9 +164,16 @@ const NewAgingCardItem = (props: INewAgingCardItem) => {
                         }}
                     >
                         {isEditMode ? (
-                            <TiDeleteOutline
-                                onClick={() => onClickDeleteButton(item)}
-                            />
+                            <div
+                                style={{
+                                    display: "flex",
+                                    justifyContent: "right",
+                                }}
+                            >
+                                <TiDeleteOutline
+                                    onClick={() => onClickDeleteButton(item)}
+                                />
+                            </div>
                         ) : (
                             <></>
                         )}
@@ -231,7 +246,7 @@ const AgingEditCardHeader = (props: IAgingEditCardHeader) => {
                     variant='danger'
                     onClick={() => setShow(!show)}
                 >
-                    딸깍
+                    {show ? "닫기" : "열기"}
                 </Button>
             </div>
         </div>

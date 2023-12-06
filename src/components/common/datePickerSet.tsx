@@ -67,7 +67,10 @@ export const DatePickerSet = (props: DatePickerProps) => {
                         >{`${time}시`}</Dropdown.Toggle>
                         <Dropdown.Menu>
                             {Array.from({ length: 12 }, (_, i) => (
-                                <Dropdown.Item onClick={() => setTime(i)}>
+                                <Dropdown.Item
+                                    onClick={() => setTime(i)}
+                                    key={"dr" + i}
+                                >
                                     {i}
                                 </Dropdown.Item>
                             ))}

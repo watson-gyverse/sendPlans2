@@ -9,7 +9,6 @@ import { Container } from "react-bootstrap"
 import { StorageContext } from "./contexts/meatLineContext"
 import { StorageMiddleWare } from "./utils/toLobbyMiddleware"
 import PlaceScreen from "./screens/aging-section/placeScreen"
-import { FetchScreen } from "./screens/aging-section/fetchScreen"
 import RecordScreen from "./screens/record-section/recordScreen"
 import { backgroundColors } from "./utils/consts/colors"
 import EditScreen from "./screens/storage-section/editScreen"
@@ -71,10 +70,6 @@ const router = createBrowserRouter(
                             path: "fetch/",
                             element: <FetchScreen2 />,
                         },
-                        // {
-                        //     path: "fetch2/",
-                        //     element: <FetchScreen2 />,
-                        // },
                     ],
                 },
                 {

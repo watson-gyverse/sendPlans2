@@ -44,7 +44,6 @@ export default function EditScreen() {
             return
         }
         console.log("++meatinfo changed++")
-
         console.log(recentMeatInfo)
         let tempList = items.filter((item) => {
             return item.meatNumber !== recentMeatInfo.meatNumber
@@ -87,8 +86,8 @@ export default function EditScreen() {
         const xlsxLetsgo = xlsx.utils.json_to_sheet(xlsxData, {
             header: xlsxHeaders,
         })
-        xlsx.utils.book_append_sheet(book, xlsxLetsgo, "DGAZA")
-        xlsx.writeFile(book, "storedInsfo.xlsx")
+        xlsx.utils.book_append_sheet(book, xlsxLetsgo, "StoreSheet")
+        xlsx.writeFile(book, xlsxData[0].입고일 + " storage.xlsx")
     }
     const sendFirestore = () => {
         xlsxData.forEach((item) => {
@@ -105,9 +104,9 @@ export default function EditScreen() {
         })
     }
 
-    const write = useCallback(_.debounce(writeXlsx, 1000), [xlsxData])
+    const write = useCallback(_.debounce(writeXlsx, 2000), [xlsxData])
 
-    const send = useCallback(_.debounce(sendFirestore, 1000), [xlsxData])
+    const send = useCallback(_.debounce(sendFirestore, 2000), [xlsxData])
 
     //빈 게 있으면 null
     const dataNullChecker = items.some((item) =>
@@ -152,6 +151,7 @@ export default function EditScreen() {
                     }}
                 >
                     <Button
+                        style={{ backgroundColor: "#217346", border: "none" }}
                         disabled={disableXlsxButton}
                         onClick={write}
                     >
@@ -160,6 +160,7 @@ export default function EditScreen() {
                         추출하기
                     </Button>
                     <Button
+                        style={{ backgroundColor: "#ffcb2b", border: "none" }}
                         disabled={disableButton}
                         onClick={send}
                     >
