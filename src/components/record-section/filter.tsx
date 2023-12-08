@@ -4,47 +4,34 @@ import _ from "lodash"
 import useFBFetch from "../../hooks/useFetch"
 import { fbCollections } from "../../utils/consts/constants"
 import { makeStepArray } from "../../utils/consts/functions"
-import { Button } from "react-bootstrap"
 import DatePickerComponent from "../storage-section/datePicker"
+import { MeatInfoAiO } from "../../utils/types/meatTypes"
 
-export type FilterProperties = {
-    currentPlace: string
-    setPlace: (place: string) => void
-    activeFridge: number[]
-    setActiveFridge: (activeFridge: number[]) => void
-    activeFloor: number[]
-    setActiveFloor: (activeFloor: number[]) => void
-    activeSpecies: string[]
-    setActiveSpecies: (activeSpecies: string[]) => void
+type FilterProps = {
+    data: MeatInfoAiO[]
+    setFilteredRecords: React.Dispatch<React.SetStateAction<MeatInfoAiO[]>>
+    places: FirestorePlace[]
 }
 
-type FilterPackage = {
-    package: FilterProperties
-}
-
-export const Filter = (props: FilterPackage) => {
-    const {
-        currentPlace,
-        setPlace,
-        activeFridge,
-        setActiveFridge,
-        activeFloor,
-        setActiveFloor,
-        activeSpecies,
-        setActiveSpecies,
-    } = props.package
-    const places = useFBFetch<FirestorePlace>(fbCollections.sp2Places).data
-    const [currentFirebasePlace, setFbPlace] = useState(places[0])
-    const [currentFridges, setFridges] = useState<number[]>([]) //깔아줄 냉장고, active와 비교
+export const Filter = (props: FilterProps) => {
+    const { data, setFilteredRecords, places } = props
+    const [currentPlace, setPlace] = useState("")
+    const [activeFridge, setActiveFridge] = useState<number[]>([])
+    const [activeFloor, setActiveFloor] = useState<number[]>([1, 2, 3, 4, 5])
+    const [activeSpecies, setActiveSpecies] = useState<string[]>(["소", "돼지"])
 
     const now = new Date()
+    const amonthAgo = new Date()
+    amonthAgo.setMonth(new Date().getMonth() - 1)
+    const [storageFromDate, setSFDate] = useState(amonthAgo)
+    const [storageToDate, setSTDate] = useState(now)
+    const [agingFromDate, setAFDate] = useState(amonthAgo)
+    const [agingToDate, setATDate] = useState(now)
+    const [finishFromDate, setFFDate] = useState(amonthAgo)
+    const [finishToDate, setFTDate] = useState(now)
 
-    const [storageFromDate, setSFDate] = useState(new Date())
-    const [storageToDate, setSTDate] = useState(new Date())
-    const [agingFromDate, setAFDate] = useState(new Date())
-    const [agingToDate, setATDate] = useState(new Date())
-    const [finishFromDate, setFFDate] = useState(new Date())
-    const [finishToDate, setFTDate] = useState(new Date())
+    const [currentFirebasePlace, setFbPlace] = useState(places[0])
+    const [currentFridges, setFridges] = useState<number[]>([]) //깔아줄 냉장고, active와 비교
 
     useEffect(() => {
         if (places.length !== 0) {
@@ -56,6 +43,53 @@ export const Filter = (props: FilterPackage) => {
             setActiveFridge(a)
         }
     }, [places])
+
+    useEffect(() => {
+        const a = _.filter(data, (item: MeatInfoAiO) => {
+            const sf = new Date(storageFromDate).getTime()
+            const st = new Date(storageToDate).getTime()
+            const af = new Date(agingFromDate).getTime()
+            const at = new Date(agingToDate).getTime()
+            const ff = new Date(finishFromDate).getTime()
+            const ft = new Date(finishToDate).getTime()
+
+            const sSplit = item.storedDate.split(" ")
+            const aSplit = item.agingDate!!.split(" ")
+            const fSplit = item.finishDate.split(" ")
+            const sd = new Date(sSplit[0]).getTime()
+            const ad = new Date(aSplit[0]).getTime()
+            const fd = new Date(fSplit[0]).getTime()
+
+            console.log(sd, sf, st, ad, af, at, fd, ff, ft)
+            return (
+                item.place === currentPlace &&
+                _.includes(activeFridge, Number(item.fridgeName)) &&
+                _.includes(activeFloor, Number(item.floor)) &&
+                _.includes(activeSpecies, item.species) &&
+                sd >= sf &&
+                sd <= st &&
+                ad >= af &&
+                ad <= at &&
+                fd >= ff &&
+                fd <= ft
+            )
+        })
+
+        console.log(a)
+        setFilteredRecords(a)
+    }, [
+        data,
+        activeFridge,
+        activeFloor,
+        activeSpecies,
+        currentPlace,
+        storageFromDate,
+        storageToDate,
+        agingFromDate,
+        agingToDate,
+        finishFromDate,
+        finishToDate,
+    ])
 
     useEffect(() => {
         if (currentFirebasePlace !== undefined) {
@@ -91,7 +125,9 @@ export const Filter = (props: FilterPackage) => {
 
     const categoryStyle = { margin: "4px 0 2px 2px" }
     return (
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <div
+            style={{ display: "flex", flexDirection: "column", padding: "4px" }}
+        >
             <div
                 style={{
                     display: "flex",
@@ -233,66 +269,84 @@ export const Filter = (props: FilterPackage) => {
                     style={{
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "space-around",
+                        justifyContent: "center",
                     }}
                 >
-                    <DatePickerComponent
-                        targetDate={storageFromDate}
-                        setTargetDate={setSFDate}
-                        variant='warning'
-                        fontSize='1rem'
-                    />
+                    <div style={{ marginRight: "16px" }}>
+                        <DatePickerComponent
+                            targetDate={storageFromDate}
+                            setTargetDate={setSFDate}
+                            variant='warning'
+                            fontSize='1rem'
+                        />
+                    </div>
+
                     <>~</>
-                    <DatePickerComponent
-                        targetDate={storageToDate}
-                        setTargetDate={setSTDate}
-                        variant='warning'
-                        fontSize='1rem'
-                    />
+
+                    <div style={{ marginLeft: "16px" }}>
+                        <DatePickerComponent
+                            targetDate={storageToDate}
+                            setTargetDate={setSTDate}
+                            variant='warning'
+                            fontSize='1rem'
+                        />
+                    </div>
                 </div>
                 <h6 style={categoryStyle}>숙성시작일</h6>
                 <div
                     style={{
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "space-around",
+                        justifyContent: "center",
                     }}
                 >
-                    <DatePickerComponent
-                        targetDate={agingFromDate}
-                        setTargetDate={setAFDate}
-                        variant='warning'
-                        fontSize='1rem'
-                    />
+                    <div style={{ marginRight: "16px" }}>
+                        <DatePickerComponent
+                            targetDate={agingFromDate}
+                            setTargetDate={setAFDate}
+                            variant='warning'
+                            fontSize='1rem'
+                        />
+                    </div>
+
                     <>~</>
-                    <DatePickerComponent
-                        targetDate={agingToDate}
-                        setTargetDate={setATDate}
-                        variant='warning'
-                        fontSize='1rem'
-                    />
+
+                    <div style={{ marginLeft: "16px" }}>
+                        <DatePickerComponent
+                            targetDate={agingToDate}
+                            setTargetDate={setATDate}
+                            variant='warning'
+                            fontSize='1rem'
+                        />
+                    </div>
                 </div>
                 <h6 style={categoryStyle}>숙성종료일</h6>
                 <div
                     style={{
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "space-around",
+                        justifyContent: "center",
                     }}
                 >
-                    <DatePickerComponent
-                        targetDate={finishFromDate}
-                        setTargetDate={setFFDate}
-                        variant='warning'
-                        fontSize='1rem'
-                    />
+                    <div style={{ marginRight: "16px" }}>
+                        <DatePickerComponent
+                            targetDate={finishFromDate}
+                            setTargetDate={setFFDate}
+                            variant='warning'
+                            fontSize='1rem'
+                        />
+                    </div>
+
                     <>~</>
-                    <DatePickerComponent
-                        targetDate={finishToDate}
-                        setTargetDate={setFTDate}
-                        variant='warning'
-                        fontSize='1rem'
-                    />
+
+                    <div style={{ marginLeft: "16px" }}>
+                        <DatePickerComponent
+                            targetDate={finishToDate}
+                            setTargetDate={setFTDate}
+                            variant='warning'
+                            fontSize='1rem'
+                        />
+                    </div>
                 </div>
             </div>
         </div>

@@ -60,9 +60,11 @@ function AgingModal(props: AgingModalParams) {
 
     const {
         register,
-        formState: { errors },
+        formState,
+        formState: { errors, isSubmitSuccessful },
         watch,
         handleSubmit,
+        reset,
     } = useForm<AgingFormOptions>({
         mode: "onSubmit",
         defaultValues: {
@@ -73,6 +75,12 @@ function AgingModal(props: AgingModalParams) {
             ultraTime: 0,
         },
     })
+
+    useEffect(() => {
+        if (formState.isSubmitSuccessful) {
+            reset()
+        }
+    }, [formState, reset])
 
     const onSubmit = (data: AgingFormOptions) => {
         console.log("data submitted")
@@ -107,6 +115,7 @@ function AgingModal(props: AgingModalParams) {
                 setTime(new Date().getHours())
                 setAmPm(false)
                 setShow(false)
+                reset()
             }}
         >
             <Modal.Header

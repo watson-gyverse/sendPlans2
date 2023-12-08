@@ -33,10 +33,7 @@ export const DatePickerSet = (props: DatePickerProps) => {
     return (
         <div>
             <Stack gap={1}>
-                <Row
-                    xs='auto'
-                    style={{ display: "flex" }}
-                >
+                <div style={{ display: "flex" }}>
                     <Col>
                         <DatePickerComponent
                             targetDate={date}
@@ -44,7 +41,7 @@ export const DatePickerSet = (props: DatePickerProps) => {
                             variant={variant}
                         />
                     </Col>
-                </Row>
+                </div>
                 <div style={{ display: "flex" }}>
                     <Button
                         variant={variant}
@@ -69,7 +66,7 @@ export const DatePickerSet = (props: DatePickerProps) => {
                             {Array.from({ length: 12 }, (_, i) => (
                                 <Dropdown.Item
                                     onClick={() => setTime(i)}
-                                    key={"dr" + i}
+                                    key={"ti" + i}
                                 >
                                     {i}
                                 </Dropdown.Item>

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button, FloatingLabel, Form, Modal, Stack } from "react-bootstrap"
 import { useForm } from "react-hook-form"
 import { finishAging } from "../../apis/agingApi"
@@ -37,9 +37,11 @@ export default function FinishAgingModal(props: FinishAgingParams) {
     }
     const {
         register,
+        formState,
         formState: { errors },
         watch,
         handleSubmit,
+        reset,
     } = useForm<FinishAgingFormOptions>({
         mode: "onSubmit",
         defaultValues: {
@@ -50,6 +52,12 @@ export default function FinishAgingModal(props: FinishAgingParams) {
             cutWeight: undefined,
         },
     })
+
+    useEffect(() => {
+        if (formState.isSubmitSuccessful) {
+            reset()
+        }
+    }, [formState, reset])
 
     const onSubmit = (data: FinishAgingFormOptions) => {
         const ok = window.confirm("정말 숙성 종료합니다?")
@@ -66,7 +74,10 @@ export default function FinishAgingModal(props: FinishAgingParams) {
     return (
         <Modal
             show={show}
-            onHide={() => setShow(false)}
+            onHide={() => {
+                reset()
+                setShow(false)
+            }}
         >
             <Modal.Header closeButton>
                 <Modal.Title>숙성 완료</Modal.Title>
