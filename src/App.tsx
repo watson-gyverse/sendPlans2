@@ -13,6 +13,8 @@ import RecordScreen from "./screens/record-section/recordScreen"
 import { backgroundColors } from "./utils/consts/colors"
 import EditScreen from "./screens/storage-section/editScreen"
 import { FetchScreen2 } from "./screens/aging-section/fetchScreen2"
+import ReportScreen from "./screens/report-section/reportScreen"
+import { ConsignScreen } from "./screens/consign-section/consignScreen"
 
 const router = createBrowserRouter(
     [
@@ -75,6 +77,14 @@ const router = createBrowserRouter(
                 {
                     path: "record",
                     element: <RecordScreen />,
+                },
+                {
+                    path: "report",
+                    element: <ReportScreen />,
+                },
+                {
+                    path: "consign",
+                    element:<ConsignScreen />
                 },
                 {
                     path: "*",

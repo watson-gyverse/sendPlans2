@@ -22,7 +22,7 @@ export const Filter = (props: FilterProps) => {
 
     const now = new Date()
     const amonthAgo = new Date()
-    amonthAgo.setMonth(new Date().getMonth() - 1)
+    amonthAgo.setMonth(new Date().getMonth() - 6)
     const [storageFromDate, setSFDate] = useState(amonthAgo)
     const [storageToDate, setSTDate] = useState(now)
     const [agingFromDate, setAFDate] = useState(amonthAgo)
@@ -60,7 +60,6 @@ export const Filter = (props: FilterProps) => {
             const ad = new Date(aSplit[0]).getTime()
             const fd = new Date(fSplit[0]).getTime()
 
-            console.log(sd, sf, st, ad, af, at, fd, ff, ft)
             return (
                 item.place === currentPlace &&
                 _.includes(activeFridge, Number(item.fridgeName)) &&

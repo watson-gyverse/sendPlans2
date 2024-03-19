@@ -1307,6 +1307,11 @@
   "resolved" "https://registry.npmjs.org/@csstools/selector-specificity/-/selector-specificity-2.2.0.tgz"
   "version" "2.2.0"
 
+"@emailjs/browser@^4.3.1":
+  "integrity" "sha512-Pb9KL6rsEGMhzFEeCr5No+VazPyBJFRLu59tAEgKmjPPA7z7gOGIJuyDLEZG5sUp0NN9WF0407govvrQ+vKvVw=="
+  "resolved" "https://registry.npmjs.org/@emailjs/browser/-/browser-4.3.1.tgz"
+  "version" "4.3.1"
+
 "@emotion/is-prop-valid@^1.2.1":
   "integrity" "sha512-61Mf7Ufx4aDxx1xlDeOm8aFFigGHE4z+0sKCa+IHCeZKiyP9RLD0Mmx7m8b9/Cf37f7NAvQOOJAbQQGVr5uERw=="
   "resolved" "https://registry.npmjs.org/@emotion/is-prop-valid/-/is-prop-valid-1.2.1.tgz"
@@ -2387,6 +2392,18 @@
   "version" "0.5.2"
   dependencies:
     "tslib" "^2.4.0"
+
+"@tanstack/react-table@^8.13.2":
+  "integrity" "sha512-b6mR3mYkjRtJ443QZh9sc7CvGTce81J35F/XMr0OoWbx0KIM7TTTdyNP2XKObvkLpYnLpCrYDwI3CZnLezWvpg=="
+  "resolved" "https://registry.npmjs.org/@tanstack/react-table/-/react-table-8.13.2.tgz"
+  "version" "8.13.2"
+  dependencies:
+    "@tanstack/table-core" "8.13.2"
+
+"@tanstack/table-core@8.13.2":
+  "integrity" "sha512-/2saD1lWBUV6/uNAwrsg2tw58uvMJ07bO2F1IWMxjFRkJiXKQRuc3Oq2aufeobD3873+4oIM/DRySIw7+QsPPw=="
+  "resolved" "https://registry.npmjs.org/@tanstack/table-core/-/table-core-8.13.2.tgz"
+  "version" "8.13.2"
 
 "@testing-library/dom@^8.5.0", "@testing-library/dom@>=7.21.4":
   "integrity" "sha512-/DiOQ5xBxgdYRC8LNk7U+RWat0S3qRLeIw3ZIkMQ9kkVlRmwD/Eg8k8CqIpD6GW7u20JIUOfMKbxtiLutpjQ4g=="
@@ -5973,7 +5990,7 @@
     "agent-base" "6"
     "debug" "4"
 
-"http-proxy-middleware@^2.0.3":
+"http-proxy-middleware@^2.0.3", "http-proxy-middleware@^2.0.6":
   "integrity" "sha512-ya/UeJ6HVBYxrgYotAZo1KvPWlgB48kUJLDePFeneHsVujFaW5WNj2NgWCAE//B1Dl02BIfYlpNgBy8Kf8Rjmw=="
   "resolved" "https://registry.npmjs.org/http-proxy-middleware/-/http-proxy-middleware-2.0.6.tgz"
   "version" "2.0.6"

@@ -23,5 +23,7 @@ yarn-debug.log*
 yarn-error.log*
 
 /src/utils/consts/urls.ts
+/src/utils/consts/email.ts
 
 /src/utils/Firebase.ts
+/src/screens/storage-section/cameraScreen copy.tsx

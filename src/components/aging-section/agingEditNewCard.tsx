@@ -130,7 +130,6 @@ const NewAgingCardItem = (props: INewAgingCardItem) => {
                 item.floor ||
                 item.ultraTime
         )
-        console.log(item.docId, a)
         return a
     }
 
