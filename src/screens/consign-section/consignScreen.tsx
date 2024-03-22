@@ -1,18 +1,35 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {useEffect, useState} from "react"
 import {backgroundColors} from "../../utils/consts/colors"
 import {ConsignTable} from "./table"
 import {ConsignData} from "../../utils/types/otherTypes"
 import AddModal from "../../components/consign-section/addModal"
+import useFBFetch from "../../hooks/useFetch"
+import {fbCollections} from "../../utils/consts/constants"
+import {where} from "firebase/firestore"
+import {Toaster} from "react-hot-toast"
+import {useNavigate} from "react-router-dom"
 
 export const ConsignScreen = () => {
+	const navigate = useNavigate()
 	const [client, setClient] = useState("")
 	const [meatNumber, setMeatNumber] = useState("")
 	const [isL, setL] = useState(false)
 	const [canAddModalShow, setCanAddModalShow] = useState(false)
 	const [addModalShow, setAddModalShow] = useState(false)
 
+	const {data, refetch} = useFBFetch<ConsignData>(
+		fbCollections.sp2Consign,
+		where("client", "==", client),
+	)
+
+	useEffect(() => {
+		console.log(data)
+	}, [data])
+
 	const onSearchClient = () => {
-		console.log(`검색해와 ${client}`)
+		console.log(`검색 ${client}`)
+		refetch()
 	}
 	const onLClick = () => {
 		setL(!isL)
@@ -35,9 +52,18 @@ export const ConsignScreen = () => {
 	}, [isL])
 
 	useEffect(() => {
-		setCanAddModalShow(client.length > 1 && meatNumber.length > 12)
+		setCanAddModalShow(client.length > 1 && meatNumber.length >= 12)
 	}, [meatNumber, client])
 
+	useEffect(() => {
+		if (!canAddModalShow) {
+			console.log("닫혀있음")
+			onSearchClient()
+		}
+	}, [canAddModalShow])
+	const onBackClick = () => {
+		navigate("../")
+	}
 	return (
 		<div
 			style={{
@@ -47,6 +73,10 @@ export const ConsignScreen = () => {
 				borderRadius: "20px",
 				padding: "20px 10px",
 			}}>
+			<Toaster />
+			<button style={{width: "60px"}} onClick={onBackClick}>
+				뒤로
+			</button>
 			{/* 위탁사 검색 */}
 			<div
 				style={{
@@ -87,7 +117,10 @@ export const ConsignScreen = () => {
 			<button disabled={!canAddModalShow} onClick={onAddButtonClick}>
 				+
 			</button>
-			<ConsignTable data={makeData()} />
+			<ConsignTable
+				data={data.sort((a, b) => (a.id < b.id ? -1 : 0))}
+				refetch={refetch}
+			/>
 			<AddModal
 				client={client}
 				meatNumber={meatNumber}
@@ -97,30 +130,31 @@ export const ConsignScreen = () => {
 		</div>
 	)
 }
-function makeData(): ConsignData[] {
-	var a: ConsignData[] = [
-		{
-			id: 1,
-			client: "까매용",
-			meatNumber: "L111122223333",
-			cut: "삼겹살",
-			initWeight: 12.21,
-			initDate: "2024-03-18 16",
-			items: [],
-			afterWeight: 14,
-			cutWeight: null,
-		},
-		{
-			id: 2,
-			client: "까매용",
-			meatNumber: "L342343234323",
-			cut: "목살",
-			initWeight: 14.22,
-			initDate: "2024-03-18 16",
-			items: [],
-			afterWeight: 12.21,
-			cutWeight: 11.11,
-		},
-	]
-	return a
-}
+
+// function makeData(): ConsignData[] {
+// 	var a: ConsignData[] = [
+// 		{
+// 			id: 1,
+// 			client: "까매용",
+// 			meatNumber: "L111122223333",
+// 			cut: "삼겹살",
+// 			initWeight: 12.21,
+// 			initDate: "2024-03-18 16",
+// 			items: [],
+// 			afterWeight: 14,
+// 			cutWeight: null,
+// 		},
+// 		{
+// 			id: 2,
+// 			client: "까매용",
+// 			meatNumber: "L342343234323",
+// 			cut: "목살",
+// 			initWeight: 14.22,
+// 			initDate: "2024-03-18 16",
+// 			items: [],
+// 			afterWeight: 12.21,
+// 			cutWeight: 11.11,
+// 		},
+// 	]
+// 	return a
+// }

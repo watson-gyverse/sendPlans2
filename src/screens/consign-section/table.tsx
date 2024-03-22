@@ -1,19 +1,28 @@
-import {useState} from "react"
+/* eslint-disable react-hooks/exhaustive-deps */
 import {ConsignData} from "../../utils/types/otherTypes"
 import {
+	Row,
 	createColumnHelper,
 	flexRender,
 	getCoreRowModel,
 	useReactTable,
 } from "@tanstack/react-table"
+import {useEffect, useState} from "react"
 import styled from "styled-components"
+import EditModal from "../../components/consign-section/editModal"
 
 type TableData = {
 	data: ConsignData[]
+	refetch: () => Promise<void>
 }
 
 export const ConsignTable = (props: TableData) => {
-	const {data} = props
+	const {data, refetch} = props
+	const [isEllipsis, setEllipsis] = useState(true)
+	const [editModalShow, setEditModalShow] = useState(false)
+	const [currentRowData, setCurrentRowData] = useState<
+		ConsignData | undefined
+	>()
 	const columnHelper = createColumnHelper<ConsignData>()
 
 	const columns = [
@@ -30,9 +39,9 @@ export const ConsignTable = (props: TableData) => {
 						style={{
 							width: "70px",
 							overflow: "hidden",
-							textOverflow: "ellipsis",
-							whiteSpace: "nowrap",
-						}}>
+							overflowWrap: isEllipsis ? "normal" : "break-word",
+						}}
+						onClick={() => setEllipsis(!isEllipsis)}>
 						{value}
 					</div>
 				)
@@ -48,7 +57,10 @@ export const ConsignTable = (props: TableData) => {
 		}),
 		columnHelper.accessor("afterWeight", {
 			header: () => <span>숙성후</span>,
-			cell: (data) => data.getValue(),
+			cell: (data) => {
+				const value = data.getValue() ? data.getValue()?.toString() : "-"
+				return value
+			},
 		}),
 		columnHelper.accessor("cutWeight", {
 			header: () => <span>손질후</span>,
@@ -64,6 +76,19 @@ export const ConsignTable = (props: TableData) => {
 		data,
 		getCoreRowModel: getCoreRowModel(),
 	})
+
+	const onRowClick = (row: Row<ConsignData>) => {
+		console.log(row.original)
+		setCurrentRowData(row.original)
+	}
+
+	useEffect(() => {
+		console.log(editModalShow)
+		refetch()
+	}, [editModalShow])
+	useEffect(() => {
+		setEditModalShow(true)
+	}, [currentRowData])
 
 	return (
 		<div>
@@ -86,9 +111,12 @@ export const ConsignTable = (props: TableData) => {
 				</thead>
 				<tbody>
 					{table.getRowModel().rows.map((row) => (
-						<tr key={row.id}>
+						<tr key={row.id} onClick={() => onRowClick(row)}>
 							{row.getVisibleCells().map((cell) => (
-								<StyledCell key={cell.id}>
+								<StyledCell
+									key={cell.id}
+									// onClick={() => setEditModalShow(true)}
+								>
 									{flexRender(cell.column.columnDef.cell, cell.getContext())}
 								</StyledCell>
 							))}
@@ -96,6 +124,15 @@ export const ConsignTable = (props: TableData) => {
 					))}
 				</tbody>
 			</table>
+			{currentRowData ? (
+				<EditModal
+					show={editModalShow}
+					setShow={setEditModalShow}
+					data={currentRowData}
+				/>
+			) : (
+				<></>
+			)}
 		</div>
 	)
 }

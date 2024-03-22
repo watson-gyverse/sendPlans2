@@ -1,8 +1,6 @@
 import { FirestorePlace } from "../../utils/types/otherTypes"
 import { useEffect, useState } from "react"
 import _ from "lodash"
-import useFBFetch from "../../hooks/useFetch"
-import { fbCollections } from "../../utils/consts/constants"
 import { makeStepArray } from "../../utils/consts/functions"
 import DatePickerComponent from "../storage-section/datePicker"
 import { MeatInfoAiO } from "../../utils/types/meatTypes"

@@ -84,3 +84,19 @@ async function addCountDoc(client: string) {
 		console.log("없어서 만들었음")
 	})
 }
+
+export async function updateExistingItem(
+	docId: string,
+	data: ConsignData,
+	thenWhat: () => void,
+) {
+	console.log("docId: ", docId)
+	console.log("data: ", data)
+
+	const ref = doc(firestoreDB, fbCollections.sp2Consign, docId)
+	await updateDoc(ref, {
+		afterWeight: data.afterWeight,
+		cutWeight: data.cutWeight,
+		items: data.items,
+	}).then(() => thenWhat())
+}

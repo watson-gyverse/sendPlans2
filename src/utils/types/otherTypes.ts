@@ -6,7 +6,7 @@ export type FirestorePlace = {
 
 //위탁 덩이 type
 export type ConsignItem = {
-	item_id: number
+	id: number
 	weight: number
 }
 
@@ -21,4 +21,5 @@ export type ConsignData = {
 	afterWeight: number | null
 	cutWeight: number | null
 	items: ConsignItem[]
+	docId: string | null
 }

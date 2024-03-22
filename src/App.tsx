@@ -1,139 +1,137 @@
-import { useState } from "react"
+import {useState} from "react"
 import "./App.css"
 import PresetScreen from "./screens/storage-section/presetScreen"
-import { Outlet, RouterProvider, createBrowserRouter } from "react-router-dom"
+import {Outlet, RouterProvider, createBrowserRouter} from "react-router-dom"
 import MainScreen from "./screens/mainScreen"
 import ErrorScreen from "./screens/errorScreen"
 import CameraScreen from "./screens/storage-section/cameraScreen"
-import { Container } from "react-bootstrap"
-import { StorageContext } from "./contexts/meatLineContext"
-import { StorageMiddleWare } from "./utils/toLobbyMiddleware"
+import {Container} from "react-bootstrap"
+import {StorageContext} from "./contexts/meatLineContext"
+import {StorageMiddleWare} from "./utils/toLobbyMiddleware"
 import PlaceScreen from "./screens/aging-section/placeScreen"
 import RecordScreen from "./screens/record-section/recordScreen"
-import { backgroundColors } from "./utils/consts/colors"
+import {backgroundColors} from "./utils/consts/colors"
 import EditScreen from "./screens/storage-section/editScreen"
-import { FetchScreen2 } from "./screens/aging-section/fetchScreen2"
+import {FetchScreen2} from "./screens/aging-section/fetchScreen2"
 import ReportScreen from "./screens/report-section/reportScreen"
-import { ConsignScreen } from "./screens/consign-section/consignScreen"
+import {ConsignScreen} from "./screens/consign-section/consignScreen"
+import CameraScreen2 from "./screens/storage-section/cameraScreen copy"
 
 const router = createBrowserRouter(
-    [
-        {
-            path: "/",
-            element: <Outlet />,
-            errorElement: <ErrorScreen />,
-            children: [
-                {
-                    index: true,
-                    // path: "main",
-                    element: <MainScreen />,
-                },
-                {
-                    path: "storage",
-                    element: (
-                        <div>
-                            <Outlet />
-                        </div>
-                    ),
-                    children: [
-                        {
-                            index: true,
+	[
+		{
+			path: "/",
+			element: <Outlet />,
+			errorElement: <ErrorScreen />,
+			children: [
+				{
+					index: true,
+					// path: "main",
+					element: <MainScreen />,
+				},
+				{
+					path: "storage",
+					element: (
+						<div>
+							<Outlet />
+						</div>
+					),
+					children: [
+						{
+							index: true,
 
-                            element: <PresetScreen />,
-                        },
-                        {
-                            path: "camera",
-                            element: (
-                                <StorageMiddleWare>
-                                    <CameraScreen />
-                                </StorageMiddleWare>
-                            ),
-                        },
-                        {
-                            path: "edit",
-                            element: (
-                                <StorageMiddleWare>
-                                    <EditScreen />
-                                </StorageMiddleWare>
-                            ),
-                        },
-                    ],
-                },
-                {
-                    path: "aging",
-                    element: (
-                        <div>
-                            <Outlet />
-                        </div>
-                    ),
-                    children: [
-                        { index: true, element: <PlaceScreen /> },
-                        {
-                            path: "fetch/",
-                            element: <FetchScreen2 />,
-                        },
-                    ],
-                },
-                {
-                    path: "record",
-                    element: <RecordScreen />,
-                },
-                {
-                    path: "report",
-                    element: <ReportScreen />,
-                },
-                {
-                    path: "consign",
-                    element:<ConsignScreen />
-                },
-                {
-                    path: "*",
-                    element: <>Not Found 051</>,
-                },
-            ],
-        },
-    ],
-    { basename: process.env.PUBLIC_URL }
+							element: <PresetScreen />,
+						},
+						{
+							path: "camera",
+							element: (
+								<StorageMiddleWare>
+									<CameraScreen />
+								</StorageMiddleWare>
+							),
+						},
+						{
+							path: "edit",
+							element: (
+								<StorageMiddleWare>
+									<EditScreen />
+								</StorageMiddleWare>
+							),
+						},
+					],
+				},
+				{
+					path: "aging",
+					element: (
+						<div>
+							<Outlet />
+						</div>
+					),
+					children: [
+						{index: true, element: <PlaceScreen />},
+						{
+							path: "fetch/",
+							element: <FetchScreen2 />,
+						},
+					],
+				},
+				{
+					path: "record",
+					element: <RecordScreen />,
+				},
+				{
+					path: "report",
+					element: <ReportScreen />,
+				},
+				{
+					path: "consign",
+					element: <ConsignScreen />,
+				},
+				{
+					path: "*",
+					element: <>Not Found 051</>,
+				},
+			],
+		},
+	],
+	{basename: process.env.PUBLIC_URL},
 )
 
 function App() {
-    const [isLoading, setLoading] = useState(true)
-    const init = async () => {
-        await new Promise((resolve) => setTimeout(resolve, 2000))
-        setLoading(false)
-    }
-    init()
+	const [isLoading, setLoading] = useState(true)
+	const init = async () => {
+		await new Promise((resolve) => setTimeout(resolve, 2000))
+		setLoading(false)
+	}
+	init()
 
-    const [scanText, setScanText] = useState<string>("undefined")
-    return (
-        <StorageContext.Provider
-            value={{
-                scanText,
-                setScanText,
-            }}
-        >
-            <div
-                style={{
-                    width: "100%",
-                    height: "100%",
-                    backgroundColor: backgroundColors.base,
-                }}
-            >
-                <Container
-                    style={{
-                        width: "380px",
-                        height: "auto",
-                        padding: "24px 20px 30px 20px",
-                    }}
-                >
-                    <RouterProvider
-                        router={router}
-                        // fallbackElement={<div>로딩</div>}
-                    />
-                </Container>
-            </div>
-        </StorageContext.Provider>
-    )
+	const [scanText, setScanText] = useState<string>("undefined")
+	return (
+		<StorageContext.Provider
+			value={{
+				scanText,
+				setScanText,
+			}}>
+			<div
+				style={{
+					width: "100%",
+					height: "100%",
+					backgroundColor: backgroundColors.base,
+				}}>
+				<Container
+					style={{
+						width: "380px",
+						height: "auto",
+						padding: "24px 20px 30px 20px",
+					}}>
+					<RouterProvider
+						router={router}
+						// fallbackElement={<div>로딩</div>}
+					/>
+				</Container>
+			</div>
+		</StorageContext.Provider>
+	)
 }
 
 export default App

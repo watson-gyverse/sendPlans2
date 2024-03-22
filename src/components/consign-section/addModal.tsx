@@ -10,6 +10,7 @@ import {
 import {ConsignData} from "../../utils/types/otherTypes"
 import moment from "moment"
 import useDidMountEffect from "../../hooks/useDidMountEffect"
+import toast, {Toaster} from "react-hot-toast"
 
 type AddModalType = {
 	client: string
@@ -58,15 +59,18 @@ export default function AddModal(props: AddModalType) {
 			afterWeight: null,
 			cutWeight: null,
 			items: [],
+			docId: null,
 		}
 		await addToFirestore(
 			data,
 			() => {
 				console.log("추가성공")
+				toast.success("추가성공")
 				updateCount(client, data.id, setRecentCount)
 			},
 			() => {
 				console.log("추가실패")
+				toast.error("추가실패")
 			},
 		)
 		await clientData()
@@ -80,13 +84,14 @@ export default function AddModal(props: AddModalType) {
 				setShow(false)
 			}}>
 			<Modal.Header closeButton>
-				<Modal.Title>입고 {recentCount}</Modal.Title>
+				<Modal.Title>입고</Modal.Title>
 			</Modal.Header>
 			<div
 				style={{
 					padding: "10px",
 					backgroundColor: "#e4f2ec",
 				}}>
+				<Toaster />
 				<RowDiv>
 					<BigSpan>위탁사(auto): </BigSpan> <BigSpan>{client}</BigSpan>
 				</RowDiv>
@@ -108,7 +113,7 @@ export default function AddModal(props: AddModalType) {
 					<input
 						type="text"
 						value={cut}
-						onChange={(e) => setCut(e.target.value)}
+						onChange={(e) => setCut(e.target.value.slice(0, 5))}
 						placeholder="삼겹살, 목살 등"
 					/>
 				</RowDiv>
@@ -117,7 +122,7 @@ export default function AddModal(props: AddModalType) {
 					<input
 						type="number"
 						value={weight}
-						onChange={(e) => setWeight(e.target.value)}
+						onChange={(e) => setWeight(e.target.value.slice(0, 7))}
 						placeholder="g단위 입력"
 					/>
 				</RowDiv>

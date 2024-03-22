@@ -9,9 +9,8 @@ export async function getMeatInfo(
 	setScanSpecies: (scanSpecies: string) => void,
 	setGender: (scanGender: string) => void,
 	setOrigin: (scanOrigin: string) => void,
-	setLoadingState: (loadingState: number) => void,
+	setLoadingState: (loadingState: boolean) => void,
 	setFailed: (hasFailed: boolean) => void,
-	setWrongCut: (isWrong: boolean) => void,
 ) {
 	try {
 		await axios
@@ -86,7 +85,7 @@ export async function getMeatInfo(
 				// setGrade(g)
 
 				setOrigin("국산")
-				setLoadingState(2)
+				setLoadingState(false)
 				setFailed(false)
 			})
 			.catch((err) => {
@@ -105,9 +104,8 @@ export async function getForeignMeatInfo(
 	setScanSpecies: (scanSpecies: string) => void,
 	setGender: (scanGender: string) => void,
 	setOrigin: (scanOrigin: string) => void,
-	setLoadingState: (loadingState: number) => void,
+	setLoadingState: (loadingState: boolean) => void,
 	setFailed: (hasFailed: boolean) => void,
-	setWrongCut: (isWrong: boolean) => void,
 ) {
 	try {
 		await axios
@@ -129,11 +127,11 @@ export async function getForeignMeatInfo(
 				setGrade("-")
 				setGender("-")
 				setOrigin("-")
-				setLoadingState(2)
+				setLoadingState(false)
 			})
 	} catch (err) {
 		console.log(err)
 		setFailed(true)
-		setLoadingState(0)
+		setLoadingState(false)
 	}
 }
