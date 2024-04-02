@@ -57,7 +57,9 @@ export default function AddModal(props: AddModalType) {
 			initWeight: parseInt(weight),
 			initDate: dateText,
 			afterWeight: null,
+			afterDate: null,
 			cutWeight: null,
+			cutDate: null,
 			items: [],
 			docId: null,
 		}

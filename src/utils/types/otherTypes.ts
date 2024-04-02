@@ -19,7 +19,9 @@ export type ConsignData = {
 	initWeight: number
 	initDate: string
 	afterWeight: number | null
+	afterDate: string | null
 	cutWeight: number | null
+	cutDate: string | null
 	items: ConsignItem[]
 	docId: string | null
 }

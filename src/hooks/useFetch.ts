@@ -28,7 +28,7 @@ const useFBFetch = <T extends FB>(
 		const list: T[] = []
 		result.forEach((doc: DocumentData) => {
 			let datum = {...doc.data(), docId: doc.id}
-			console.log(doc.data)
+			// console.log(doc.data)
 			list.push(datum)
 		})
 		setData(list)

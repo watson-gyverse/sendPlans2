@@ -96,7 +96,9 @@ export async function updateExistingItem(
 	const ref = doc(firestoreDB, fbCollections.sp2Consign, docId)
 	await updateDoc(ref, {
 		afterWeight: data.afterWeight,
+		afterDate: data.afterDate,
 		cutWeight: data.cutWeight,
+		cutDate: data.cutDate,
 		items: data.items,
 	}).then(() => thenWhat())
 }

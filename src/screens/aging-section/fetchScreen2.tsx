@@ -19,6 +19,7 @@ import {NewAgingCard} from "../../components/aging-section/agingEditNewCard"
 import {AgingEditContextType} from "../../contexts/agingEditContext"
 import {sortAgingItems} from "../../utils/consts/functions"
 import {xlsxAgingHeaders} from "../../utils/consts/constants"
+import {AgingScreen} from "./agingScreen"
 
 export const FetchScreen2 = () => {
 	const navigate = useNavigate()
@@ -254,13 +255,6 @@ export const FetchScreen2 = () => {
 		setIsEditMode(!isEditMode)
 	}
 
-	const onClickAgingDeleteButton = (item: MeatInfoWithEntry) => {
-		const ok = window.confirm("숙성 중인 아이템입니다. 정말 삭제하시겠습니까?")
-		if (ok) {
-			deleteFromAgingFridge(item.docId!!, fetch())
-		}
-	}
-
 	const onCheckAll = useCallback(
 		(checked: boolean) => {
 			if (checked) {
@@ -468,29 +462,9 @@ export const FetchScreen2 = () => {
 							alignItems: "center",
 							justifyContent: "space-around",
 							marginTop: "10px",
-						}}></div>
-
-					{agingItems.map((item) => {
-						return (
-							<div>
-								<div
-									style={{
-										width: "100%",
-									}}>
-									<AgingFinishCard
-										key={item.docId}
-										meatInfo={item}
-										isEditMode={isEditMode}
-										clickEvent={() => {
-											setRecentMeatInfo(item)
-											setFinishModalShow(true)
-										}}
-										onClickDelete={() => onClickAgingDeleteButton(item)}
-									/>
-								</div>
-							</div>
-						)
-					})}
+						}}>
+						<AgingScreen place={placeName} />
+					</div>
 				</Stack>
 			)}
 
@@ -503,19 +477,6 @@ export const FetchScreen2 = () => {
 					setClose={() => setEditModalShow(false)}
 					show={editModalShow}
 					setShow={setEditModalShow}
-				/>
-			) : (
-				<></>
-			)}
-
-			{recentMeatInfo !== undefined ? (
-				<FinishAgingModal
-					meatInfo={recentMeatInfo}
-					finishAgingEvent={() => {
-						onFinishedAging(recentMeatInfo)
-					}}
-					show={finishModalShow}
-					setShow={setFinishModalShow}
 				/>
 			) : (
 				<></>
