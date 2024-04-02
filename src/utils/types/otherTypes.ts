@@ -19,7 +19,23 @@ export type ConsignData = {
 	initWeight: number
 	initDate: string
 	afterWeight: number | null
+	afterDate: string | null
 	cutWeight: number | null
+	cutDate: string | null
 	items: ConsignItem[]
 	docId: string | null
+}
+
+export type ConsignCsvData = {
+	id: string
+	client: string
+	meatNumber: string
+	cut: string
+	initWeight: number
+	initDate: string
+	afterWeight: string
+	afterDate: string
+	cutWeight: string
+	cutDate: string
+	itemWeight: number
 }

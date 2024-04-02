@@ -57,7 +57,9 @@ export default function AddModal(props: AddModalType) {
 			initWeight: parseInt(weight),
 			initDate: dateText,
 			afterWeight: null,
+			afterDate: null,
 			cutWeight: null,
+			cutDate: null,
 			items: [],
 			docId: null,
 		}
@@ -67,6 +69,7 @@ export default function AddModal(props: AddModalType) {
 				console.log("추가성공")
 				toast.success("추가성공")
 				updateCount(client, data.id, setRecentCount)
+				setShow(false)
 			},
 			() => {
 				console.log("추가실패")
@@ -122,7 +125,7 @@ export default function AddModal(props: AddModalType) {
 					<input
 						type="number"
 						value={weight}
-						onChange={(e) => setWeight(e.target.value.slice(0, 7))}
+						onChange={(e) => setWeight(e.target.value.slice(0, 5))}
 						placeholder="g단위 입력"
 					/>
 				</RowDiv>

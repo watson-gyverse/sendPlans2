@@ -14,7 +14,7 @@ import {StorageContext} from "../../contexts/meatLineContext"
 import {backgroundColors} from "../../utils/consts/colors"
 import useDidMountEffect from "../../hooks/useDidMountEffect"
 
-export default function CameraScreen() {
+export default function CameraScreen3() {
 	const {scanText, setScanText} = useContext(StorageContext)
 
 	const [forceEnabled, setForceEnable] = useState(false)

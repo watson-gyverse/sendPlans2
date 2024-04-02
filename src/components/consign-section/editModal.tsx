@@ -2,41 +2,57 @@
 import {Modal} from "react-bootstrap"
 import styled from "styled-components"
 import toast, {Toaster} from "react-hot-toast"
+import moment from "moment"
 import {ConsignData, ConsignItem} from "../../utils/types/otherTypes"
 import {useEffect, useState} from "react"
 import {updateExistingItem} from "../../apis/consignApi"
+import DatePickerComponent from "../storage-section/datePicker"
+import {isNullOrNanOrUndefined} from "../../utils/consts/functions"
 
 type EditModalType = {
 	data: ConsignData
 	show: boolean
 	setShow: (show: boolean) => void
+	setSthChanged: (changed: boolean) => void
 }
 
 export default function EditModal(props: EditModalType) {
-	const {show, setShow, data} = props
+	const {show, setShow, data, setSthChanged} = props
 	const [newAfterWeight, setAfterWeight] = useState(
 		isNullOrNanOrUndefined(data.afterWeight) ? "" : String(data.afterWeight)!!,
+	)
+	const [afterDate, setAfterDate] = useState(
+		data.afterDate ? new Date(data.afterDate) : new Date(),
 	)
 	const [newCutWeight, setCutWeight] = useState(
 		isNullOrNanOrUndefined(data.cutWeight) ? "" : String(data.cutWeight)!!,
 	)
+	const [changableAw, setAwChangable] = useState(false)
+	const [changableCw, setCwChangable] = useState(false)
+	const [cutDate, setCutDate] = useState(
+		data.cutDate ? new Date(data.cutDate) : new Date(),
+	)
 	const [newItems, setItems] = useState<ConsignItem[]>([])
-	// const [canRequest, setCanRequest] = useState(false)
 
 	const [newItemsWeight, setItemsWeight] = useState<string[]>([])
 	const [itemInputCount, setInputCount] = useState(1)
 
 	const onSubmitClick = () => {
+		const afterDateText = moment(afterDate).format("YYYY-MM-DD ")
+		const cutDateText = moment(cutDate).format("YYYY-MM-DD ")
 		const {afterWeight, cutWeight, items, ...unchangedData} = data
 		const updateData: ConsignData = {
 			...unchangedData,
 			afterWeight: parseInt(newAfterWeight),
 			cutWeight: parseInt(newCutWeight),
 			items: [...Array.from(data.items), ...newItems],
+			afterDate: afterDateText,
+			cutDate: cutDateText,
 		}
 		updateExistingItem(data.docId!!, updateData, () => {
 			setShow(false)
 			toast.success("업데이트 완료")
+			setSthChanged(true)
 		})
 	}
 
@@ -99,16 +115,16 @@ export default function EditModal(props: EditModalType) {
 			onShow={() => {}}
 			show={show}
 			onHide={() => {
-				setShow(false)
 				setItemsWeight([])
 				setInputCount(1)
 				setItems([])
+				setAfterWeight("")
+				setCutWeight("")
+				setShow(false)
 			}}>
 			<Toaster />
 			<Modal.Header closeButton>
-				<Modal.Title>
-					업데이트 {data.docId} {data.cut}
-				</Modal.Title>
+				<Modal.Title>업데이트</Modal.Title>
 			</Modal.Header>
 			<div
 				style={{
@@ -134,25 +150,59 @@ export default function EditModal(props: EditModalType) {
 				</RowDiv>
 				<RowDiv>
 					<BigSpan>숙성 후 무게: </BigSpan>
-					{isNullOrNanOrUndefined(data.afterWeight) ? (
+					{isNullOrNanOrUndefined(data.afterWeight) || changableAw ? (
 						<input
+							style={{width: "5rem"}}
 							type="number"
-							onChange={(e) => setAfterWeight(e.target.value.slice(0, 7))}
+							value={newAfterWeight}
+							onChange={(e) => setAfterWeight(e.target.value.slice(0, 5))}
 						/>
 					) : (
-						<BigSpan>{data.afterWeight}</BigSpan>
+						<BigSpan style={{width: "5rem"}}>{data.afterWeight}</BigSpan>
 					)}
+					<button
+						style={{
+							display: isNullOrNanOrUndefined(data.afterWeight)
+								? "none"
+								: "block",
+						}}
+						onClick={() => setAwChangable(!changableAw)}>
+						☆
+					</button>
+					<DatePickerComponent
+						targetDate={afterDate}
+						setTargetDate={setAfterDate}
+						variant={"none"}
+						fontSize="1rem"
+					/>
 				</RowDiv>
 				<RowDiv>
-					<BigSpan>손질 후 무게: </BigSpan>
-					{isNullOrNanOrUndefined(data.cutWeight) ? (
+					<BigSpan>손질 후 무게: </BigSpan>{" "}
+					{isNullOrNanOrUndefined(data.cutWeight) || changableCw ? (
 						<input
+							style={{width: "5rem"}}
 							type="number"
-							onChange={(e) => setCutWeight(e.target.value.slice(0, 7))}
+							value={newCutWeight}
+							onChange={(e) => setCutWeight(e.target.value.slice(0, 5))}
 						/>
 					) : (
-						<BigSpan>{data.cutWeight}</BigSpan>
+						<BigSpan style={{width: "5rem"}}>{data.cutWeight}</BigSpan>
 					)}
+					<button
+						style={{
+							display: isNullOrNanOrUndefined(data.cutWeight)
+								? "none"
+								: "block",
+						}}
+						onClick={() => setCwChangable(!changableCw)}>
+						☆
+					</button>
+					<DatePickerComponent
+						targetDate={cutDate}
+						setTargetDate={setCutDate}
+						variant={"none"}
+						fontSize="1rem"
+					/>
 				</RowDiv>
 				{/* <PortionTable items={data.items} setItems={setItems} /> */}
 				<table>
@@ -205,10 +255,3 @@ const RowDiv = styled.div`
 	display: flex;
 	align-items: center;
 `
-
-function isNullOrNanOrUndefined(a: any): boolean {
-	if (a === null || a === undefined || Number.isNaN(a)) {
-		return true
-	}
-	return false
-}

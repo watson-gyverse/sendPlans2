@@ -36,6 +36,17 @@ export default function CameraScreen() {
 
 	const [newText, setNewText] = useState("")
 
+	const [isL, setL] = useState(false)
+	const onLClick = () => {
+		setL(!isL)
+	}
+	useEffect(() => {
+		if (isL && !showScanner) {
+			setNewText("L".concat(newText))
+		} else if (!isL && !showScanner) {
+			setNewText(newText.replace("L", ""))
+		}
+	}, [isL, showScanner])
 	//번호 입력
 	const onScanSuccess = (decodedText: string) => {
 		console.log("newText: " + decodedText)
@@ -172,7 +183,7 @@ export default function CameraScreen() {
 					marginBottom: "2rem",
 					justifyContent: "space-between",
 				}}>
-				<Button onClick={goToPreset}>뒤!로</Button>
+				<Button onClick={goToPreset}>뒤로</Button>
 				<Button onClick={() => setShowScanner(!showScanner)}>직접 입력</Button>
 			</div>
 			{showScanner ? (
@@ -195,17 +206,29 @@ export default function CameraScreen() {
 						justifyContent: "space-evenly",
 						alignItems: "center",
 					}}>
-					<label htmlFor="뽀삐">이력 번호</label>
+					<label htmlFor="뽀삐">이력번호</label>
+					<button
+						onClick={onLClick}
+						style={{
+							outline: "none",
+							backgroundColor: isL ? "#45f4a5" : "#6b8077",
+						}}>
+						L
+					</button>
 					<input
+						style={{width: "9rem"}}
 						type="text"
 						name="뽀삐"
 						value={manualNumber}
 						onChange={(e) => setManualNumber(e.target.value)}
 					/>
 					<Button
+						style={{
+							width: "5rem",
+						}}
 						onClick={() => {
 							console.log(manualNumber)
-							onScanSuccess(manualNumber)
+							onScanSuccess(isL ? "L" + manualNumber : manualNumber)
 						}}>
 						제출
 					</Button>

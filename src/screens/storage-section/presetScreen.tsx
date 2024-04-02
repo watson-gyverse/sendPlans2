@@ -83,7 +83,6 @@ export default function PresetScreen() {
 	return (
 		<div
 			style={{
-				padding: "1rem",
 				backgroundColor: backgroundColors.storage_back,
 			}}>
 			<Toaster position="top-center" reverseOrder={false} />

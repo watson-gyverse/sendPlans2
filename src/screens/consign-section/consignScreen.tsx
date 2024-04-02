@@ -1,15 +1,37 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import {useEffect, useState} from "react"
+import {useEffect, useRef, useState} from "react"
 import {backgroundColors} from "../../utils/consts/colors"
 import {ConsignTable} from "./table"
-import {ConsignData} from "../../utils/types/otherTypes"
+import {
+	ConsignCsvData,
+	ConsignData,
+	ConsignItem,
+} from "../../utils/types/otherTypes"
 import AddModal from "../../components/consign-section/addModal"
 import useFBFetch from "../../hooks/useFetch"
 import {fbCollections} from "../../utils/consts/constants"
 import {where} from "firebase/firestore"
 import {Toaster} from "react-hot-toast"
 import {useNavigate} from "react-router-dom"
-
+import styled from "styled-components"
+import * as xlsx from "xlsx"
+import {padNumber} from "../../utils/consts/functions"
+import {CSVLink} from "react-csv"
+import moment from "moment"
+import Link from "react-csv/components/Link"
+const headers = [
+	{label: "일련번호", key: "id"},
+	{label: "위탁사", key: "client"},
+	{label: "이력번호", key: "meatNumber"},
+	{label: "부위", key: "cut"},
+	{label: "숙성전무게", key: "initWeight"},
+	{label: "숙성시작일", key: "initDate"},
+	{label: "숙성후무게", key: "afterWeight"},
+	{label: "숙성종료일", key: "afterDate"},
+	{label: "손질후무게", key: "cutWeight"},
+	{label: "손질한날짜", key: "cutDate"},
+	{label: "덩이별무게", key: "itemWeight"},
+]
 export const ConsignScreen = () => {
 	const navigate = useNavigate()
 	const [client, setClient] = useState("")
@@ -22,9 +44,31 @@ export const ConsignScreen = () => {
 		fbCollections.sp2Consign,
 		where("client", "==", client),
 	)
-
+	const [csvData, setCsvData] = useState<ConsignCsvData[]>([])
 	useEffect(() => {
 		console.log(data)
+		const newData: ConsignCsvData[] = []
+		data.forEach((datum) => {
+			datum.items.forEach((item, index) => {
+				const xlsxDatum: ConsignCsvData = {
+					id: padNumber(datum.id, 3) + "_" + padNumber(index, 2),
+					client: datum.client,
+					meatNumber: datum.meatNumber,
+					cut: datum.cut,
+					initWeight: datum.initWeight,
+					initDate: datum.initDate,
+					afterWeight: anywayFill(datum.afterWeight),
+					afterDate: anywayFill(datum.afterDate),
+					cutWeight: anywayFill(datum.cutWeight),
+					cutDate: anywayFill(datum.cutDate),
+					itemWeight: item.weight,
+				}
+				newData.push(xlsxDatum)
+			})
+		})
+		setCsvData(newData)
+		console.log("xlsxData: ")
+		console.log(newData)
 	}, [data])
 
 	const onSearchClient = () => {
@@ -56,14 +100,15 @@ export const ConsignScreen = () => {
 	}, [meatNumber, client])
 
 	useEffect(() => {
-		if (!canAddModalShow) {
-			console.log("닫혀있음")
-			onSearchClient()
+		if (!addModalShow) {
+			refetch()
 		}
-	}, [canAddModalShow])
+	}, [addModalShow])
+
 	const onBackClick = () => {
 		navigate("../")
 	}
+
 	return (
 		<div
 			style={{
@@ -74,31 +119,22 @@ export const ConsignScreen = () => {
 				padding: "20px 10px",
 			}}>
 			<Toaster />
-			<button style={{width: "60px"}} onClick={onBackClick}>
-				뒤로
-			</button>
+
 			{/* 위탁사 검색 */}
-			<div
-				style={{
-					display: "flex",
-					flexDirection: "row",
-					justifyContent: "center",
-				}}>
+			<MenuDiv>
+				<button style={{width: "60px"}} onClick={onBackClick}>
+					뒤로
+				</button>
 				<input
-					style={{width: "10rem"}}
+					style={{width: "12rem"}}
 					type="text"
 					id="clientInput"
 					placeholder="위탁사 명"
 					onChange={(e) => setClient(e.target.value)}
 				/>
 				<button onClick={onSearchClient}>조회</button>
-			</div>
-			<div
-				style={{
-					display: "flex",
-					flexDirection: "row",
-					justifyContent: "center",
-				}}>
+			</MenuDiv>
+			<MenuDiv>
 				<button
 					onClick={onLClick}
 					style={{
@@ -112,11 +148,27 @@ export const ConsignScreen = () => {
 					type="number"
 					placeholder="지금 추가할 이력번호 입력"
 					onChange={(e) => onMeatNumberChange(e.target.value)}
-				/>
-			</div>
-			<button disabled={!canAddModalShow} onClick={onAddButtonClick}>
-				+
-			</button>
+				/>{" "}
+				<button
+					style={{width: "3rem"}}
+					disabled={!canAddModalShow}
+					onClick={onAddButtonClick}>
+					+
+				</button>
+				<div style={{marginLeft: "1rem"}}>
+					{csvData.length > 1 ? (
+						<CSVLink
+							headers={headers}
+							data={csvData}
+							filename={`${client}_${moment().format("YYYYMMDD")}.csv`}>
+							csv
+						</CSVLink>
+					) : (
+						<></>
+					)}
+				</div>
+			</MenuDiv>
+
 			<ConsignTable
 				data={data.sort((a, b) => (a.id < b.id ? -1 : 0))}
 				refetch={refetch}
@@ -129,6 +181,17 @@ export const ConsignScreen = () => {
 			/>
 		</div>
 	)
+}
+
+const MenuDiv = styled.div`
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	margin-bottom: 4px;
+`
+
+function anywayFill(a: any): string {
+	return `${a ? a : "-"}`
 }
 
 // function makeData(): ConsignData[] {

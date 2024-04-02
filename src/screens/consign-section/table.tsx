@@ -23,6 +23,8 @@ export const ConsignTable = (props: TableData) => {
 	const [currentRowData, setCurrentRowData] = useState<
 		ConsignData | undefined
 	>()
+	const [sthChanged, setSthChanged] = useState(false)
+
 	const columnHelper = createColumnHelper<ConsignData>()
 
 	const columns = [
@@ -37,7 +39,7 @@ export const ConsignTable = (props: TableData) => {
 				return (
 					<div
 						style={{
-							width: "70px",
+							width: "60px",
 							overflow: "hidden",
 							overflowWrap: isEllipsis ? "normal" : "break-word",
 						}}
@@ -76,15 +78,16 @@ export const ConsignTable = (props: TableData) => {
 		data,
 		getCoreRowModel: getCoreRowModel(),
 	})
-
 	const onRowClick = (row: Row<ConsignData>) => {
 		console.log(row.original)
 		setCurrentRowData(row.original)
 	}
 
 	useEffect(() => {
-		console.log(editModalShow)
-		refetch()
+		if (!editModalShow) {
+			setCurrentRowData(undefined)
+			if (sthChanged) refetch()
+		}
 	}, [editModalShow])
 	useEffect(() => {
 		setEditModalShow(true)
@@ -129,6 +132,7 @@ export const ConsignTable = (props: TableData) => {
 					show={editModalShow}
 					setShow={setEditModalShow}
 					data={currentRowData}
+					setSthChanged={setSthChanged}
 				/>
 			) : (
 				<></>

@@ -72,17 +72,6 @@ export default function MainScreen() {
 						<br />
 						조회하기
 					</Button>
-
-					<Button
-						style={{height: "140px", width: "140px"}}
-						variant="success"
-						onClick={naviToReportScreen}>
-						<GiBugNet style={{height: "60px", width: "60px"}} />
-						<br />
-						벌레신고
-					</Button>
-				</div>
-				<div style={{display: "flex", justifyContent: "space-evenly"}}>
 					<Button
 						style={{height: "140px", width: "140px"}}
 						variant="info"
@@ -90,6 +79,16 @@ export default function MainScreen() {
 						<VscRocket style={{height: "60px", width: "60px"}} />
 						<br />
 						대량숙성
+					</Button>
+				</div>
+				<div style={{display: "flex", justifyContent: "space-evenly"}}>
+					<Button
+						style={{height: "140px", width: "140px"}}
+						variant="success"
+						onClick={naviToReportScreen}>
+						<GiBugNet style={{height: "60px", width: "60px"}} />
+						<br />
+						벌레신고
 					</Button>
 					<div style={{height: "140px", width: "140px"}}></div>
 				</div>
