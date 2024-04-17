@@ -32,7 +32,7 @@ export const DatePickerSet = (props: DatePickerProps) => {
 	return (
 		<div>
 			<Stack gap={1}>
-				<div style={{display: "flex", justifyContent: "space-evenly"}}>
+				<div style={{display: "flex", justifyContent: "center"}}>
 					<DatePickerComponent
 						targetDate={date}
 						setTargetDate={setDate}
@@ -43,6 +43,7 @@ export const DatePickerSet = (props: DatePickerProps) => {
 						style={{
 							fontSize: "1.5rem",
 							width: "80px",
+							borderRadius: "0",
 						}}
 						onClick={() => setAmPm(!amPm)}>
 						{amPm ? "AM" : "PM"}
@@ -51,6 +52,8 @@ export const DatePickerSet = (props: DatePickerProps) => {
 						<Dropdown.Toggle
 							style={{
 								fontSize: "1.5rem",
+								width: "90px",
+								borderRadius: "0",
 							}}
 							variant={variant}
 							id="dropdown-hour">{`${time}시`}</Dropdown.Toggle>
@@ -62,7 +65,7 @@ export const DatePickerSet = (props: DatePickerProps) => {
 							))}
 						</Dropdown.Menu>
 					</Dropdown>
-					<div style={{width: "100px"}}></div>
+					{/* <div style={{width: "100px"}}></div> */}
 				</div>
 			</Stack>
 		</div>

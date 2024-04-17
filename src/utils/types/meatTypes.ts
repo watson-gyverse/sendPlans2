@@ -41,7 +41,12 @@ export type MeatInfoAiO = MeatInfoWithEntry & {
 	cutDate: string | null
 	docId: string | null
 }
-
+export type MeatTableData = MeatInfoAiO & {
+	loss: string | null
+	lossP: string | null
+	cutLoss: string | null
+	cutLossP: string | null
+}
 export type XlsxStoreType = {
 	[index: string]: string
 	입고일: string

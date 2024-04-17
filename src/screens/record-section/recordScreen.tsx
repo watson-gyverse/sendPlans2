@@ -1,58 +1,47 @@
+import {useEffect, useState} from "react"
+import {RecordPCScreen} from "./recordPCScreen"
+import RecordMobileScreen from "./recordMobileScreen"
+import {useMediaQuery} from "react-responsive"
+import styled from "styled-components"
 import {Button, Collapse} from "react-bootstrap"
 import {Filter} from "../../components/record-section/filter"
-import {useState} from "react"
+import useFBFetch from "../../hooks/useFetch"
+import {FirestorePlace} from "../../utils/types/otherTypes"
+import {fbCollections} from "../../utils/consts/constants"
 import {MeatInfoAiO} from "../../utils/types/meatTypes"
 import {useNavigate} from "react-router-dom"
-import useFBFetch from "../../hooks/useFetch"
-import {fbCollections} from "../../utils/consts/constants"
-import {RecordCard} from "../../components/record-section/recordCard"
-import {FirestorePlace} from "../../utils/types/otherTypes"
 
-export default function RecordScreen() {
+export default function RecordBranchScreen() {
 	const navigate = useNavigate()
-	const [filterOpen, setFilterOpen] = useState(false)
-	// const [modalShow, setModalShow] = useState(false)
 	const data = useFBFetch<MeatInfoAiO>(fbCollections.sp2Record).data
-	const places = useFBFetch<FirestorePlace>(fbCollections.sp2Places).data
+	const [filterOpen, setFilterOpen] = useState(true)
 	const [filteredRecords, setFilteredRecords] = useState<MeatInfoAiO[]>([])
-	const onfilterOpenClick = () => {
-		setFilterOpen(!filterOpen)
-	}
+	const places = useFBFetch<FirestorePlace>(fbCollections.sp2Places).data
+	const isMobile = useMediaQuery({query: "(max-width: 1224px)"})
 	const onClickBack = () => {
 		navigate("../")
 	}
-
+	useEffect(() => {
+		console.log(filteredRecords)
+	}, [filteredRecords])
 	return (
-		<div
-			style={{
-				backgroundColor: "#f0d286",
-				padding: "20px 10px",
-				borderRadius: "20px",
-			}}>
-			<div
-				style={{
-					top: 0,
-					backgroundColor: "#f0d286ba",
-					padding: "6px 4px",
-				}}>
-				<Button variant="warning" onClick={onClickBack}>
-					뒤로
-				</Button>
-				<Button
-					variant="warning"
-					style={{marginLeft: "20px"}}
-					onClick={onfilterOpenClick}
-					aria-controls="filterCollapse"
-					// aria-expanded={filterOpen}
-				>
-					필터
-				</Button>
-			</div>
+		<div>
+			<button onClick={onClickBack}>뒤로</button>
+			<h1>히스토리</h1>
+			<Button
+				variant="warning"
+				style={{marginLeft: "20px"}}
+				onClick={() => setFilterOpen(!filterOpen)}
+				aria-controls="filterCollapse"
+				// aria-expanded={filterOpen}
+			>
+				필터
+			</Button>
 			<Collapse in={filterOpen}>
 				<div
 					id="filterCollapse"
 					style={{
-						backgroundColor: "#edc86c",
+						backgroundColor: "#eeeeb5",
 						padding: "6px 4px",
 						marginTop: "10px",
 					}}>
@@ -60,28 +49,25 @@ export default function RecordScreen() {
 						data={data}
 						setFilteredRecords={setFilteredRecords}
 						places={places}
+						direction={isMobile ? "column" : "row"}
 					/>
 				</div>
 			</Collapse>
-			<div style={{height: "2000px"}}>
-				{filteredRecords.map((item) => (
-					<div>
-						<RecordCard
-							item={item}
-							// setModalShow={setModalShow}
-						/>
-					</div>
-				))}
-			</div>
-			{/* <Modal
-                show={modalShow}
-                onHide={() => setModalShow(false)}
-            >
-                <Modal.Header closeButton>
-                    <h6>상세 정보</h6>
-                </Modal.Header>
-                <Modal.Body></Modal.Body>
-            </Modal> */}
+			{isMobile ? (
+				<RecordMobileScreen data={filteredRecords} />
+			) : (
+				<RecordPCScreen data={filteredRecords} />
+			)}
+			{/* <StyledContent>123</StyledContent> */}
 		</div>
 	)
 }
+
+const StyledContent = styled.h1`
+	color: black;
+	background-color: yellow;
+	@media screen and (max-width: 600px) {
+		color: red;
+		background-color: blue;
+	}
+`

@@ -123,3 +123,7 @@ export const checkProperty = <T extends object, K extends keyof T>(
 
 	return hasProperty || isNullOrUndefined
 }
+export const ThreeStep = /\B(?=(\d{3})+(?!\d))/g
+export function ThreeStepComma(string: string) {
+	return string.replace(ThreeStep, ",")
+}

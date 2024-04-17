@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {useEffect, useState} from "react"
 import {backgroundColors} from "../../utils/consts/colors"
-import {ConsignTable} from "./table"
+import {ConsignTable} from "../../components/consign-section/table"
 import {ConsignData} from "../../utils/types/otherTypes"
 import AddModal from "../../components/consign-section/addModal"
 import useFBFetch from "../../hooks/useFetch"

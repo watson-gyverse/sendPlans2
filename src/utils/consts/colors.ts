@@ -7,6 +7,7 @@ export const backgroundColors = {
 	agedCard: "#ffebeb",
 	report: "#78b980",
 	consign: "#d0edc6",
+	record: "#f0d286",
 }
 
 export const fontColors = {

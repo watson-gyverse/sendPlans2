@@ -318,13 +318,12 @@ export const FetchScreen2 = () => {
 						alignItems: "center",
 						display: "flex",
 					}}>
-					<AiFillSetting
-						style={{
-							width: "30px",
-							height: "30px",
-						}}
-						onClick={onClickEditModeButton}
-					/>
+					<Button
+						style={{width: "60px", height: "50px", padding: "0"}}
+						variant="danger"
+						onClick={onClickEditModeButton}>
+						폐기
+					</Button>
 				</div>
 			</div>
 			{/* 탭 */}

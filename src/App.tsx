@@ -9,13 +9,12 @@ import {Container} from "react-bootstrap"
 import {StorageContext} from "./contexts/meatLineContext"
 import {StorageMiddleWare} from "./utils/toLobbyMiddleware"
 import PlaceScreen from "./screens/aging-section/placeScreen"
-import RecordScreen from "./screens/record-section/recordScreen"
 import {backgroundColors} from "./utils/consts/colors"
 import EditScreen from "./screens/storage-section/editScreen"
 import {FetchScreen2} from "./screens/aging-section/fetchScreen2"
 import ReportScreen from "./screens/report-section/reportScreen"
 import {ConsignScreen} from "./screens/consign-section/consignScreen"
-import CameraScreen2 from "./screens/storage-section/cameraScreen copy"
+import RecordBranchScreen from "./screens/record-section/recordScreen"
 
 const router = createBrowserRouter(
 	[
@@ -39,7 +38,6 @@ const router = createBrowserRouter(
 					children: [
 						{
 							index: true,
-
 							element: <PresetScreen />,
 						},
 						{
@@ -77,7 +75,7 @@ const router = createBrowserRouter(
 				},
 				{
 					path: "record",
-					element: <RecordScreen />,
+					element: <RecordBranchScreen />,
 				},
 				{
 					path: "report",
@@ -98,12 +96,12 @@ const router = createBrowserRouter(
 )
 
 function App() {
-	const [isLoading, setLoading] = useState(true)
-	const init = async () => {
-		await new Promise((resolve) => setTimeout(resolve, 2000))
-		setLoading(false)
-	}
-	init()
+	// const [isLoading, setLoading] = useState(true)
+	// const init = async () => {
+	// 	await new Promise((resolve) => setTimeout(resolve, 2000))
+	// 	setLoading(false)
+	// }
+	// init()
 
 	const [scanText, setScanText] = useState<string>("undefined")
 	return (
@@ -114,21 +112,18 @@ function App() {
 			}}>
 			<div
 				style={{
-					width: "100%",
+					width: "100vw",
 					height: "100%",
-					backgroundColor: backgroundColors.base,
+					overflow: "auto",
+					display: "flex",
+					justifyContent: "center",
+					alignItems: "flex-start",
+					backgroundColor: backgroundColors.agedCard,
 				}}>
-				<Container
-					style={{
-						width: "380px",
-						height: "auto",
-						padding: "24px 20px 30px 20px",
-					}}>
-					<RouterProvider
-						router={router}
-						// fallbackElement={<div>로딩</div>}
-					/>
-				</Container>
+				<RouterProvider
+					router={router}
+					// fallbackElement={<div>로딩</div>}
+				/>
 			</div>
 		</StorageContext.Provider>
 	)

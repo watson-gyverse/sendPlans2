@@ -9,12 +9,13 @@ type FilterProps = {
 	data: MeatInfoAiO[]
 	setFilteredRecords: React.Dispatch<React.SetStateAction<MeatInfoAiO[]>>
 	places: FirestorePlace[]
+	direction: "row" | "column"
 }
 
 export const Filter = (props: FilterProps) => {
-	const {data, setFilteredRecords, places} = props
+	const {data, setFilteredRecords, places, direction} = props
 	const [currentPlace, setPlace] = useState("")
-	const [activeFridge, setActiveFridge] = useState<number[]>([])
+	const [activeFridges, setActiveFridge] = useState<number[]>([])
 	const [activeFloor, setActiveFloor] = useState<number[]>([1, 2, 3, 4, 5])
 	const [activeSpecies, setActiveSpecies] = useState<string[]>(["소", "돼지"])
 
@@ -29,7 +30,11 @@ export const Filter = (props: FilterProps) => {
 	const [finishToDate, setFTDate] = useState(now)
 
 	const [currentFirebasePlace, setFbPlace] = useState(places[0])
-	const [currentFridges, setFridges] = useState<number[]>([]) //깔아줄 냉장고, active와 비교
+	const [currentFridges, setFridges] = useState<number[]>([])
+	// 현재 장소의 냉장고 수
+
+	const inactive_color = "#d9cbda"
+	const active_color = "#d37aff"
 
 	useEffect(() => {
 		if (places.length !== 0) {
@@ -60,7 +65,7 @@ export const Filter = (props: FilterProps) => {
 
 			return (
 				item.place === currentPlace &&
-				_.includes(activeFridge, Number(item.fridgeName)) &&
+				_.includes(activeFridges, Number(item.fridgeName)) &&
 				_.includes(activeFloor, Number(item.floor)) &&
 				_.includes(activeSpecies, item.species) &&
 				sd >= sf &&
@@ -72,11 +77,11 @@ export const Filter = (props: FilterProps) => {
 			)
 		})
 
-		console.log(a)
+		// console.log(a)
 		setFilteredRecords(a)
 	}, [
 		data,
-		activeFridge,
+		activeFridges,
 		activeFloor,
 		activeSpecies,
 		currentPlace,
@@ -89,11 +94,11 @@ export const Filter = (props: FilterProps) => {
 	])
 
 	useEffect(() => {
-		if (currentFirebasePlace !== undefined) {
+		if (currentFirebasePlace) {
 			let b = makeStepArray(Number(currentFirebasePlace.count))
 			setFridges(b)
 
-			if (activeFridge.length > Number(currentFirebasePlace.count)) {
+			if (activeFridges.length > Number(currentFirebasePlace.count)) {
 				setActiveFridge(b)
 			}
 		}
@@ -103,8 +108,8 @@ export const Filter = (props: FilterProps) => {
 		return _.includes(list, i)
 	}
 	const onClickFridge = (i: number) => {
-		console.log(i, activeFridge)
-		onClickFilter(i, activeFridge, setActiveFridge)
+		console.log(i, currentFridges[i])
+		onClickFilter(i, activeFridges, setActiveFridge)
 	}
 
 	const onClickFloor = (i: number) => {
@@ -122,198 +127,218 @@ export const Filter = (props: FilterProps) => {
 
 	const categoryStyle = {margin: "4px 0 2px 2px"}
 	return (
-		<div style={{display: "flex", flexDirection: "column", padding: "4px"}}>
+		<div style={{display: "flex", flexDirection: direction, padding: "4px"}}>
 			<div
 				style={{
 					display: "flex",
 					flexWrap: "wrap",
-					flexDirection: "column",
+					flexDirection: direction,
 				}}>
-				<h6 style={categoryStyle}>장소</h6>
-				<div style={{display: "flex", flexWrap: "wrap"}}>
-					{places.map((place) => {
-						return (
+				<div
+					style={{
+						display: "flex",
+						flexWrap: "wrap",
+						flexDirection: "column",
+					}}>
+					<h6 style={categoryStyle}>장소</h6>
+					<div style={{display: "flex", flexWrap: "wrap"}}>
+						{places.map((place) => {
+							return (
+								<button
+									style={{
+										backgroundColor:
+											place.name === currentPlace
+												? active_color
+												: inactive_color,
+									}}
+									value={place.count}
+									onClick={() => {
+										setFbPlace(place)
+										setPlace(place.name)
+									}}>
+									{place.name}
+								</button>
+							)
+						})}
+					</div>
+					<h6 style={categoryStyle}>냉장고</h6>
+					<div>
+						<button
+							style={{
+								backgroundColor: isEqual(activeFridges, currentFridges)
+									? active_color
+									: inactive_color,
+							}}
+							onClick={() => {
+								setActiveFridge(
+									activeFridges.length === Number(currentFirebasePlace.count)
+										? []
+										: [...currentFridges],
+								)
+							}}>
+							전체
+						</button>
+						{currentFridges.map((i) => (
 							<button
 								style={{
-									backgroundColor:
-										place.name === currentPlace ? "#cc81f2" : "#eabcff",
+									backgroundColor: isActive(i, activeFridges)
+										? active_color
+										: inactive_color,
 								}}
-								value={place.count}
 								onClick={() => {
-									setFbPlace(place)
-									setPlace(place.name)
+									onClickFridge(i)
 								}}>
-								{place.name}
+								{i}
 							</button>
-						)
-					})}
-				</div>
-				<h6 style={categoryStyle}>냉장고</h6>
-				<div>
-					<button
-						style={{
-							backgroundColor: isEqual(activeFridge, currentFridges)
-								? "#cc81f2"
-								: "#eabcff",
-						}}
-						onClick={() => {
-							setActiveFridge(
-								activeFridge.length === Number(currentFirebasePlace.count)
-									? []
-									: currentFridges,
-							)
-						}}>
-						전체
-					</button>
-					{currentFridges.map((i) => (
+						))}
+					</div>
+					<h6 style={categoryStyle}>층</h6>
+					<div style={{display: "flex", flexWrap: "wrap"}}>
 						<button
 							style={{
-								backgroundColor: isActive(i, activeFridge)
-									? "#cc81f2"
-									: "#eabcff",
+								backgroundColor:
+									activeFloor.length === 5 ? active_color : inactive_color,
 							}}
 							onClick={() => {
-								onClickFridge(i)
+								setActiveFloor(activeFloor.length === 5 ? [] : [1, 2, 3, 4, 5])
 							}}>
-							{i}
+							전체
 						</button>
-					))}
-				</div>
-				<h6 style={categoryStyle}>층</h6>
-				<div style={{display: "flex", flexWrap: "wrap"}}>
-					<button
-						style={{
-							backgroundColor: activeFloor.length === 5 ? "#cc81f2" : "#eabcff",
-						}}
-						onClick={() => {
-							setActiveFloor(activeFloor.length === 5 ? [] : [1, 2, 3, 4, 5])
-						}}>
-						전체
-					</button>
-					{makeStepArray(5).map((i) => (
+						{makeStepArray(5).map((i) => (
+							<button
+								style={{
+									backgroundColor: isActive(i, activeFloor)
+										? active_color
+										: inactive_color,
+								}}
+								onClick={() => {
+									onClickFloor(i)
+								}}>
+								{i}
+							</button>
+						))}
+					</div>
+					<h6 style={{margin: "4px 0 2px 0"}}>육종</h6>
+					<div style={{display: "flex", flexWrap: "wrap"}}>
 						<button
 							style={{
-								backgroundColor: isActive(i, activeFloor)
-									? "#cc81f2"
-									: "#eabcff",
+								backgroundColor:
+									activeSpecies.length === 2 ? active_color : inactive_color,
 							}}
 							onClick={() => {
-								onClickFloor(i)
+								setActiveSpecies(
+									activeSpecies.length === 2 ? [] : ["소", "돼지"],
+								)
 							}}>
-							{i}
+							전체
 						</button>
-					))}
+						<button
+							style={{
+								backgroundColor: _.includes(activeSpecies, "소")
+									? active_color
+									: inactive_color,
+							}}
+							onClick={() => onClickSpecies("소")}>
+							소
+						</button>
+						<button
+							style={{
+								backgroundColor: _.includes(activeSpecies, "돼지")
+									? active_color
+									: inactive_color,
+							}}
+							onClick={() => onClickSpecies("돼지")}>
+							돼지
+						</button>
+					</div>
 				</div>
-				<h6 style={{margin: "4px 0 2px 0"}}>육종</h6>
-				<div style={{display: "flex", flexWrap: "wrap"}}>
-					<button
+				<div
+					style={{
+						display: "flex",
+						flexWrap: "wrap",
+						flexDirection: "column",
+						padding: direction === "row" ? "0 0 0 10px" : "10px 0 0 0 ",
+					}}>
+					<h6 style={categoryStyle}>입고일</h6>
+					<div
 						style={{
-							backgroundColor:
-								activeSpecies.length === 2 ? "#cc81f2" : "#eabcff",
-						}}
-						onClick={() => {
-							setActiveSpecies(activeSpecies.length === 2 ? [] : ["소", "돼지"])
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "center",
 						}}>
-						전체
-					</button>
-					<button
+						<div style={{marginRight: "16px"}}>
+							<DatePickerComponent
+								targetDate={storageFromDate}
+								setTargetDate={setSFDate}
+								variant="warning"
+								fontSize="1rem"
+							/>
+						</div>
+
+						<>~</>
+
+						<div style={{marginLeft: "16px"}}>
+							<DatePickerComponent
+								targetDate={storageToDate}
+								setTargetDate={setSTDate}
+								variant="warning"
+								fontSize="1rem"
+							/>
+						</div>
+					</div>
+					<h6 style={categoryStyle}>숙성시작일</h6>
+					<div
 						style={{
-							backgroundColor: _.includes(activeSpecies, "소")
-								? "#cc81f2"
-								: "#eabcff",
-						}}
-						onClick={() => onClickSpecies("소")}>
-						소
-					</button>
-					<button
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "center",
+						}}>
+						<div style={{marginRight: "16px"}}>
+							<DatePickerComponent
+								targetDate={agingFromDate}
+								setTargetDate={setAFDate}
+								variant="warning"
+								fontSize="1rem"
+							/>
+						</div>
+
+						<>~</>
+
+						<div style={{marginLeft: "16px"}}>
+							<DatePickerComponent
+								targetDate={agingToDate}
+								setTargetDate={setATDate}
+								variant="warning"
+								fontSize="1rem"
+							/>
+						</div>
+					</div>
+					<h6 style={categoryStyle}>숙성종료일</h6>
+					<div
 						style={{
-							backgroundColor: _.includes(activeSpecies, "돼지")
-								? "#cc81f2"
-								: "#eabcff",
-						}}
-						onClick={() => onClickSpecies("돼지")}>
-						돼지
-					</button>
-				</div>
-				<h6 style={categoryStyle}>입고일</h6>
-				<div
-					style={{
-						display: "flex",
-						alignItems: "center",
-						justifyContent: "center",
-					}}>
-					<div style={{marginRight: "16px"}}>
-						<DatePickerComponent
-							targetDate={storageFromDate}
-							setTargetDate={setSFDate}
-							variant="warning"
-							fontSize="1rem"
-						/>
-					</div>
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "center",
+						}}>
+						<div style={{marginRight: "16px"}}>
+							<DatePickerComponent
+								targetDate={finishFromDate}
+								setTargetDate={setFFDate}
+								variant="warning"
+								fontSize="1rem"
+							/>
+						</div>
 
-					<>~</>
+						<>~</>
 
-					<div style={{marginLeft: "16px"}}>
-						<DatePickerComponent
-							targetDate={storageToDate}
-							setTargetDate={setSTDate}
-							variant="warning"
-							fontSize="1rem"
-						/>
-					</div>
-				</div>
-				<h6 style={categoryStyle}>숙성시작일</h6>
-				<div
-					style={{
-						display: "flex",
-						alignItems: "center",
-						justifyContent: "center",
-					}}>
-					<div style={{marginRight: "16px"}}>
-						<DatePickerComponent
-							targetDate={agingFromDate}
-							setTargetDate={setAFDate}
-							variant="warning"
-							fontSize="1rem"
-						/>
-					</div>
-
-					<>~</>
-
-					<div style={{marginLeft: "16px"}}>
-						<DatePickerComponent
-							targetDate={agingToDate}
-							setTargetDate={setATDate}
-							variant="warning"
-							fontSize="1rem"
-						/>
-					</div>
-				</div>
-				<h6 style={categoryStyle}>숙성종료일</h6>
-				<div
-					style={{
-						display: "flex",
-						alignItems: "center",
-						justifyContent: "center",
-					}}>
-					<div style={{marginRight: "16px"}}>
-						<DatePickerComponent
-							targetDate={finishFromDate}
-							setTargetDate={setFFDate}
-							variant="warning"
-							fontSize="1rem"
-						/>
-					</div>
-
-					<>~</>
-
-					<div style={{marginLeft: "16px"}}>
-						<DatePickerComponent
-							targetDate={finishToDate}
-							setTargetDate={setFTDate}
-							variant="warning"
-							fontSize="1rem"
-						/>
+						<div style={{marginLeft: "16px"}}>
+							<DatePickerComponent
+								targetDate={finishToDate}
+								setTargetDate={setFTDate}
+								variant="warning"
+								fontSize="1rem"
+							/>
+						</div>
 					</div>
 				</div>
 			</div>

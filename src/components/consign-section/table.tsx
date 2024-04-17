@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-table"
 import {useEffect, useState} from "react"
 import styled from "styled-components"
-import EditModal from "../../components/consign-section/editModal"
+import EditModal from "./editModal"
 
 type TableData = {
 	data: ConsignData[]

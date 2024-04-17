@@ -10,12 +10,7 @@ import {
 import {MeatInfoAiO, MeatInfoWithEntry} from "../utils/types/meatTypes"
 import {firestoreDB} from "../utils/Firebase"
 import {fbCollections} from "../utils/consts/constants"
-import {
-	getCollection,
-	sortMeatInfoArray,
-	sortMeatInfoArray2,
-} from "../utils/consts/functions"
-import _ from "lodash"
+import {getCollection, sortMeatInfoArray} from "../utils/consts/functions"
 const dbStorage = getCollection(fbCollections.sp2Storage)
 const dbAging = getCollection(fbCollections.sp2Aging)
 const dbRecord = getCollection(fbCollections.sp2Record)

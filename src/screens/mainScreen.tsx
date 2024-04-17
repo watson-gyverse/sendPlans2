@@ -7,6 +7,9 @@ import {VscRocket} from "react-icons/vsc"
 import {GiBugNet} from "react-icons/gi"
 
 import {useState} from "react"
+import {PortraitDiv, StyledPortraitDiv} from "../utils/consts/style"
+import {backgroundColors} from "../utils/consts/colors"
+import styled from "styled-components"
 export default function MainScreen() {
 	const navigate = useNavigate()
 	const naviToDateScreen = () => {
@@ -39,12 +42,12 @@ export default function MainScreen() {
 	const [a, seta] = useState(false)
 
 	return (
-		<div>
+		<PortraitDiv bgColor={backgroundColors.base} padding="20px 10px">
 			<Toaster />
-			<Stack gap={3}>
+			<Stack gap={2} style={{display: "flex", alignItems: "center"}}>
 				<h1 style={{fontSize: "3rem", fontFamily: "양진체"}}>미트가이버</h1>
 				<p style={{fontSize: "2.2rem"}}>입고/숙성 관리</p>
-				<div style={{display: "flex", justifyContent: "space-evenly"}}>
+				<StackDiv>
 					<Button
 						style={{height: "140px", width: "140px"}}
 						variant="primary"
@@ -61,9 +64,9 @@ export default function MainScreen() {
 						<br />
 						숙성하기
 					</Button>
-				</div>
+				</StackDiv>
 
-				<div style={{display: "flex", justifyContent: "space-evenly"}}>
+				<StackDiv>
 					<Button
 						style={{height: "140px", width: "140px"}}
 						variant="warning"
@@ -81,8 +84,8 @@ export default function MainScreen() {
 						<br />
 						벌레신고
 					</Button>
-				</div>
-				<div style={{display: "flex", justifyContent: "space-evenly"}}>
+				</StackDiv>
+				<StackDiv>
 					<Button
 						style={{height: "140px", width: "140px"}}
 						variant="info"
@@ -92,7 +95,7 @@ export default function MainScreen() {
 						대량숙성
 					</Button>
 					<div style={{height: "140px", width: "140px"}}></div>
-				</div>
+				</StackDiv>
 			</Stack>
 			<Button style={{display: "none"}} onClick={() => seta(!a)}>
 				a
@@ -103,6 +106,12 @@ export default function MainScreen() {
 				</Modal.Header>
 				<Modal.Body>ㅁㄴㅇㄹ</Modal.Body>
 			</Modal>
-		</div>
+		</PortraitDiv>
 	)
 }
+
+const StackDiv = styled.div`
+	display: flex;
+	justify-content: space-evenly;
+	width: 304px;
+`

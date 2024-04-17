@@ -7,6 +7,11 @@ import {sessionKeys} from "../../utils/consts/constants"
 import moment from "moment"
 import {backgroundColors} from "../../utils/consts/colors"
 import {DatePickerSet} from "../../components/common/datePickerSet"
+import {
+	PortraitDiv,
+	StyledHeader,
+	StyledPortraitDiv,
+} from "../../utils/consts/style"
 
 export default function PresetScreen() {
 	const [date, setDate] = useState(new Date())
@@ -81,42 +86,57 @@ export default function PresetScreen() {
 		}
 	}, [species])
 	return (
-		<div
-			style={{
-				padding: "1rem",
-				backgroundColor: backgroundColors.storage_back,
-			}}>
+		<PortraitDiv bgColor={backgroundColors.storage_back} padding="30px 10px">
 			<Toaster position="top-center" reverseOrder={false} />
-			<Button variant="primary" onClick={() => navigate("../../")}>
-				뒤로
-			</Button>
+			<StyledHeader>
+				<Button
+					style={{width: "20%"}}
+					variant="primary"
+					onClick={() => navigate("../../")}>
+					뒤로
+				</Button>
+
+				<h2
+					style={{
+						width: "50%",
+						textAlign: "center",
+					}}>
+					사전 설정
+				</h2>
+				<div style={{width: "12%"}}></div>
+			</StyledHeader>
 
 			<Stack
 				gap={1}
 				style={{
+					width: "20rem",
+					marginTop: "20px",
+					zIndex: "2",
+					position: "relative",
+					backgroundColor: backgroundColors.storage,
+					borderRadius: "20px",
+					padding: "20px 12px",
+				}}>
+				<h3>언제 입고되었나요?</h3>
+
+				<DatePickerSet dateData={dateData} />
+			</Stack>
+			<div
+				style={{
+					width: "20rem",
 					marginTop: "20px",
 					zIndex: "2",
 					position: "relative",
 					backgroundColor: backgroundColors.storage,
 					borderRadius: "20px",
 					padding: "12px",
+					display: "flex",
+					justifyContent: "center",
+					alignItems: "center",
+					flexDirection: "column",
 				}}>
-				<h2>언제 입고되었나요?</h2>
-
-				<DatePickerSet dateData={dateData} />
-			</Stack>
-			<div style={{height: "1rem"}}></div>
-			<Stack
-				gap={1}
-				style={{
-					zIndex: "1",
-					position: "relative",
-					backgroundColor: backgroundColors.storage,
-					borderRadius: "20px",
-					padding: "12px",
-				}}>
-				<h2>어떤 고기인가요?</h2>
-				<ButtonGroup>
+				<h3>어떤 고기인가요?</h3>
+				<ButtonGroup style={{width: "90%"}}>
 					{["돼지", "소"].map((radio, idx) => (
 						<ToggleButton
 							key={idx}
@@ -128,12 +148,23 @@ export default function PresetScreen() {
 							onChange={onSpeciesChanged}
 							style={{
 								fontSize: "1.3rem",
+								borderRadius: "0",
 							}}>
 							{radio}
 						</ToggleButton>
 					))}
 				</ButtonGroup>
-				<ButtonGroup vertical={true} defaultValue={""} size="sm">
+				<ButtonGroup
+					vertical={true}
+					defaultValue={""}
+					size="sm"
+					style={{
+						display: "flex",
+						justifyContent: "center",
+						alignItems: "center",
+						width: "18rem",
+						padding: "0 10px 0 10px",
+					}}>
 					{cutList.map((radio, idx) => (
 						<ToggleButton
 							key={idx}
@@ -152,11 +183,11 @@ export default function PresetScreen() {
 						</ToggleButton>
 					))}
 				</ButtonGroup>
-			</Stack>
+			</div>
 			<div style={{height: "4px"}}></div>
 			<Button
 				style={{
-					width: "5rem",
+					width: "70%",
 					height: "3rem",
 					fontSize: "1.2rem",
 				}}
@@ -164,6 +195,6 @@ export default function PresetScreen() {
 				onClick={goToCameraScreen}>
 				다음
 			</Button>
-		</div>
+		</PortraitDiv>
 	)
 }
