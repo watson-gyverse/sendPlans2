@@ -96,12 +96,12 @@ const columns = [
 			columnHelper.accessor("cutLoss", {
 				id: "cutLoss",
 				cell: (info) => info.getValue(),
-				header: () => "손질로스",
+				header: () => "최종로스",
 			}),
 			columnHelper.accessor("cutLossP", {
 				id: "cutLossP",
 				cell: (info) => info.getValue(),
-				header: () => "손질로스%",
+				header: () => "최종로스%",
 			}),
 		],
 	}),
