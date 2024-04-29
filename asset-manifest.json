@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/sendplans2/static/css/main.eac6cad7.css",
-    "main.js": "/sendplans2/static/js/main.d368216d.js",
-    "static/js/787.e37ffa18.chunk.js": "/sendplans2/static/js/787.e37ffa18.chunk.js",
+    "main.css": "/sendplans2/static/css/main.23d79d1b.css",
+    "main.js": "/sendplans2/static/js/main.9d62adad.js",
+    "static/js/787.6cb10c4b.chunk.js": "/sendplans2/static/js/787.6cb10c4b.chunk.js",
     "index.html": "/sendplans2/index.html",
-    "main.eac6cad7.css.map": "/sendplans2/static/css/main.eac6cad7.css.map",
-    "main.d368216d.js.map": "/sendplans2/static/js/main.d368216d.js.map",
-    "787.e37ffa18.chunk.js.map": "/sendplans2/static/js/787.e37ffa18.chunk.js.map"
+    "main.23d79d1b.css.map": "/sendplans2/static/css/main.23d79d1b.css.map",
+    "main.9d62adad.js.map": "/sendplans2/static/js/main.9d62adad.js.map",
+    "787.6cb10c4b.chunk.js.map": "/sendplans2/static/js/787.6cb10c4b.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.eac6cad7.css",
-    "static/js/main.d368216d.js"
+    "static/css/main.23d79d1b.css",
+    "static/js/main.9d62adad.js"
   ]
 }
