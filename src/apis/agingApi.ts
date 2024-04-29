@@ -45,6 +45,7 @@ export async function fetchFromFirestore(
 			agingDate: null,
 			docId: doc.id,
 			ultraTime: null,
+			uploadTime: data.uploadTime,
 		}
 		sArray.push(item)
 	})
@@ -76,6 +77,7 @@ export async function fetchFromFirestore(
 			afterWeight: data.afterWeight,
 			cutWeight: data.cutWeight,
 			cutDate: data.cutDate,
+			uploadTime: data.uploadTime,
 		}
 		aArray.push(item)
 	})
@@ -114,6 +116,7 @@ export async function fetchFromFirestore2(
 				agingDate: null,
 				docId: doc.id,
 				ultraTime: null,
+				uploadTime: data.uploadTime,
 			}
 			sArray.push(item)
 		})
@@ -145,6 +148,7 @@ export async function fetchFromFirestore2(
 				afterWeight: data.afterWeight,
 				cutWeight: data.cutWeight,
 				cutDate: data.cutDate,
+				uploadTime: data.uploadTime,
 			}
 			aArray.push(item)
 		})

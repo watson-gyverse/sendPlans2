@@ -20,6 +20,7 @@ export type MeatInfo = MeatScanned & {
 
 export type MeatInfoWithCount = MeatInfo & {
 	count: number
+	uploadTime: number | null
 }
 
 export type MeatInfoWithEntry = MeatInfo & {
@@ -31,6 +32,7 @@ export type MeatInfoWithEntry = MeatInfo & {
 	agingDate: string | null
 	docId: string
 	ultraTime: number | null
+	uploadTime: number | null
 }
 
 //all in one

@@ -118,7 +118,7 @@ function App() {
 					display: "flex",
 					justifyContent: "center",
 					alignItems: "flex-start",
-					backgroundColor: backgroundColors.agedCard,
+					backgroundColor: backgroundColors.base,
 				}}>
 				<RouterProvider
 					router={router}

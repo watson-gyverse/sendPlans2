@@ -1,36 +1,41 @@
+import _ from "lodash"
 import {useCallback, useEffect, useState} from "react"
 import {Button, ButtonGroup, Stack, ToggleButton} from "react-bootstrap"
-import {
-	deleteFromAgingFridge,
-	fetchFromFirestore2,
-	passToAgingCollection,
-} from "../../apis/agingApi"
-import {MeatInfoWithEntry, XlsxAgingType} from "../../utils/types/meatTypes"
-import * as xlsx from "xlsx"
 import toast, {Toaster} from "react-hot-toast"
-import AgingModal from "../../components/aging-section/agingModal"
 import {useLocation, useNavigate} from "react-router-dom"
-import {AgingFinishCard} from "../../components/aging-section/agingFinishCard"
-import {AiFillSetting} from "react-icons/ai"
-import FinishAgingModal from "../../components/aging-section/agingFinishModal"
-import _ from "lodash"
-import {backgroundColors} from "../../utils/consts/colors"
+import * as xlsx from "xlsx"
+import {fetchFromFirestore2, passToAgingCollection} from "../../apis/agingApi"
 import {NewAgingCard} from "../../components/aging-section/agingEditNewCard"
+import AgingModal from "../../components/aging-section/agingModal"
 import {AgingEditContextType} from "../../contexts/agingEditContext"
+import {backgroundColors} from "../../utils/consts/colors"
+import {fbCollections, xlsxAgingHeaders} from "../../utils/consts/constants"
 import {sortAgingItems} from "../../utils/consts/functions"
-import {xlsxAgingHeaders} from "../../utils/consts/constants"
+import {MeatInfoWithEntry, XlsxAgingType} from "../../utils/types/meatTypes"
 import {AgingScreen} from "./agingScreen"
+import useFBFetch from "../../hooks/useFetch"
+import {where} from "firebase/firestore"
 
 export const FetchScreen2 = () => {
 	const navigate = useNavigate()
 	const location = useLocation()
-	const placeName = location.state.placeName
-	const placeCount = location.state.placeCount
+	const [placeName, setPlaceName] = useState(
+		location.state ? location.state.placeName : "카대",
+	)
+	const [placeCount, setPlaceCount] = useState(
+		location.state ? location.state.placeCount : "4",
+	)
 
 	const agingKey = "RecentAging"
 	const dateKey = "RecentDate"
 
 	const [isEditMode, setIsEditMode] = useState(false)
+	const mn = new URLSearchParams(location.search).get("mn")
+	const cut = new URLSearchParams(location.search).get("cut")
+	const {data, refetch} = useFBFetch<MeatInfoWithEntry>(
+		fbCollections.sp2Storage,
+		mn && cut ? [where("cut", "==", cut), where("meatNumber", "==", mn)] : [],
+	)
 	const [rawItems, setRawItems] = useState<MeatInfoWithEntry[]>([])
 	const [storedItems, setStoredItems] = useState<MeatInfoWithEntry[][]>([])
 	const [agingItems, setAgingItems] = useState<MeatInfoWithEntry[]>([])
@@ -41,11 +46,29 @@ export const FetchScreen2 = () => {
 
 	const [whichTab, setWhichTab] = useState(true)
 	const [editModalShow, setEditModalShow] = useState(false)
-	const [finishModalShow, setFinishModalShow] = useState(false)
 
 	const recentAging = localStorage.getItem(agingKey)
 	const lastXlsxDate = localStorage.getItem(dateKey)
 	const [xlsxData, setXlsxData] = useState<XlsxAgingType[]>([])
+
+	// useEffect(() => {
+	// 	if (location.state !== null) setPlaceName(location.state.placeName)
+	// 	else {
+	// 		const ok = window.confirm("장소를 카대로 하시겠습니까? 취소: 매장")
+	// 		setPlaceName(ok ? "카대" : "매장")
+	// 		if (location.state !== null) setPlaceCount(location.state.placeCount)
+	// 		else {
+	// 			setPlaceCount(ok ? "4" : "2")
+	// 		}
+	// 	}
+	// }, [])
+	useEffect(() => {
+		setRawItems(data)
+	}, [data])
+
+	useEffect(() => {
+		refetch()
+	}, [mn, cut])
 
 	function fetch() {
 		fetchFromFirestore2(
@@ -53,7 +76,7 @@ export const FetchScreen2 = () => {
 			setAgingItems,
 			placeName,
 			() => {
-				console.warn("fetch complete")
+				console.log("fetch complete")
 			},
 			() => {
 				console.error("fetch failed")
@@ -110,7 +133,11 @@ export const FetchScreen2 = () => {
 
 	useEffect(() => {
 		console.log("INITIAL LOAD")
-		fetch()
+		// fetch()
+		setRawItems(data)
+		console.log("mn: " + mn)
+		console.log("cut: " + cut)
+
 		console.log(recentAging)
 		if (recentAging !== null && recentAging !== "") {
 			const data: XlsxAgingType[] = JSON.parse(recentAging)
@@ -124,7 +151,7 @@ export const FetchScreen2 = () => {
 	useEffect(() => {
 		let init: {[index: string]: Array<MeatInfoWithEntry>} = {}
 		const reducedS = rawItems.reduce((acc, cur) => {
-			let key = cur.meatNumber + cur.storedDate
+			let key = cur.meatNumber + cur.storedDate + cur.cut
 			acc[key] ? acc[key].push(cur) : (acc[key] = [cur])
 			return acc
 		}, init)
@@ -187,19 +214,20 @@ export const FetchScreen2 = () => {
 
 	async function startAging(item: MeatInfoWithEntry) {
 		await passToAgingCollection(item)
-		await fetchFromFirestore2(
-			setRawItems,
-			setAgingItems,
-			placeName,
-			() => {
-				console.log("success and fetch")
-				fetch()
-				toast.success("숙성시작")
-			},
-			() => {
-				console.log("error !@")
-			},
-		)
+		refetch()
+		// await fetchFromFirestore2(
+		// 	setRawItems,
+		// 	setAgingItems,
+		// 	placeName,
+		// 	() => {
+		// 		console.log("success and fetch")
+		// 		fetch()
+		// 		toast.success("숙성시작")
+		// 	},
+		// 	() => {
+		// 		console.log("error !@")
+		// 	},
+		// )
 	}
 
 	const makeXlsx = (items: MeatInfoWithEntry[]) => {
@@ -246,11 +274,6 @@ export const FetchScreen2 = () => {
 	}
 	const write = useCallback(_.debounce(writeXlsx, 2000), [xlsxData])
 
-	const onFinishedAging = async (item: MeatInfoWithEntry) => {
-		setFinishModalShow(false)
-		fetch()
-		toast.success("숙성종료 완료")
-	}
 	const onClickEditModeButton = () => {
 		setIsEditMode(!isEditMode)
 	}
@@ -462,7 +485,7 @@ export const FetchScreen2 = () => {
 							justifyContent: "space-around",
 							marginTop: "10px",
 						}}>
-						<AgingScreen place={placeName} />
+						<AgingScreen place={placeName} isEditMode={isEditMode} />
 					</div>
 				</Stack>
 			)}
@@ -471,7 +494,7 @@ export const FetchScreen2 = () => {
 				<AgingModal
 					meatInfo={recentMeatInfo}
 					placeName={placeName}
-					placeCount={placeCount}
+					placeCount={parseInt(placeCount)}
 					setMeatInfo={setRecentMeatInfo}
 					setClose={() => setEditModalShow(false)}
 					show={editModalShow}

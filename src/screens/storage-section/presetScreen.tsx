@@ -1,17 +1,29 @@
 import {Button, ButtonGroup, Stack, ToggleButton} from "react-bootstrap"
 import {useNavigate} from "react-router-dom"
-import {useEffect, useState} from "react"
+import {useCallback, useEffect, useState} from "react"
 import {BeefCuts, PorkCuts} from "../../utils/consts/meat"
 import toast, {Toaster} from "react-hot-toast"
-import {sessionKeys} from "../../utils/consts/constants"
+import {
+	fbCollections,
+	sessionKeys,
+	xlsxHeaders,
+} from "../../utils/consts/constants"
 import moment from "moment"
 import {backgroundColors} from "../../utils/consts/colors"
 import {DatePickerSet} from "../../components/common/datePickerSet"
+import {PortraitDiv, StyledHeader} from "../../utils/consts/style"
+import useFBFetch from "../../hooks/useFetch"
+import {limit, orderBy} from "firebase/firestore"
 import {
-	PortraitDiv,
-	StyledHeader,
-	StyledPortraitDiv,
-} from "../../utils/consts/style"
+	MeatInfoAiO,
+	MeatInfoWithCount,
+	MeatInfoWithEntry,
+	XlsxStoreType,
+} from "../../utils/types/meatTypes"
+import _ from "lodash"
+import * as xlsx from "xlsx"
+import {parseToDate, storingXlsxData} from "../../utils/consts/functions"
+import {updateNamedExports} from "typescript"
 
 export default function PresetScreen() {
 	const [date, setDate] = useState(new Date())
@@ -85,6 +97,75 @@ export default function PresetScreen() {
 			setCutList(PorkCuts)
 		}
 	}, [species])
+
+	const {data, loading, refetch} = useFBFetch<MeatInfoWithEntry>(
+		fbCollections.sp2Storage,
+		[],
+		orderBy("uploadTime"),
+		limit(10),
+	)
+
+	const [xlsxData, setXlsxData] = useState<XlsxStoreType[]>([])
+
+	const writeXlsx = () => {
+		console.log("write", xlsxData)
+		const book = xlsx.utils.book_new()
+		const xlsxLetsgo = xlsx.utils.json_to_sheet(xlsxData, {
+			header: xlsxHeaders,
+		})
+		xlsx.utils.book_append_sheet(book, xlsxLetsgo, "StoreSheet")
+		xlsx.writeFile(book, " storage.xlsx")
+	}
+	const write = useCallback(_.debounce(writeXlsx, 2000), [xlsxData])
+
+	useEffect(() => {
+		console.log(
+			data
+				.filter((item) => "uploadTime" in item)
+				.sort((a, b) =>
+					a.uploadTime && b.uploadTime
+						? b.uploadTime - a.uploadTime
+						: parseToDate(b.storedDate).getTime() -
+						  parseToDate(a.storedDate).getTime(),
+				),
+		)
+		const max = data
+			.filter((item) => "uploadTime" in item)
+			.sort((a, b) =>
+				a.uploadTime && b.uploadTime
+					? b.uploadTime - a.uploadTime
+					: parseToDate(b.storedDate).getTime() -
+					  parseToDate(a.storedDate).getTime(),
+			)[0]?.uploadTime
+		console.log(max)
+
+		var list: XlsxStoreType[] = data
+			.filter((item) => "uploadTime" in item)
+			.sort((a, b) =>
+				a.uploadTime && b.uploadTime
+					? b.uploadTime - a.uploadTime
+					: parseToDate(b.storedDate).getTime() -
+					  parseToDate(a.storedDate).getTime(),
+			)
+			.filter((item) => item.uploadTime === max)
+			.map((item) => {
+				return {
+					입고일: item.storedDate,
+					이력번호: item.meatNumber!!,
+					순번: item.entry,
+					육종: item.species,
+					원산지: item.origin!!,
+					암수: item.gender!!,
+					등급: item.grade!!,
+					부위: item.cut,
+					보관: item.freeze!!,
+					단가: item.price!!,
+				}
+			})
+
+		setXlsxData(list)
+	}, [data])
+
 	return (
 		<PortraitDiv bgColor={backgroundColors.storage_back} padding="30px 10px">
 			<Toaster position="top-center" reverseOrder={false} />
@@ -92,7 +173,7 @@ export default function PresetScreen() {
 				<Button
 					style={{width: "20%"}}
 					variant="primary"
-					onClick={() => navigate("../../")}>
+					onClick={() => navigate("../")}>
 					뒤로
 				</Button>
 
@@ -103,7 +184,9 @@ export default function PresetScreen() {
 					}}>
 					사전 설정
 				</h2>
-				<div style={{width: "12%"}}></div>
+				<Button style={{width: "20%"}} variant="primary" onClick={write}>
+					최근
+				</Button>
 			</StyledHeader>
 
 			<Stack
@@ -111,11 +194,14 @@ export default function PresetScreen() {
 				style={{
 					width: "20rem",
 					marginTop: "20px",
-					zIndex: "2",
 					position: "relative",
 					backgroundColor: backgroundColors.storage,
 					borderRadius: "20px",
 					padding: "20px 12px",
+					display: "flex",
+					justifyContent: "center",
+					alignItems: "center",
+					flexDirection: "column",
 				}}>
 				<h3>언제 입고되었나요?</h3>
 
@@ -125,7 +211,6 @@ export default function PresetScreen() {
 				style={{
 					width: "20rem",
 					marginTop: "20px",
-					zIndex: "2",
 					position: "relative",
 					backgroundColor: backgroundColors.storage,
 					borderRadius: "20px",

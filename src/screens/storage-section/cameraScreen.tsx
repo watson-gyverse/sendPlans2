@@ -112,6 +112,7 @@ export default function CameraScreen() {
 			freeze: null,
 			price: null,
 			count: 1,
+			uploadTime: null,
 		}
 		var alreadyExist = false
 
@@ -134,7 +135,7 @@ export default function CameraScreen() {
 
 	const onNextButtonClicked = () => {
 		session.setItem(sessionKeys.storageItems, JSON.stringify(items))
-		navigate("/storage/edit")
+		navigate("/storage/edit", {replace: true})
 	}
 
 	useEffect(() => {

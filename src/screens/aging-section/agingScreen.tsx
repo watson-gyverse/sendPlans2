@@ -11,16 +11,15 @@ import {Stack} from "react-bootstrap"
 
 interface IAgingScreen {
 	place: string
+	isEditMode: boolean
 }
 
 export const AgingScreen = (props: IAgingScreen) => {
-	const {data, refetch} = useFBFetch<MeatInfoAiO>(
-		fbCollections.sp2Aging,
+	const {data, refetch} = useFBFetch<MeatInfoAiO>(fbCollections.sp2Aging, [
 		where("place", "==", props.place),
-	)
+	])
 	const [recentItem, setRecentItem] = useState<MeatInfoAiO>()
 
-	const [isEditMode, setEditMode] = useState(false)
 	const [finishModalShow, setFinishModalShow] = useState(false)
 
 	const onClickAgingDeleteButton = (item: MeatInfoAiO) => {
@@ -41,15 +40,14 @@ export const AgingScreen = (props: IAgingScreen) => {
 			<Toaster />
 			{data.map((item) => {
 				return (
-					<div>
+					<div key={item.docId}>
 						<div
 							style={{
 								width: "100%",
 							}}>
 							<AgingFinishCard
-								key={item.docId}
 								meatInfo={item}
-								isEditMode={isEditMode}
+								isEditMode={props.isEditMode}
 								clickEvent={() => {
 									setRecentItem(item)
 									setFinishModalShow(true)

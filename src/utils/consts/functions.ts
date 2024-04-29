@@ -1,5 +1,9 @@
 import {XMLParser} from "fast-xml-parser"
-import {MeatInfoWithEntry} from "../types/meatTypes"
+import {
+	MeatInfoWithCount,
+	MeatInfoWithEntry,
+	XlsxStoreType,
+} from "../types/meatTypes"
 import {collection} from "firebase/firestore"
 import {firestoreDB} from "../Firebase"
 import _ from "lodash"
@@ -126,4 +130,31 @@ export const checkProperty = <T extends object, K extends keyof T>(
 export const ThreeStep = /\B(?=(\d{3})+(?!\d))/g
 export function ThreeStepComma(string: string) {
 	return string.replace(ThreeStep, ",")
+}
+
+export function storingXlsxData(items: MeatInfoWithCount[]): XlsxStoreType[] {
+	let list: XlsxStoreType[] = []
+	for (let item of items) {
+		for (let i = 1; i <= item.count; i++) {
+			list = [
+				...list,
+				{
+					입고일: item.storedDate,
+					이력번호: item.meatNumber!!,
+					순번:
+						String(i).padStart(2, "0") +
+						"/" +
+						String(item.count).padStart(2, "0"),
+					육종: item.species,
+					원산지: item.origin!!,
+					암수: item.gender!!,
+					등급: item.grade!!,
+					부위: item.cut,
+					보관: item.freeze!!,
+					단가: item.price!!,
+				},
+			]
+		}
+	}
+	return list
 }

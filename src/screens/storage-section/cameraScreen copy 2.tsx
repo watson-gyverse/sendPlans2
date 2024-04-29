@@ -103,6 +103,7 @@ export default function CameraScreen() {
 			freeze: null,
 			price: null,
 			count: 1,
+			uploadTime: null,
 		}
 		var alreadyExist = false
 

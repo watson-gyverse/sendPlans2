@@ -1,6 +1,9 @@
 import {
 	DocumentData,
 	QueryFieldFilterConstraint,
+	QueryLimitConstraint,
+	QueryOrderByConstraint,
+	and,
 	getDocs,
 	query,
 } from "firebase/firestore"
@@ -13,11 +16,13 @@ type FB = FirestorePlace | MeatInfoWithEntry | MeatInfoAiO | ConsignData
 
 const useFBFetch = <T extends FB>(
 	collection: string,
-	where?: QueryFieldFilterConstraint,
+	conditions?: QueryFieldFilterConstraint[],
+	orderBy?: QueryOrderByConstraint,
+	limit?: QueryLimitConstraint,
 ) => {
 	const db = getCollection(collection)
 
-	const q = where ? query(db, where) : db
+	const q = conditions ? query(db, and(...conditions)) : db
 	const [data, setData] = useState<T[]>([])
 	const [loading, setLoading] = useState(false)
 

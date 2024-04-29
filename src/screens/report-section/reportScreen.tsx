@@ -47,60 +47,64 @@ const ReportScreen = () => {
 	return (
 		<div
 			style={{
+				width: "100%",
+				height: "100%",
 				display: "flex",
 				flexDirection: "column",
+				alignItems: "center",
 				backgroundColor: backgroundColors.report,
-				borderRadius: "20px",
 				padding: "20px 10px",
 			}}>
 			<Toaster />
-			<div
-				style={{
-					display: "flex",
-					flexDirection: "row",
-					alignItems: "center",
-					justifyContent: "space-evenly",
-					marginBottom: "10px",
-				}}>
-				<Button
-					style={{width: "60px", height: "40px"}}
-					variant="success"
-					onClick={goToPreset}>
-					뒤로
+			<div style={{width: "400px", display: "flex", flexDirection: "column"}}>
+				<div
+					style={{
+						display: "flex",
+						flexDirection: "row",
+						alignItems: "center",
+						justifyContent: "space-evenly",
+						marginBottom: "10px",
+					}}>
+					<Button
+						style={{width: "60px", height: "40px"}}
+						variant="success"
+						onClick={goToPreset}>
+						뒤로
+					</Button>
+					<h1 style={{margin: "0"}}>버그제보</h1>
+					<div style={{width: "60px", height: "50px"}}></div>
+				</div>
+				<ButtonGroup
+					style={{
+						marginBottom: "10px",
+					}}>
+					{radios.map((radio, idx) => (
+						<ToggleButton
+							style={{width: "0px"}}
+							id={`radio ${idx}`}
+							type="checkbox"
+							value={radio.value}
+							checked={checkedRadio === radio.value}
+							onChange={(e) => setCheckedRadio(e.currentTarget.value)}
+							variant="success">
+							{radio.name}
+						</ToggleButton>
+					))}
+				</ButtonGroup>
+				<label htmlFor="뽀삐">
+					<h5 style={{margin: "0"}}>내용</h5>
+				</label>
+				<textarea
+					style={{height: "300px"}}
+					name="뽀삐"
+					value={description}
+					onChange={(e) => setDesc(e.target.value)}
+				/>
+				<div style={{height: "12px"}}></div>
+				<Button variant="success" onClick={onSendClick}>
+					발송
 				</Button>
-				<h1 style={{margin: "0"}}>버그제보</h1>
-				<div style={{width: "60px", height: "50px"}}></div>
 			</div>
-			<ButtonGroup
-				style={{
-					marginBottom: "10px",
-				}}>
-				{radios.map((radio, idx) => (
-					<ToggleButton
-						style={{width: "0px"}}
-						id={`radio ${idx}`}
-						type="checkbox"
-						value={radio.value}
-						checked={checkedRadio === radio.value}
-						onChange={(e) => setCheckedRadio(e.currentTarget.value)}
-						variant="success">
-						{radio.name}
-					</ToggleButton>
-				))}
-			</ButtonGroup>
-			<label htmlFor="뽀삐">
-				<h5 style={{margin: "0"}}>내용</h5>
-			</label>
-			<textarea
-				style={{height: "300px"}}
-				name="뽀삐"
-				value={description}
-				onChange={(e) => setDesc(e.target.value)}
-			/>
-			<div style={{height: "12px"}}></div>
-			<Button variant="success" onClick={onSendClick}>
-				발송
-			</Button>
 		</div>
 	)
 }

@@ -10,6 +10,7 @@ import {FirestorePlace} from "../../utils/types/otherTypes"
 import {fbCollections} from "../../utils/consts/constants"
 import {MeatInfoAiO} from "../../utils/types/meatTypes"
 import {useNavigate} from "react-router-dom"
+import {backgroundColors} from "../../utils/consts/colors"
 
 export default function RecordBranchScreen() {
 	const navigate = useNavigate()
@@ -25,18 +26,34 @@ export default function RecordBranchScreen() {
 		console.log(filteredRecords)
 	}, [filteredRecords])
 	return (
-		<div>
-			<button onClick={onClickBack}>뒤로</button>
-			<h1>히스토리</h1>
-			<Button
-				variant="warning"
-				style={{marginLeft: "20px"}}
-				onClick={() => setFilterOpen(!filterOpen)}
-				aria-controls="filterCollapse"
-				// aria-expanded={filterOpen}
-			>
-				필터
-			</Button>
+		<div
+			style={{
+				backgroundColor: backgroundColors.record,
+				width: "100%",
+				height: "100%",
+			}}>
+			<div
+				style={{
+					paddingTop: "10px",
+					paddingLeft: isMobile ? "0" : "20px",
+					display: "flex",
+					alignItems: "center",
+					justifyContent: isMobile ? "center" : "flex-start",
+				}}>
+				<Button variant="warning" onClick={onClickBack}>
+					뒤로
+				</Button>
+				<h1>히스토리</h1>
+				<Button
+					variant="warning"
+					onClick={() => setFilterOpen(!filterOpen)}
+					aria-controls="filterCollapse"
+					// aria-expanded={filterOpen}
+				>
+					필터
+				</Button>
+			</div>
+
 			<Collapse in={filterOpen}>
 				<div
 					id="filterCollapse"

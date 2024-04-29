@@ -18,10 +18,9 @@ export const ConsignScreen = () => {
 	const [canAddModalShow, setCanAddModalShow] = useState(false)
 	const [addModalShow, setAddModalShow] = useState(false)
 
-	const {data, refetch} = useFBFetch<ConsignData>(
-		fbCollections.sp2Consign,
+	const {data, refetch} = useFBFetch<ConsignData>(fbCollections.sp2Consign, [
 		where("client", "==", client),
-	)
+	])
 
 	useEffect(() => {
 		console.log(data)
@@ -67,16 +66,22 @@ export const ConsignScreen = () => {
 	return (
 		<div
 			style={{
+				width: "100%",
+				height: "100%",
 				display: "flex",
 				flexDirection: "column",
+				alignItems: "center",
 				backgroundColor: backgroundColors.consign,
-				borderRadius: "20px",
 				padding: "20px 10px",
 			}}>
 			<Toaster />
-			<button style={{width: "60px"}} onClick={onBackClick}>
-				뒤로
-			</button>
+			<div
+				style={{
+					width: "400px",
+					display: "flex",
+					flexDirection: "column",
+				}}></div>
+
 			{/* 위탁사 검색 */}
 			<div
 				style={{
@@ -84,6 +89,9 @@ export const ConsignScreen = () => {
 					flexDirection: "row",
 					justifyContent: "center",
 				}}>
+				<button style={{width: "60px"}} onClick={onBackClick}>
+					뒤로
+				</button>
 				<input
 					style={{width: "10rem"}}
 					type="text"
@@ -113,10 +121,11 @@ export const ConsignScreen = () => {
 					placeholder="지금 추가할 이력번호 입력"
 					onChange={(e) => onMeatNumberChange(e.target.value)}
 				/>
+				<button disabled={!canAddModalShow} onClick={onAddButtonClick}>
+					+
+				</button>
 			</div>
-			<button disabled={!canAddModalShow} onClick={onAddButtonClick}>
-				+
-			</button>
+
 			<ConsignTable
 				data={data.sort((a, b) => (a.id < b.id ? -1 : 0))}
 				refetch={refetch}
