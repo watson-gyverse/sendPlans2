@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/sendplans2/static/css/main.23d79d1b.css",
-    "main.js": "/sendplans2/static/js/main.a2efcba6.js",
+    "main.js": "/sendplans2/static/js/main.93cdd437.js",
     "static/js/787.6cb10c4b.chunk.js": "/sendplans2/static/js/787.6cb10c4b.chunk.js",
     "index.html": "/sendplans2/index.html",
     "main.23d79d1b.css.map": "/sendplans2/static/css/main.23d79d1b.css.map",
-    "main.a2efcba6.js.map": "/sendplans2/static/js/main.a2efcba6.js.map",
+    "main.93cdd437.js.map": "/sendplans2/static/js/main.93cdd437.js.map",
     "787.6cb10c4b.chunk.js.map": "/sendplans2/static/js/787.6cb10c4b.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.23d79d1b.css",
-    "static/js/main.a2efcba6.js"
+    "static/js/main.93cdd437.js"
   ]
 }
