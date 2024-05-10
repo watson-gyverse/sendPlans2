@@ -15,6 +15,7 @@ import {FetchScreen2} from "./screens/aging-section/fetchScreen2"
 import ReportScreen from "./screens/report-section/reportScreen"
 import {ConsignScreen} from "./screens/consign-section/consignScreen"
 import RecordBranchScreen from "./screens/record-section/recordScreen"
+import {StockScreen} from "./screens/stock-section/stockScreen"
 
 const router = createBrowserRouter(
 	[
@@ -86,6 +87,10 @@ const router = createBrowserRouter(
 					element: <ConsignScreen />,
 				},
 				{
+					path: "stock",
+					element: <StockScreen />,
+				},
+				{
 					path: "*",
 					element: <>Not Found 051</>,
 				},
@@ -112,9 +117,8 @@ function App() {
 			}}>
 			<div
 				style={{
-					width: "100vw",
+					width: "100%",
 					height: "100%",
-					overflow: "auto",
 					display: "flex",
 					justifyContent: "center",
 					alignItems: "flex-start",

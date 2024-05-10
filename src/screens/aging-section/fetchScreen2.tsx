@@ -63,6 +63,9 @@ export const FetchScreen2 = () => {
 	// 	}
 	// }, [])
 	useEffect(() => {
+		if (data.length === 0 && mn !== null) {
+			setWhichTab(false)
+		}
 		setRawItems(data)
 	}, [data])
 

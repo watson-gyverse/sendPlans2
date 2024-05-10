@@ -56,7 +56,7 @@ const ReportScreen = () => {
 				padding: "20px 10px",
 			}}>
 			<Toaster />
-			<div style={{width: "400px", display: "flex", flexDirection: "column"}}>
+			<div style={{width: "100%", display: "flex", flexDirection: "column"}}>
 				<div
 					style={{
 						display: "flex",

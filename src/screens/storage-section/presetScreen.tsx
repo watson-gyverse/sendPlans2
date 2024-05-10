@@ -14,16 +14,10 @@ import {DatePickerSet} from "../../components/common/datePickerSet"
 import {PortraitDiv, StyledHeader} from "../../utils/consts/style"
 import useFBFetch from "../../hooks/useFetch"
 import {limit, orderBy} from "firebase/firestore"
-import {
-	MeatInfoAiO,
-	MeatInfoWithCount,
-	MeatInfoWithEntry,
-	XlsxStoreType,
-} from "../../utils/types/meatTypes"
+import {MeatInfoWithEntry, XlsxStoreType} from "../../utils/types/meatTypes"
 import _ from "lodash"
 import * as xlsx from "xlsx"
-import {parseToDate, storingXlsxData} from "../../utils/consts/functions"
-import {updateNamedExports} from "typescript"
+import {parseToDate} from "../../utils/consts/functions"
 
 export default function PresetScreen() {
 	const [date, setDate] = useState(new Date())
@@ -102,7 +96,7 @@ export default function PresetScreen() {
 		fbCollections.sp2Storage,
 		[],
 		orderBy("uploadTime"),
-		limit(10),
+		limit(20),
 	)
 
 	const [xlsxData, setXlsxData] = useState<XlsxStoreType[]>([])
@@ -129,6 +123,7 @@ export default function PresetScreen() {
 						  parseToDate(a.storedDate).getTime(),
 				),
 		)
+		new Date().getDate()
 		const max = data
 			.filter((item) => "uploadTime" in item)
 			.sort((a, b) =>
@@ -147,7 +142,12 @@ export default function PresetScreen() {
 					: parseToDate(b.storedDate).getTime() -
 					  parseToDate(a.storedDate).getTime(),
 			)
-			.filter((item) => item.uploadTime === max)
+			.filter(
+				(item) =>
+					typeof item.uploadTime === "number" &&
+					typeof max === "number" &&
+					new Date(item.uploadTime!).getDate() === new Date(max!).getDate(),
+			)
 			.map((item) => {
 				return {
 					입고일: item.storedDate,
@@ -192,7 +192,7 @@ export default function PresetScreen() {
 			<Stack
 				gap={1}
 				style={{
-					width: "20rem",
+					width: "100%",
 					marginTop: "20px",
 					position: "relative",
 					backgroundColor: backgroundColors.storage,
@@ -209,7 +209,7 @@ export default function PresetScreen() {
 			</Stack>
 			<div
 				style={{
-					width: "20rem",
+					width: "100%",
 					marginTop: "20px",
 					position: "relative",
 					backgroundColor: backgroundColors.storage,
@@ -228,10 +228,10 @@ export default function PresetScreen() {
 							id={`species-${idx}`}
 							value={radio}
 							type="radio"
-							variant="primary"
 							checked={radio === species}
 							onChange={onSpeciesChanged}
 							style={{
+								width: "40%",
 								fontSize: "1.3rem",
 								borderRadius: "0",
 							}}>
@@ -247,7 +247,7 @@ export default function PresetScreen() {
 						display: "flex",
 						justifyContent: "center",
 						alignItems: "center",
-						width: "18rem",
+						width: "100%",
 						padding: "0 10px 0 10px",
 					}}>
 					{cutList.map((radio, idx) => (

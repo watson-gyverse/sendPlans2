@@ -11,8 +11,15 @@ import {useCallback, useEffect, useState} from "react"
 import {getCollection} from "../utils/consts/functions"
 import {MeatInfoAiO, MeatInfoWithEntry} from "../utils/types/meatTypes"
 import {ConsignData, FirestorePlace} from "../utils/types/otherTypes"
+import {StockCategory, StockOrder} from "../utils/types/stockTypes"
 
-type FB = FirestorePlace | MeatInfoWithEntry | MeatInfoAiO | ConsignData
+type FB =
+	| FirestorePlace
+	| MeatInfoWithEntry
+	| MeatInfoAiO
+	| ConsignData
+	| StockCategory
+	| StockOrder
 
 const useFBFetch = <T extends FB>(
 	collection: string,

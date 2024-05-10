@@ -1,6 +1,6 @@
 html {
 	height: 100%;
-	overflow: auto;
+	overflow: hidden;
 }
 
 body {
@@ -12,12 +12,10 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 	/* user-select: none; */
 	height: 100%;
-	overflow: auto;
 }
 
 #root {
 	height: 100%;
-	overflow: auto;
 }
 
 code {

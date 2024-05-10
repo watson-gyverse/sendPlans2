@@ -15,6 +15,8 @@ export const fbCollections = {
 	sp2Record: "Sp2Record",
 	sp2Report: "Sp2Report",
 	sp2Consign: "Sp2Consign",
+	sp2Stock: "Sp2Stock",
+	sp2Order: "Sp2Order",
 	consignCounter: "ConsignCounter",
 } as const
 

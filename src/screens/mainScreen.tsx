@@ -5,9 +5,9 @@ import {GiCardboardBoxClosed} from "react-icons/gi"
 import {RiTimer2Line, RiHistoryFill} from "react-icons/ri"
 import {VscRocket} from "react-icons/vsc"
 import {GiBugNet} from "react-icons/gi"
-
+import {VscLayoutMenubar} from "react-icons/vsc"
 import {useState} from "react"
-import {PortraitDiv, StyledPortraitDiv} from "../utils/consts/style"
+import {PortraitDiv} from "../utils/consts/style"
 import {backgroundColors} from "../utils/consts/colors"
 import styled from "styled-components"
 export default function MainScreen() {
@@ -37,6 +37,10 @@ export default function MainScreen() {
 		// toast("입고/숙성기록\n업데이트 예정")
 
 		navigate("/consign")
+	}
+	const naviToStockScreen = () => {
+		toast.remove()
+		navigate("/stock")
 	}
 
 	const [a, seta] = useState(false)
@@ -94,7 +98,15 @@ export default function MainScreen() {
 						<br />
 						대량숙성
 					</Button>
-					<div style={{height: "140px", width: "140px"}}></div>
+					<Button
+						style={{height: "140px", width: "140px"}}
+						variant="secondary"
+						onClick={naviToStockScreen}>
+						<VscLayoutMenubar style={{height: "60px", width: "60px"}} />
+						<br />
+						재고관리
+					</Button>
+					{/* <div style={{height: "140px", width: "140px"}}></div> */}
 				</StackDiv>
 			</Stack>
 			<Button style={{display: "none"}} onClick={() => seta(!a)}>
