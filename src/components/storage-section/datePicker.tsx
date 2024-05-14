@@ -34,19 +34,21 @@ const DatePickerComponent = (props: DatePickerProps) => {
 		),
 	)
 	return (
-		<DatePicker
-			selected={targetDate}
-			onChange={(date: Date) => {
-				const a = new Date(date)
-				a.setHours(0)
-				a.setMinutes(0)
-				a.setSeconds(0)
-				a.setMilliseconds(0)
-				setTargetDate(a)
-			}}
-			customInput={React.createElement(CustomInput)}
-			dateFormat="yyyy/MM/dd"
-		/>
+		<div style={{zIndex: "100"}}>
+			<DatePicker
+				selected={targetDate}
+				onChange={(date: Date) => {
+					const a = new Date(date)
+					a.setHours(0)
+					a.setMinutes(0)
+					a.setSeconds(0)
+					a.setMilliseconds(0)
+					setTargetDate(a)
+				}}
+				customInput={React.createElement(CustomInput)}
+				dateFormat="yyyy/MM/dd"
+			/>
+		</div>
 	)
 }
 

@@ -79,14 +79,13 @@ export default function MainScreen() {
 						<br />
 						조회하기
 					</Button>
-
 					<Button
 						style={{height: "140px", width: "140px"}}
-						variant="success"
-						onClick={naviToReportScreen}>
-						<GiBugNet style={{height: "60px", width: "60px"}} />
+						variant="secondary"
+						onClick={naviToStockScreen}>
+						<VscLayoutMenubar style={{height: "60px", width: "60px"}} />
 						<br />
-						벌레신고
+						재고관리
 					</Button>
 				</StackDiv>
 				<StackDiv>
@@ -100,11 +99,11 @@ export default function MainScreen() {
 					</Button>
 					<Button
 						style={{height: "140px", width: "140px"}}
-						variant="secondary"
-						onClick={naviToStockScreen}>
-						<VscLayoutMenubar style={{height: "60px", width: "60px"}} />
+						variant="success"
+						onClick={naviToReportScreen}>
+						<GiBugNet style={{height: "60px", width: "60px"}} />
 						<br />
-						재고관리
+						벌레신고
 					</Button>
 					{/* <div style={{height: "140px", width: "140px"}}></div> */}
 				</StackDiv>

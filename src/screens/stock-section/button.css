@@ -182,6 +182,9 @@ button[class*="btn"] {
 .btn-two.orange {
 	background-color: #ffab45;
 }
+.btn-two.black {
+	background-color: #717171;
+}
 
 .rounded {
 	border-radius: 10px;

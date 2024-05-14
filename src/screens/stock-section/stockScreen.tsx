@@ -8,7 +8,7 @@ import {
 	updateProduct,
 	updateProductsAfterOrder,
 } from "../../apis/stockApi"
-import {backgroundColors} from "../../utils/consts/colors"
+import {backgroundColors, cardColors} from "../../utils/consts/colors"
 import "./button.css"
 import "./modal.css"
 import useFBFetch from "../../hooks/useFetch"
@@ -18,11 +18,12 @@ import {
 	StockOrderItem,
 	StockProduct,
 } from "../../utils/types/stockTypes"
-import {useEffect, useState} from "react"
+import {useEffect, useMemo, useState} from "react"
 import {StockModal} from "../../components/stock-section/stockModal"
 import {useNavigate} from "react-router-dom"
 import {AiFillSetting} from "react-icons/ai"
 import {useMediaQuery} from "react-responsive"
+import styled from "styled-components"
 
 export const StockScreen = () => {
 	const navigate = useNavigate()
@@ -34,12 +35,15 @@ export const StockScreen = () => {
 
 	const [newPrdName, setNewPrdName] = useState("")
 	const [newPrdCnt, setNewPrdCnt] = useState(0)
-	const [newPrdColor, setNewPrdColor] = useState("")
+	const [colorNumber, setColorNumber] = useState(0)
+	const cardColor = useMemo(() => {
+		return Object.values(cardColors)[colorNumber]
+	}, [colorNumber])
 	const [showNPModal, setShowNPModal] = useState(false)
 
 	const [showEditModal, setShowEditModal] = useState(false)
 	const [currentPrd, setCurrentPrd] = useState<StockProduct>()
-
+	const [currentCat, setCurrentCat] = useState("")
 	const {data, refetch} = useFBFetch<StockCategory>(fbCollections.sp2Stock)
 	const isMobile = useMediaQuery({query: "(max-width: 1224px)"})
 	const [orderList, setOrderList] = useState<StockOrderItem[]>([])
@@ -64,6 +68,9 @@ export const StockScreen = () => {
 	}
 	const goToHome = () => {
 		navigate("../")
+	}
+	const goToOrders = () => {
+		navigate("orders")
 	}
 	const onAddCategoryClick = () => {
 		if (data.filter((datum) => datum.catName === newCatName).length !== 0) {
@@ -105,6 +112,10 @@ export const StockScreen = () => {
 		data
 			.filter((datum) => datum.docId === currentId)
 			.forEach((datum) => {
+				console.log("docid: ", datum.docId)
+
+				console.log("pds: ", datum.products)
+
 				datum.products.forEach((prd) => {
 					console.log("prev: ", prd.prdOrder, ", max: ", max)
 					console.log(prd.prdOrder > max)
@@ -123,7 +134,7 @@ export const StockScreen = () => {
 				newPrdName,
 				newPrdCnt,
 				max + 1,
-				newPrdColor,
+				cardColor,
 				null,
 			).then(async () => {
 				setShowNPModal(false)
@@ -158,9 +169,18 @@ export const StockScreen = () => {
 				newPrdName,
 				newPrdCnt,
 				pd.prdOrder,
-				newPrdColor,
+				cardColor,
 				pd.prdName,
 			).then(async () => {
+				addOrder([
+					{
+						catId: currentId,
+						prdName: pd.prdName,
+						change: currentPrd ? newPrdCnt - currentPrd.prdCnt : -99,
+						curStock: newPrdCnt,
+						catName: currentCat,
+					},
+				])
 				setShowEditModal(false)
 				refetch()
 			})
@@ -190,6 +210,7 @@ export const StockScreen = () => {
 	const onProductClick = (docId: string, catName: string, pd: StockProduct) => {
 		if (isEditMode) {
 			setCurrentPrd(pd)
+			setCurrentCat(catName)
 			setShowEditModal(true)
 			setCurrentId(docId)
 			setNewPrdName(pd.prdName)
@@ -208,13 +229,25 @@ export const StockScreen = () => {
 				if (existing.change === pd.prdCnt) {
 					toast.error("재고가 없습니다.")
 				}
-				newOrderList.push({
+				let newOrder = {
 					catId: docId,
 					catName: existing.catName,
 					prdName: pd.prdName,
 					change:
-						existing.change < pd.prdCnt ? existing.change + 1 : existing.change,
-				})
+						//2개 재고 클릭
+						existing.change * -1 < pd.prdCnt
+							? existing.change - 1
+							: existing.change,
+					curStock: 0,
+				}
+				newOrder.curStock = pd.prdCnt + newOrder.change
+				console.log(
+					pd.prdCnt,
+					existing.change,
+					newOrder.change,
+					newOrder.curStock,
+				)
+				newOrderList.push(newOrder)
 
 				setOrderList(newOrderList)
 			} else {
@@ -222,7 +255,8 @@ export const StockScreen = () => {
 					catId: docId,
 					catName: catName,
 					prdName: pd.prdName,
-					change: 1,
+					change: -1,
+					curStock: pd.prdCnt - 1,
 				}
 				setOrderList(
 					[...orderList, newCat].sort(
@@ -254,6 +288,15 @@ export const StockScreen = () => {
 			toast(`${cnt}`)
 		}
 	}
+
+	useEffect(() => {
+		console.log(colorNumber)
+	}, [colorNumber])
+
+	const onColorSelectorClick = () => {
+		if (colorNumber < 5) setColorNumber(colorNumber + 1)
+		else setColorNumber(0)
+	}
 	const onDeleteFromBucketClick = (order: StockOrderItem) => {
 		const newOrderList = orderList.filter((o) => o.prdName !== order.prdName)
 
@@ -265,12 +308,12 @@ export const StockScreen = () => {
 	}, [orderList])
 
 	useEffect(() => {
-		console.log(data)
-	}, [data])
+		console.log(cardColor)
+	}, [cardColor])
 	return (
 		<div
 			style={{
-				width: "100%",
+				width: isMobile ? "100vw" : "100%",
 				display: "flex",
 				flexDirection: "column",
 				alignItems: "center",
@@ -283,6 +326,9 @@ export const StockScreen = () => {
 					뒤로
 				</button>
 				<h1>상품 재고 관리</h1>
+				<button className="btn-two small blue" onClick={goToOrders}>
+					기록
+				</button>
 				<AiFillSetting
 					style={{width: "30px", height: "30px"}}
 					onClick={() => setEditMode(!isEditMode)}
@@ -316,12 +362,7 @@ export const StockScreen = () => {
 			{showNPModal && (
 				<StockModal>
 					<h1>상품 추가</h1>
-					<div
-						style={{
-							display: "flex",
-							justifyContent: "center",
-							alignItems: "center",
-						}}>
+					<ModalLineDiv>
 						<p style={{width: "4rem", textAlign: "center", margin: "0"}}>
 							상품명
 						</p>
@@ -332,41 +373,50 @@ export const StockScreen = () => {
 							onChange={(e) => setNewPrdName(e.target.value)}
 							// placeholder="상품명"
 						/>
-					</div>
-					<div
+					</ModalLineDiv>
+					<ModalLineDiv
 						style={{
 							display: "flex",
 							justifyContent: "center",
 							alignItems: "center",
+							marginBottom: "4px",
 						}}>
 						<p style={{width: "4rem", textAlign: "center", margin: "0"}}>
 							수량
 						</p>
-						<input
-							style={{width: "5rem", minWidth: "10rem"}}
-							type="text"
-							value={newPrdCnt}
-							onChange={(e) => setNewPrdCnt(parseInt(e.target.value))}
-							placeholder="수량"
-						/>
-					</div>
-					<div
-						style={{
-							display: "flex",
-							justifyContent: "center",
-							alignItems: "center",
-						}}>
+						<ModalLineDiv>
+							<button
+								style={{width: "3rem"}}
+								onClick={() => setNewPrdCnt(newPrdCnt > 1 ? newPrdCnt - 1 : 0)}>
+								-
+							</button>
+							<input
+								style={{width: "3rem", minWidth: "4rem"}}
+								type="text"
+								value={newPrdCnt}
+								onChange={(e) => setNewPrdCnt(parseInt(e.target.value))}
+								placeholder="수량"
+							/>
+							<button
+								style={{width: "3rem"}}
+								onClick={() => setNewPrdCnt(newPrdCnt + 1)}>
+								+
+							</button>
+						</ModalLineDiv>
+					</ModalLineDiv>
+					<ModalLineDiv>
 						<p style={{width: "6rem", textAlign: "center", margin: "0"}}>
 							컬러(hex)
 						</p>
-						<input
-							style={{width: "4rem", minWidth: "8rem"}}
-							type="text"
-							value={newPrdColor}
-							onChange={(e) => setNewPrdColor(e.target.value)}
-							placeholder="000000"
+						<button
+							style={{
+								backgroundColor: Object.values(cardColors)[colorNumber],
+								width: "8rem",
+								height: "100%",
+							}}
+							onClick={onColorSelectorClick}
 						/>
-					</div>
+					</ModalLineDiv>
 					<div
 						style={{
 							display: "flex",
@@ -385,12 +435,7 @@ export const StockScreen = () => {
 			{showEditModal && currentPrd && (
 				<StockModal>
 					<h1>상품 수정</h1>
-					<div
-						style={{
-							display: "flex",
-							justifyContent: "center",
-							alignItems: "center",
-						}}>
+					<ModalLineDiv>
 						<p style={{width: "4rem", textAlign: "center", margin: "0"}}>
 							상품명
 						</p>
@@ -402,42 +447,44 @@ export const StockScreen = () => {
 							onChange={(e) => setNewPrdName(e.target.value)}
 							// placeholder="상품명"
 						/>
-					</div>
-					<div
-						style={{
-							display: "flex",
-							justifyContent: "center",
-							alignItems: "center",
-						}}>
+					</ModalLineDiv>
+					<ModalLineDiv>
 						<p style={{width: "4rem", textAlign: "center", margin: "0"}}>
 							수량
 						</p>
-						<input
-							style={{width: "30%", minWidth: "10rem"}}
-							type="text"
-							// value={newPrdCnt}
-							defaultValue={currentPrd.prdCnt}
-							onChange={(e) => setNewPrdCnt(parseInt(e.target.value))}
-							placeholder="수량"
-						/>
-					</div>
-					<div
-						style={{
-							display: "flex",
-							justifyContent: "center",
-							alignItems: "center",
-						}}>
+						<ModalLineDiv>
+							<button
+								style={{width: "3rem"}}
+								onClick={() => setNewPrdCnt(newPrdCnt > 1 ? newPrdCnt - 1 : 0)}>
+								-
+							</button>
+							<input
+								style={{width: "3rem", minWidth: "4rem"}}
+								type="text"
+								value={newPrdCnt}
+								onChange={(e) => setNewPrdCnt(parseInt(e.target.value))}
+								placeholder="수량"
+							/>
+							<button
+								style={{width: "3rem"}}
+								onClick={() => setNewPrdCnt(newPrdCnt + 1)}>
+								+
+							</button>
+						</ModalLineDiv>
+					</ModalLineDiv>
+					<ModalLineDiv>
 						<p style={{width: "6rem", textAlign: "center", margin: "0"}}>
 							컬러(hex)
 						</p>
-						<input
-							style={{width: "4rem", minWidth: "8rem"}}
-							type="text"
-							defaultValue={currentPrd.color ? currentPrd.color : ""}
-							onChange={(e) => setNewPrdColor(e.target.value)}
-							placeholder="000000"
+						<button
+							style={{
+								backgroundColor: Object.values(cardColors)[colorNumber],
+								width: "8rem",
+								height: "100%",
+							}}
+							onClick={onColorSelectorClick}
 						/>
-					</div>
+					</ModalLineDiv>
 					<div
 						style={{
 							display: "flex",
@@ -513,7 +560,9 @@ export const StockScreen = () => {
 														maxHeight: "8rem",
 														backgroundColor:
 															pd.color && pd.color !== ""
-																? `#${pd.color}`
+																? pd.color.charAt(0) === "#"
+																	? `${pd.color}`
+																	: `#${pd.color}`
 																: undefined,
 													}}
 													onClick={() =>
@@ -573,35 +622,82 @@ export const StockScreen = () => {
 					</button>
 				)}
 			</div>
-			<div style={{display: "flex"}}>주문 내용</div>
-			{data.map((datum) => (
-				<div style={{display: "flex", flexDirection: "column"}}>
-					{orderList.filter((order) => order.catName === datum.catName).length >
-					0 ? (
-						<h4>{datum.catName}</h4>
-					) : (
-						<></>
-					)}
-
-					{orderList
-						.filter((order) => order.catName === datum.catName)
-						.sort((a, b) => a.prdName.localeCompare(b.prdName))
-						.map((order) => (
-							<div
-								style={{
-									display: "flex",
-									width: "200px",
-									justifyContent: "space-evenly",
-								}}>
-								<h6>{order.prdName}</h6>
-								<h6>{order.change}</h6>
-								<button onClick={() => onDeleteFromBucketClick(order)}>
-									x
-								</button>
-							</div>
-						))}
+			<div
+				style={{
+					display: "flex",
+					width: isMobile ? "90%" : "60%",
+					flexDirection: "column",
+					justifyContent: "center",
+					alignItems: "center",
+					backgroundColor: "#e9e9e9",
+					padding: "10px",
+				}}>
+				<div
+					style={{
+						display: "flex",
+						width: "100%",
+						minHeight: "1rem",
+						justifyContent: "center",
+						alignItems: "center",
+						border: "1px solid #545454",
+						backgroundColor: "#faf9f9",
+						borderRadius: "4px",
+					}}>
+					주문 내용
 				</div>
-			))}
+				<div
+					style={{
+						width: "100%",
+						minHeight: "30px",
+						justifyContent: "center",
+						alignItems: "center",
+						border: "1px solid #545454",
+						backgroundColor: "#faf9f9",
+						borderRadius: "4px",
+						marginTop: "6px",
+					}}>
+					{data.map((datum) => (
+						<div
+							style={{
+								display: "flex",
+								flexDirection: "column",
+								justifyContent: "center",
+								alignItems: "center",
+							}}>
+							{orderList.filter((order) => order.catName === datum.catName)
+								.length > 0 ? (
+								<h4>{datum.catName}</h4>
+							) : (
+								<></>
+							)}
+
+							{orderList
+								.filter((order) => order.catName === datum.catName)
+								.sort((a, b) => a.prdName.localeCompare(b.prdName))
+								.map((order) => (
+									<div
+										style={{
+											display: "flex",
+											width: "200px",
+											justifyContent: "space-evenly",
+											alignItems: "center",
+											marginBottom: "2px",
+										}}>
+										<h6 style={{margin: "0"}}>{order.prdName}</h6>
+										<h6 style={{margin: "0"}}> ×{-order.change}</h6>
+										<button
+											style={{padding: "2px"}}
+											className="btn-two black small"
+											onClick={() => onDeleteFromBucketClick(order)}>
+											<h6 style={{margin: "0"}}>제거</h6>
+										</button>
+									</div>
+								))}
+						</div>
+					))}
+				</div>
+			</div>
+
 			<div style={{display: "flex"}}>
 				<button
 					className="btn-two orange large"
@@ -618,3 +714,12 @@ export const StockScreen = () => {
 		</div>
 	)
 }
+
+const ModalLineDiv = styled.div`
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: 4px;
+	height: 40px;
+`

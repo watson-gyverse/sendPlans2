@@ -24,4 +24,5 @@ export type StockOrderItem = {
 	catName: string
 	prdName: string
 	change: number
+	curStock: number
 }

@@ -16,6 +16,7 @@ import ReportScreen from "./screens/report-section/reportScreen"
 import {ConsignScreen} from "./screens/consign-section/consignScreen"
 import RecordBranchScreen from "./screens/record-section/recordScreen"
 import {StockScreen} from "./screens/stock-section/stockScreen"
+import {OrderHistoryScreen} from "./screens/stock-section/orderHistoryScreen"
 
 const router = createBrowserRouter(
 	[
@@ -88,7 +89,15 @@ const router = createBrowserRouter(
 				},
 				{
 					path: "stock",
-					element: <StockScreen />,
+					element: (
+						<div>
+							<Outlet />
+						</div>
+					),
+					children: [
+						{index: true, element: <StockScreen />},
+						{path: "orders", element: <OrderHistoryScreen />},
+					],
 				},
 				{
 					path: "*",

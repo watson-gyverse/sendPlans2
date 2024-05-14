@@ -13,3 +13,12 @@ export const backgroundColors = {
 export const fontColors = {
 	storage: "#3279d5",
 }
+
+export const cardColors = {
+	red: "#dc143c",
+	brightred: "#E9573E",
+	orange: "#ffab45",
+	brown: "#853123",
+	lightblue: "#4777bf",
+	black: "#060708",
+}

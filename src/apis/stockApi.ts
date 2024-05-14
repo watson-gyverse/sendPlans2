@@ -5,7 +5,6 @@ import {
 	doc,
 	getDoc,
 	increment,
-	runTransaction,
 	updateDoc,
 	writeBatch,
 } from "firebase/firestore"
@@ -18,14 +17,11 @@ const dbStock = getCollection(fbCollections.sp2Stock)
 const dbOrder = getCollection(fbCollections.sp2Order)
 
 export async function addCategory(name: string, id: number) {
-	await addDoc(dbStock, {catName: name, id: id})
+	await addDoc(dbStock, {catName: name, order: id, products: []})
 }
 
 export async function addOrder(orderList: StockOrderItem[]) {
 	await addDoc(dbOrder, {dateTime: new Date().getTime(), orders: orderList})
-	// await runTransaction(firestoreDB,async(transaction)=>{
-
-	// } )
 }
 
 export async function updateProduct(
@@ -91,7 +87,7 @@ export async function updateProductsAfterOrder(orderList: StockOrderItem[]) {
 				products: arrayUnion({
 					prdOrder: target?.prdOrder,
 					prdName: order.prdName,
-					prdCnt: target.prdCnt - order.change,
+					prdCnt: target.prdCnt + order.change,
 					color: target.color,
 				}),
 			})

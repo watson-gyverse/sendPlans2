@@ -1,8 +1,16 @@
-import useFBFetch from "../../hooks/useFetch"
-import {fbCollections} from "../../utils/consts/constants"
-import {StockOrder} from "../../utils/types/stockTypes"
+import {useNavigate} from "react-router-dom"
+import {OrderHistoryTable} from "../../components/stock-section/table"
 
 export const OrderHistoryScreen = () => {
-	const {data, refetch} = useFBFetch<StockOrder>(fbCollections.sp2Order)
-	return <div></div>
+	const navigate = useNavigate()
+
+	const onBackClick = () => {
+		navigate("../")
+	}
+	return (
+		<div style={{paddingTop: "12px"}}>
+			<button onClick={onBackClick}>뒤로</button>
+			<OrderHistoryTable />
+		</div>
+	)
 }
