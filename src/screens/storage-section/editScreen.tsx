@@ -101,7 +101,7 @@ export default function EditScreen() {
 			<Stack gap={2}>
 				<Button
 					style={{width: "100px", height: "4rem"}}
-					onClick={() => navigate("../camera")}
+					onClick={() => navigate("../preset")}
 					variant="secondary">
 					뒤로
 				</Button>

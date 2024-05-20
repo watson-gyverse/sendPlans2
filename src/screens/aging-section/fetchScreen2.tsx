@@ -119,11 +119,19 @@ export const FetchScreen2 = () => {
 		checkedSList.forEach((item) => {
 			let it = _.find(rawItems, {docId: item})
 			if (it !== undefined) {
+				console.log(it.agingDate)
+
 				if (
 					it.agingDate === null ||
+					it.agingDate === undefined ||
 					it.beforeWeight === null ||
+					it.beforeWeight === undefined ||
 					it.fridgeName === null ||
-					it.floor === null
+					it.fridgeName === undefined ||
+					it.floor === null ||
+					it.floor === undefined ||
+					it.ultraTime === null ||
+					it.ultraTime === undefined
 				) {
 					isClean = false
 				} else {
@@ -133,23 +141,6 @@ export const FetchScreen2 = () => {
 		})
 		return isClean
 	}
-
-	useEffect(() => {
-		console.log("INITIAL LOAD")
-		// fetch()
-		setRawItems(data)
-		console.log("mn: " + mn)
-		console.log("cut: " + cut)
-
-		console.log(recentAging)
-		if (recentAging !== null && recentAging !== "") {
-			const data: XlsxAgingType[] = JSON.parse(recentAging)
-			if (!_.some(data, _.isUndefined)) {
-				console.log(data)
-				setXlsxData(data)
-			}
-		}
-	}, [])
 
 	useEffect(() => {
 		let init: {[index: string]: Array<MeatInfoWithEntry>} = {}
@@ -216,21 +207,9 @@ export const FetchScreen2 = () => {
 	}, [checkedSList])
 
 	async function startAging(item: MeatInfoWithEntry) {
-		await passToAgingCollection(item)
-		refetch()
-		// await fetchFromFirestore2(
-		// 	setRawItems,
-		// 	setAgingItems,
-		// 	placeName,
-		// 	() => {
-		// 		console.log("success and fetch")
-		// 		fetch()
-		// 		toast.success("숙성시작")
-		// 	},
-		// 	() => {
-		// 		console.log("error !@")
-		// 	},
-		// )
+		await passToAgingCollection(item).then(() => {
+			refetch()
+		})
 	}
 
 	const makeXlsx = (items: MeatInfoWithEntry[]) => {

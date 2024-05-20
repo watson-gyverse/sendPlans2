@@ -20,8 +20,12 @@ export async function addCategory(name: string, id: number) {
 	await addDoc(dbStock, {catName: name, order: id, products: []})
 }
 
-export async function addOrder(orderList: StockOrderItem[]) {
-	await addDoc(dbOrder, {dateTime: new Date().getTime(), orders: orderList})
+export async function addOrder(orderList: StockOrderItem[], memo: string) {
+	await addDoc(dbOrder, {
+		dateTime: new Date().getTime(),
+		orders: orderList,
+		memo: memo,
+	})
 }
 
 export async function updateProduct(

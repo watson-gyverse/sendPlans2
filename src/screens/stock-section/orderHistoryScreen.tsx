@@ -8,8 +8,17 @@ export const OrderHistoryScreen = () => {
 		navigate("../")
 	}
 	return (
-		<div style={{paddingTop: "12px"}}>
-			<button onClick={onBackClick}>뒤로</button>
+		<div
+			style={{
+				width: "auto",
+				paddingTop: "12px",
+				display: "flex",
+				flexDirection: "column",
+				justifyContent: "center",
+			}}>
+			<button style={{width: "600px"}} onClick={onBackClick}>
+				뒤로
+			</button>
 			<OrderHistoryTable />
 		</div>
 	)

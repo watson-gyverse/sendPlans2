@@ -6,12 +6,26 @@ import {RiTimer2Line, RiHistoryFill} from "react-icons/ri"
 import {VscRocket} from "react-icons/vsc"
 import {GiBugNet} from "react-icons/gi"
 import {VscLayoutMenubar} from "react-icons/vsc"
-import {useState} from "react"
+import {useEffect, useState} from "react"
 import {PortraitDiv} from "../utils/consts/style"
 import {backgroundColors} from "../utils/consts/colors"
 import styled from "styled-components"
+import {fbLogout, getAuthentication} from "../utils/Firebase"
 export default function MainScreen() {
 	const navigate = useNavigate()
+	const token = sessionStorage.getItem("token")
+	useEffect(() => {
+		const handleTokenChange = (event: StorageEvent) => {
+			if (event.storageArea === sessionStorage && event.key === "token") {
+				console.log("토큰이 변경됨: ", token)
+			}
+		}
+		window.addEventListener("storage", handleTokenChange)
+
+		return () => {
+			window.removeEventListener("storage", handleTokenChange)
+		}
+	}, [token])
 	const naviToDateScreen = () => {
 		toast.remove()
 		navigate("/storage/")
@@ -108,6 +122,8 @@ export default function MainScreen() {
 					{/* <div style={{height: "140px", width: "140px"}}></div> */}
 				</StackDiv>
 			</Stack>
+			<button onClick={() => getAuthentication()}>log in</button>
+			<button onClick={() => fbLogout()}>log out</button>
 			<Button style={{display: "none"}} onClick={() => seta(!a)}>
 				a
 			</Button>

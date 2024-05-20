@@ -1,8 +1,10 @@
 import {ReactNode} from "react"
+import {useMediaQuery} from "react-responsive"
 type ModalChildren = {
 	children: ReactNode
 }
 export const StockModal = ({children}: ModalChildren) => {
+	const isMobile = useMediaQuery({query: "(max-width: 1224px)"})
 	return (
 		<div
 			// className="modal"
@@ -21,13 +23,14 @@ export const StockModal = ({children}: ModalChildren) => {
 			<div
 				className="modal-content"
 				style={{
-					width: "66%",
+					border: "6px #c13523 solid",
+					width: isMobile ? "66%" : "25%",
 					height: "40%",
 					minWidth: "10rem",
 					display: "flex",
 					justifyContent: "center",
 					alignItems: "center",
-					backgroundColor: "#d3d3d3",
+					backgroundColor: "#ededed",
 				}}>
 				{children}
 			</div>

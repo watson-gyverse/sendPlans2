@@ -9,7 +9,9 @@ import {fbCollections} from "../../utils/consts/constants"
 import {StockOrder, StockOrderItem} from "../../utils/types/stockTypes"
 import styled from "styled-components"
 import moment from "moment"
+import {useMediaQuery} from "react-responsive"
 export const OrderHistoryTable = () => {
+	const isMobile = useMediaQuery({query: "(max-width: 1224px)"})
 	const {data, refetch} = useFBFetch<StockOrder>(fbCollections.sp2Order)
 
 	const columnHelper = createColumnHelper<StockOrder>()
@@ -18,8 +20,18 @@ export const OrderHistoryTable = () => {
 		columnHelper.accessor("dateTime", {
 			header: () => <h2>일자</h2>,
 			cell: (data) => {
-				const d = new Date(data.getValue())
-				return moment(d).format("YYYY-MM-DD HH:mm")
+				const d = moment(new Date(data.getValue()))
+				const date = d.format("YYYY-MM-DD")
+				const time = d.format("HH:mm")
+				return (
+					<div style={{textAlign: "center"}}>
+						<h6>
+							{date}
+							{isMobile ? <br /> : " "}
+							{time}
+						</h6>
+					</div>
+				)
 			},
 		}),
 		columnHelper.accessor("orders", {
@@ -57,6 +69,10 @@ export const OrderHistoryTable = () => {
 				})
 				return a
 			},
+		}),
+		columnHelper.accessor("memo", {
+			header: () => <h2>메모</h2>,
+			cell: (data) => data.getValue(),
 		}),
 	]
 

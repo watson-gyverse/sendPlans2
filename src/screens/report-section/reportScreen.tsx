@@ -51,19 +51,27 @@ const ReportScreen = () => {
 				height: "100%",
 				display: "flex",
 				flexDirection: "column",
+				justifyContent: "center",
 				alignItems: "center",
 				backgroundColor: backgroundColors.report,
 				padding: "20px 10px",
 			}}>
 			<Toaster />
-			<div style={{width: "100%", display: "flex", flexDirection: "column"}}>
+			<div
+				style={{
+					width: "100%",
+					display: "flex",
+					flexDirection: "column",
+					alignItems: "center",
+					justifyContent: "center",
+				}}>
 				<div
 					style={{
 						display: "flex",
 						flexDirection: "row",
 						alignItems: "center",
 						justifyContent: "space-evenly",
-						marginBottom: "10px",
+						marginBottom: "30px",
 					}}>
 					<Button
 						style={{width: "60px", height: "40px"}}
@@ -72,10 +80,15 @@ const ReportScreen = () => {
 						뒤로
 					</Button>
 					<h1 style={{margin: "0"}}>버그제보</h1>
-					<div style={{width: "60px", height: "50px"}}></div>
+					<div style={{width: "60px", height: "40px", margin: "9px"}}></div>
 				</div>
+				<h2>카테고리</h2>
 				<ButtonGroup
 					style={{
+						display: "flex",
+						flexDirection: "row",
+						justifyContent: "center",
+						width: "70%",
 						marginBottom: "10px",
 					}}>
 					{radios.map((radio, idx) => (
@@ -91,17 +104,20 @@ const ReportScreen = () => {
 						</ToggleButton>
 					))}
 				</ButtonGroup>
-				<label htmlFor="뽀삐">
+				<label htmlFor="description">
 					<h5 style={{margin: "0"}}>내용</h5>
 				</label>
 				<textarea
-					style={{height: "300px"}}
-					name="뽀삐"
+					style={{width: "80%", height: "400px"}}
+					name="description"
 					value={description}
 					onChange={(e) => setDesc(e.target.value)}
 				/>
 				<div style={{height: "12px"}}></div>
-				<Button variant="success" onClick={onSendClick}>
+				<Button
+					style={{width: "200px", height: "100px"}}
+					variant="success"
+					onClick={onSendClick}>
 					발송
 				</Button>
 			</div>

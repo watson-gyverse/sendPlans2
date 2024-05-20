@@ -5,9 +5,8 @@ import {Outlet, RouterProvider, createBrowserRouter} from "react-router-dom"
 import MainScreen from "./screens/mainScreen"
 import ErrorScreen from "./screens/errorScreen"
 import CameraScreen from "./screens/storage-section/cameraScreen"
-import {Container} from "react-bootstrap"
 import {StorageContext} from "./contexts/meatLineContext"
-import {StorageMiddleWare} from "./utils/toLobbyMiddleware"
+import {StorageMiddleWare, TokenMiddleWare} from "./utils/toLobbyMiddleware"
 import PlaceScreen from "./screens/aging-section/placeScreen"
 import {backgroundColors} from "./utils/consts/colors"
 import EditScreen from "./screens/storage-section/editScreen"
@@ -33,9 +32,9 @@ const router = createBrowserRouter(
 				{
 					path: "storage",
 					element: (
-						<div>
+						<TokenMiddleWare>
 							<Outlet />
-						</div>
+						</TokenMiddleWare>
 					),
 					children: [
 						{
@@ -63,9 +62,9 @@ const router = createBrowserRouter(
 				{
 					path: "aging",
 					element: (
-						<div>
+						<TokenMiddleWare>
 							<Outlet />
-						</div>
+						</TokenMiddleWare>
 					),
 					children: [
 						{index: true, element: <PlaceScreen />},
@@ -77,22 +76,34 @@ const router = createBrowserRouter(
 				},
 				{
 					path: "record",
-					element: <RecordBranchScreen />,
+					element: (
+						<TokenMiddleWare>
+							<RecordBranchScreen />
+						</TokenMiddleWare>
+					),
 				},
 				{
 					path: "report",
-					element: <ReportScreen />,
+					element: (
+						<TokenMiddleWare>
+							<ReportScreen />
+						</TokenMiddleWare>
+					),
 				},
 				{
 					path: "consign",
-					element: <ConsignScreen />,
+					element: (
+						<TokenMiddleWare>
+							<ConsignScreen />
+						</TokenMiddleWare>
+					),
 				},
 				{
 					path: "stock",
 					element: (
-						<div>
+						<TokenMiddleWare style={{width: "100%", height: "100%"}}>
 							<Outlet />
-						</div>
+						</TokenMiddleWare>
 					),
 					children: [
 						{index: true, element: <StockScreen />},
@@ -101,7 +112,7 @@ const router = createBrowserRouter(
 				},
 				{
 					path: "*",
-					element: <>Not Found 051</>,
+					element: <ErrorScreen />,
 				},
 			],
 		},

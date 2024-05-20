@@ -47,6 +47,7 @@ export const StockScreen = () => {
 	const {data, refetch} = useFBFetch<StockCategory>(fbCollections.sp2Stock)
 	const isMobile = useMediaQuery({query: "(max-width: 1224px)"})
 	const [orderList, setOrderList] = useState<StockOrderItem[]>([])
+	const [memo, setMemo] = useState("")
 
 	const handleCloseModal = () => {
 		setShowNCModal(false)
@@ -172,15 +173,20 @@ export const StockScreen = () => {
 				cardColor,
 				pd.prdName,
 			).then(async () => {
-				addOrder([
-					{
-						catId: currentId,
-						prdName: pd.prdName,
-						change: currentPrd ? newPrdCnt - currentPrd.prdCnt : -99,
-						curStock: newPrdCnt,
-						catName: currentCat,
-					},
-				])
+				addOrder(
+					[
+						{
+							catId: currentId,
+							prdName: pd.prdName,
+							change: currentPrd ? newPrdCnt - currentPrd.prdCnt : -99,
+							curStock: newPrdCnt,
+							catName: currentCat,
+						},
+					],
+					memo,
+				).then(() => {
+					setMemo("")
+				})
 				setShowEditModal(false)
 				refetch()
 			})
@@ -275,12 +281,13 @@ export const StockScreen = () => {
 				return curr.change + prev
 			}, 0)
 			console.log(cnt)
-			addOrder(orderList).then(async (result) => {
+			addOrder(orderList, memo).then(async (result) => {
 				// 주문 후 재고 업데이트
 				updateProductsAfterOrder(orderList).then(() => {
 					toast("출고완료")
 					refetch()
 				})
+				setMemo("")
 				setOrderList([])
 				toast.success("완료")
 				await refetch()
@@ -313,7 +320,8 @@ export const StockScreen = () => {
 	return (
 		<div
 			style={{
-				width: isMobile ? "100vw" : "100%",
+				height: "100%",
+				width: "100%", //isMobile ? "100vw" : "100%",
 				display: "flex",
 				flexDirection: "column",
 				alignItems: "center",
@@ -485,6 +493,13 @@ export const StockScreen = () => {
 							onClick={onColorSelectorClick}
 						/>
 					</ModalLineDiv>
+					<ModalLineDiv>
+						<textarea
+							style={{width: "13rem", height: "100%"}}
+							placeholder="메모(선택)"
+							onChange={(e) => setMemo(e.target.value)}
+						/>
+					</ModalLineDiv>
 					<div
 						style={{
 							display: "flex",
@@ -643,7 +658,7 @@ export const StockScreen = () => {
 						backgroundColor: "#faf9f9",
 						borderRadius: "4px",
 					}}>
-					주문 내용
+					출고 내용
 				</div>
 				<div
 					style={{
@@ -696,6 +711,13 @@ export const StockScreen = () => {
 						</div>
 					))}
 				</div>
+				<textarea
+					style={{marginTop: "10px", width: "60%", height: "40px"}}
+					name="memo"
+					placeholder="메모(선택)"
+					value={memo}
+					onChange={(e) => setMemo(e.target.value)}
+				/>
 			</div>
 
 			<div style={{display: "flex"}}>

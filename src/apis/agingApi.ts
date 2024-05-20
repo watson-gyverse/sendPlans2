@@ -184,12 +184,12 @@ export async function passToAgingCollection(
 		place: item.place,
 		ultraTime: item.ultraTime,
 	})
-		.then(() => console.warn("aging으로 넘김"))
+		.then(() => console.log("aging으로 넘김"))
 		.catch(() => {
 			console.error("않되")
 		})
 
-	deleteFromStorage(item.docId)
+	await deleteFromStorage(item.docId)
 }
 
 export async function deleteFromStorage(id: string, thenWhat: void) {
