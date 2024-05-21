@@ -14,6 +14,7 @@ import {fbLogout, getAuthentication} from "../utils/Firebase"
 export default function MainScreen() {
 	const navigate = useNavigate()
 	const token = sessionStorage.getItem("token")
+
 	useEffect(() => {
 		const handleTokenChange = (event: StorageEvent) => {
 			if (event.storageArea === sessionStorage && event.key === "token") {

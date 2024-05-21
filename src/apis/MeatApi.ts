@@ -1,5 +1,5 @@
 import axios from "axios"
-import {SYS_ID, foreignMeatInfoUrl, meatInfoUrl} from "../utils/consts/urls"
+import {meatInfoUrl} from "../utils/consts/urls"
 import {xmlThatIWannaKill} from "../utils/consts/functions"
 import {Exception} from "sass"
 

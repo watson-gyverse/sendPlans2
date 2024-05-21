@@ -16,6 +16,7 @@ import {ConsignScreen} from "./screens/consign-section/consignScreen"
 import RecordBranchScreen from "./screens/record-section/recordScreen"
 import {StockScreen} from "./screens/stock-section/stockScreen"
 import {OrderHistoryScreen} from "./screens/stock-section/orderHistoryScreen"
+import {SampleFormScreen} from "./screens/form-section/sampleFormScreen"
 
 const router = createBrowserRouter(
 	[
@@ -110,6 +111,7 @@ const router = createBrowserRouter(
 						{path: "orders", element: <OrderHistoryScreen />},
 					],
 				},
+				{path: "submit", element: <SampleFormScreen />},
 				{
 					path: "*",
 					element: <ErrorScreen />,
