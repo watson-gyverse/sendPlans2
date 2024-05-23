@@ -16,21 +16,20 @@ export async function GetFromBizNum(
 	gb: number,
 	q: string,
 ): Promise<bizItem | null> {
-	const result = await axios.get(bizNoUrl, {
-		params: {
-			gb: gb,
-			q: q,
-		},
-	})
 	try {
+		if (!bizNoUrl) {
+			return null
+		}
+		const result = await axios.get(bizNoUrl, {
+			params: {
+				gb: gb,
+				q: q,
+			},
+		})
 		const items = result.data.data.items
 		if (items !== null && items !== "") {
-			console.log("여기선: ", items)
-
 			const item = items[0]
-			console.log("notnull: ", item)
-			const company = item.company
-			const stt = item.bsttcd //01 계속사업자, 02 휴업자, 03 폐업자
+
 			return item
 		} else {
 			console.log("널죽이겠다", result.data)
@@ -38,7 +37,7 @@ export async function GetFromBizNum(
 		}
 	} catch (err) {
 		console.error(err)
-		console.log("hmm..", result.data)
+		console.log("hmm..")
 
 		return null
 	}

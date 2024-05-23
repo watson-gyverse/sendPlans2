@@ -296,10 +296,6 @@ export const StockScreen = () => {
 		}
 	}
 
-	useEffect(() => {
-		console.log(colorNumber)
-	}, [colorNumber])
-
 	const onColorSelectorClick = () => {
 		if (colorNumber < 5) setColorNumber(colorNumber + 1)
 		else setColorNumber(0)
@@ -310,13 +306,6 @@ export const StockScreen = () => {
 		setOrderList(newOrderList)
 	}
 
-	useEffect(() => {
-		console.log(orderList)
-	}, [orderList])
-
-	useEffect(() => {
-		console.log(cardColor)
-	}, [cardColor])
 	return (
 		<div
 			style={{
