@@ -1,10 +1,41 @@
-import {ReactNode} from "react"
-import {useMediaQuery} from "react-responsive"
+import {ReactNode, useEffect, useRef} from "react"
 type ModalChildren = {
 	children: ReactNode
+	setOpen: (isOpen: boolean) => void
+	closableAtOutside?: boolean
 }
-export const StockModal = ({children}: ModalChildren) => {
-	const isMobile = useMediaQuery({query: "(max-width: 1224px)"})
+export const StockModal = ({
+	children,
+	setOpen,
+	closableAtOutside = true,
+}: ModalChildren) => {
+	// const isMobile = useMediaQuery({query: "(max-width: 1224px)"})
+
+	const modalRef = useRef<HTMLDivElement>(null)
+
+	useEffect(() => {
+		const handleClickOutside = (e: any) => {
+			if (
+				closableAtOutside &&
+				modalRef.current &&
+				!modalRef.current.contains(e.target)
+			) {
+				setOpen(false)
+			}
+		}
+		const handleEscapeKey = (e: any) => {
+			if (e.key === "Escape") {
+				setOpen(false)
+			}
+		}
+		document.addEventListener("mousedown", handleClickOutside)
+		document.addEventListener("keydown", handleEscapeKey)
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside)
+			document.removeEventListener("keydown", handleEscapeKey)
+		}
+	}, [])
+
 	return (
 		<div
 			// className="modal"
@@ -12,26 +43,26 @@ export const StockModal = ({children}: ModalChildren) => {
 				display: "flex",
 				flexDirection: "column",
 				position: "fixed",
+				justifyContent: "center",
 				zIndex: 1,
 				left: 0,
 				top: 0,
 				width: "100%",
-				height: "100%",
-				overflow: "auto",
+				height: "100vh",
 				backgroundColor: "rgba(0, 0, 0, 0.4)",
 			}}>
 			<div
 				className="modal-content"
 				style={{
 					border: "6px #c13523 solid",
-					width: isMobile ? "66%" : "25%",
-					height: "40%",
-					minWidth: "10rem",
+					padding: "20px 10px",
+					width: "auto",
 					display: "flex",
-					justifyContent: "center",
+					justifyContent: "flex-start",
 					alignItems: "center",
 					backgroundColor: "#ededed",
-				}}>
+				}}
+				ref={modalRef}>
 				{children}
 			</div>
 		</div>

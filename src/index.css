@@ -1,7 +1,7 @@
 html {
 	min-height: 100%;
 	background-color: "#123123";
-	overflow: auto;
+	overflow: visible;
 }
 
 body {
@@ -14,6 +14,7 @@ body {
 	/* user-select: none; */
 	min-height: 100%;
 	background-color: "#123123ff";
+	overflow: hidden;
 }
 
 #root {

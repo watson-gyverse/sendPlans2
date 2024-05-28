@@ -2,7 +2,7 @@ import React, {ForwardedRef, forwardRef, useEffect, useState} from "react"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import {Button} from "react-bootstrap"
-
+import "./popper.css"
 type DatePickerInputProps = {
 	value: any
 	onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
@@ -34,8 +34,11 @@ const DatePickerComponent = (props: DatePickerProps) => {
 		),
 	)
 	return (
-		<div style={{zIndex: "100"}}>
+		<div>
 			<DatePicker
+				popperProps={{
+					positionFixed: true, // use this to make the popper position: fixed
+				}}
 				selected={targetDate}
 				onChange={(date: Date) => {
 					const a = new Date(date)

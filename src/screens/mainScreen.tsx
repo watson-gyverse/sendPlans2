@@ -16,15 +16,22 @@ import {LoginUser, addUser, updateUserLogin} from "../apis/userApi"
 
 export default function MainScreen() {
 	const navigate = useNavigate()
-	const [token, setToken] = useState(sessionStorage.getItem("token"))
+	const [token, setToken] = useState(localStorage.getItem("token"))
 	const [tempToken, setTempToken] = useState("")
 	const [isLoginModalOpen, setLoginModalOpen] = useState(false)
 	const [showingText, setShowingText] = useState("이용약관")
+	const [isAgreeChecked, setAgreeChecked] = useState(false)
+
+	const handleAgreeBoxChange = () => {
+		setAgreeChecked(!isAgreeChecked)
+	}
+	const [description, setDesc] = useState("")
+
 	const [loginUser, setLoginUser] = useState<LoginUser>()
 
 	useEffect(() => {
 		const handleTokenChange = (event: StorageEvent) => {
-			if (event.storageArea === sessionStorage && event.key === "token") {
+			if (event.storageArea === localStorage && event.key === "token") {
 				console.log("토큰이 변경됨: ", token)
 			}
 		}
@@ -68,7 +75,6 @@ export default function MainScreen() {
 	const onSignInClick = async () => {
 		const result = await getAuthentication()
 		if (result !== undefined) {
-			setLoginModalOpen(true)
 			try {
 				const newUser = {
 					name: result.user.displayName!,
@@ -76,19 +82,23 @@ export default function MainScreen() {
 					createdAt: new Date(result.user.metadata.creationTime!).getTime(),
 					lastLogin: new Date(result.user.metadata.lastSignInTime!).getTime(),
 				}
+				const token = await result.user.getIdToken()
 				if (Math.abs(newUser.createdAt - newUser.lastLogin) > 10000) {
 					updateUserLogin(newUser.email)
+					localStorage.setItem("token", result.user.refreshToken)
+					setToken(token)
+				} else {
+					setLoginModalOpen(true)
+					setTempToken(token)
 				}
 				setLoginUser(newUser)
 			} catch (err) {
 				console.error("err", err)
+				toast.error("알수없는 오류 발생")
 			}
-
-			const token = await result.user.getIdToken()
-
-			setTempToken(token)
 		} else {
 			setToken("")
+			localStorage.removeItem("token")
 		}
 	}
 
@@ -120,6 +130,7 @@ export default function MainScreen() {
 				console.log("addUser result: ", result)
 			}
 			setToken(tempToken)
+			localStorage.setItem("token", tempToken)
 		} else {
 			setTempToken("")
 		}
@@ -127,7 +138,7 @@ export default function MainScreen() {
 	}
 
 	const onResetSessionClick = () => {
-		sessionStorage.removeItem("token")
+		localStorage.removeItem("token")
 		setToken("")
 		setTempToken("")
 	}
@@ -135,7 +146,7 @@ export default function MainScreen() {
 	const [a, seta] = useState(false)
 
 	return (
-		<PortraitDiv bgColor={backgroundColors.base} padding="20px 10px">
+		<PortraitDiv bgColor={backgroundColors.base} padding="20px 10px 0px 10px">
 			<Toaster />
 			<Stack gap={2} style={{display: "flex", alignItems: "center"}}>
 				<p
@@ -226,33 +237,62 @@ export default function MainScreen() {
 				<button style={{marginTop: "30px"}} onClick={onResetSessionClick}>
 					비상용 세션 초기화
 				</button>
+				<div
+					style={{
+						display: "flex",
+						flexDirection: "column",
+						width: "100%",
+						height: "60px",
+						padding: "6px",
+						backgroundColor: "#bababa",
+						borderTop: "2px solid #454545",
+					}}>
+					<a
+						style={{color: "#000000"}}
+						target="_blank"
+						href="https://gyverse.com/policy-privacy"
+						rel="noreferrer noopener">
+						개인정보 취급방침
+					</a>
+				</div>
 			</Stack>
 			{isLoginModalOpen && (
-				<StockModal>
-					<div style={{display: "flex", flexDirection: "column"}}>
-						{/* <button onClick={() => setLoginModalOpen(false)}>x</button> */}
-						<ButtonGroup style={{justifyContent: "center"}}>
-							{["이용약관", "개인정보취급방침"].map((item, idx) => (
-								<ToggleButton
-									key={idx}
-									id={`login-${idx}`}
-									value={item}
-									type="radio"
-									checked={item === showingText}
-									onChange={onShowingTextChange}
-									style={{
-										fontSize: "1rem",
-										borderRadius: "0",
-									}}>
-									{item}
-								</ToggleButton>
-							))}
-						</ButtonGroup>
+				<StockModal closableAtOutside={false} setOpen={setLoginModalOpen}>
+					<div
+						style={{
+							display: "flex",
+							flexDirection: "column",
+							// justifyContent: "center",
+							alignItems: "center",
+						}}>
+						<label>
+							<input
+								type="checkbox"
+								checked={isAgreeChecked}
+								onChange={handleAgreeBoxChange}
+							/>
+							(필수) 개인정보 수집·이용 동의
+						</label>
+						<p style={{fontSize: "0.7rem"}}>
+							자세한 내용은{" "}
+							<a
+								target="_blank"
+								href="https://gyverse.com/policy-privacy"
+								rel="noreferrer noopener">
+								개인정보 처리방침
+							</a>
+							을 확인해주세요 귀하는 위와 같이 개인정보를 수집 이용하는데 동의를
+							거부할 권리가 있습니다. 필수 수집 항목에 대한 동의를 거절하는 경우
+							서비스 이용이 제한될 수 있습니다.
+						</p>
 						<ButtonGroup style={{justifyContent: "center"}}>
 							<button className="btn-two small white" onClick={onRefugeClick}>
 								동의안함
 							</button>
-							<button className="btn-two small orange" onClick={onAgreeClick}>
+							<button
+								disabled={!isAgreeChecked}
+								className="btn-two small orange"
+								onClick={onAgreeClick}>
 								동의하고 <br />
 								로그인하기
 							</button>

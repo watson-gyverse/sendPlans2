@@ -10,13 +10,13 @@ export const OrderHistoryScreen = () => {
 	return (
 		<div
 			style={{
-				width: "auto",
 				paddingTop: "12px",
 				display: "flex",
 				flexDirection: "column",
 				justifyContent: "center",
+				alignContent: "center",
 			}}>
-			<button style={{width: "600px"}} onClick={onBackClick}>
+			<button style={{marginBottom: "20px"}} onClick={onBackClick}>
 				뒤로
 			</button>
 			<OrderHistoryTable />

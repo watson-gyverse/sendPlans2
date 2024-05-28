@@ -82,48 +82,43 @@ export const OrderHistoryTable = () => {
 		getCoreRowModel: getCoreRowModel(),
 	})
 	return (
-		<div>
-			<table>
-				<thead>
-					{t.getHeaderGroups().map((hGroup) => {
-						return (
-							<tr key={hGroup.id}>
-								{hGroup.headers.map((header) => {
-									return (
-										<StyledHeader key={header.id} colSpan={header.colSpan}>
-											{header.isPlaceholder
-												? "-"
-												: flexRender(
-														header.column.columnDef.header,
-														header.getContext(),
-												  )}
-										</StyledHeader>
-									)
-								})}
-							</tr>
-						)
-					})}
-				</thead>
-				<tbody>
-					{t.getRowModel().rows.map((row) => {
-						return (
-							<tr key={row.id}>
-								{row.getVisibleCells().map((cell) => {
-									return (
-										<StyledCell key={cell.id}>
-											{flexRender(
-												cell.column.columnDef.cell,
-												cell.getContext(),
-											)}
-										</StyledCell>
-									)
-								})}
-							</tr>
-						)
-					})}
-				</tbody>
-			</table>
-		</div>
+		<table>
+			<thead>
+				{t.getHeaderGroups().map((hGroup) => {
+					return (
+						<tr key={hGroup.id}>
+							{hGroup.headers.map((header) => {
+								return (
+									<StyledHeader key={header.id} colSpan={header.colSpan}>
+										{header.isPlaceholder
+											? "-"
+											: flexRender(
+													header.column.columnDef.header,
+													header.getContext(),
+											  )}
+									</StyledHeader>
+								)
+							})}
+						</tr>
+					)
+				})}
+			</thead>
+			<tbody>
+				{t.getRowModel().rows.map((row) => {
+					return (
+						<tr key={row.id}>
+							{row.getVisibleCells().map((cell) => {
+								return (
+									<StyledCell key={cell.id}>
+										{flexRender(cell.column.columnDef.cell, cell.getContext())}
+									</StyledCell>
+								)
+							})}
+						</tr>
+					)
+				})}
+			</tbody>
+		</table>
 	)
 }
 const StyledHeader = styled.th`

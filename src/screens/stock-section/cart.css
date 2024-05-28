@@ -1,0 +1,81 @@
+.cart-icon {
+	cursor: pointer;
+}
+
+.cart-icon span {
+	display: flex;
+	top: 11px;
+	right: -5px;
+	background-color: red;
+	color: white;
+	font-size: 12px;
+	font-weight: bold;
+	padding: 2px 6px;
+	justify-content: center;
+	align-items: center;
+	border-radius: 50%;
+}
+
+@media (min-width: 1224px) {
+	.cart-icon-container {
+		right: 100px;
+	}
+}
+
+@media (max-width: 1224px) {
+	.cart-icon-container {
+		bottom: 40px;
+		right: 10px;
+	}
+}
+.cart-icon-container {
+	position: fixed;
+	display: inline-block;
+	cursor: pointer;
+	width: 60px; /* 원형 크기 조절 */
+	height: 60px; /* 원형 크기 조절 */
+	background-color: #f0f0f0; /* 배경색 설정 */
+	border-radius: 50%; /* 원형 모양 */
+	text-align: center; /* 아이콘 가운데 정렬 */
+	line-height: 60px; /* 수직 가운데 정렬 */
+}
+
+.cart-icon-container i {
+	font-size: 20px; /* 아이콘 크기 조절 */
+	color: #333; /* 아이콘 색상 */
+}
+.cart-icon-container span {
+	position: absolute;
+	bottom: -12px;
+	right: -8px;
+	background-color: red;
+	color: white;
+	width: 40px;
+	height: 40px;
+	font-size: 15px;
+	font-weight: bold;
+	padding: 3px 6px; /* 숫자 주변 여백 조절 */
+	border-radius: 50%; /* 동그라미 모양 */
+	display: flex; /* 가로, 세로 중앙 정렬 */
+	justify-content: center;
+	align-items: center;
+}
+
+@keyframes bounce {
+	0%,
+	20%,
+	50%,
+	80%,
+	100% {
+		transform: translateY(0);
+	}
+	40% {
+		transform: translateY(-10px);
+	}
+	60% {
+		transform: translateY(-5px);
+	}
+}
+.bounce {
+	animation: bounce 0.5s;
+}

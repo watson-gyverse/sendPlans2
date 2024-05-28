@@ -11,6 +11,7 @@ import {
 import {backgroundColors, cardColors} from "../../utils/consts/colors"
 import "./button.css"
 import "./modal.css"
+import "./cart.css"
 import useFBFetch from "../../hooks/useFetch"
 import {fbCollections} from "../../utils/consts/constants"
 import {
@@ -18,13 +19,13 @@ import {
 	StockOrderItem,
 	StockProduct,
 } from "../../utils/types/stockTypes"
-import {useEffect, useMemo, useState} from "react"
+import {useEffect, useMemo, useRef, useState} from "react"
 import {StockModal} from "../../components/stock-section/stockModal"
 import {useNavigate} from "react-router-dom"
 import {AiFillSetting} from "react-icons/ai"
 import {useMediaQuery} from "react-responsive"
 import styled from "styled-components"
-
+import {FaShoppingCart} from "react-icons/fa"
 export const StockScreen = () => {
 	const navigate = useNavigate()
 	const [isEditMode, setEditMode] = useState(false)
@@ -48,6 +49,8 @@ export const StockScreen = () => {
 	const isMobile = useMediaQuery({query: "(max-width: 1224px)"})
 	const [orderList, setOrderList] = useState<StockOrderItem[]>([])
 	const [memo, setMemo] = useState("")
+
+	const [showOrderModal, setShowOrderModal] = useState(false)
 
 	const handleCloseModal = () => {
 		setShowNCModal(false)
@@ -305,6 +308,27 @@ export const StockScreen = () => {
 
 		setOrderList(newOrderList)
 	}
+	const cartIconRef = useRef<HTMLDivElement>(null)
+	useEffect(() => {
+		console.log("움직여다오", cartIconRef)
+
+		if (cartIconRef.current) {
+			console.log("add")
+
+			cartIconRef.current.classList.add("bounce")
+		}
+		const cleanUpAnimation = () => {
+			if (cartIconRef.current) {
+				console.log("remove")
+				cartIconRef.current.classList.remove("bounce")
+			}
+		}
+		const timeoutId = setTimeout(cleanUpAnimation, 500)
+
+		return () => {
+			clearTimeout(timeoutId)
+		}
+	}, [orderList, cartIconRef])
 
 	return (
 		<div
@@ -317,6 +341,17 @@ export const StockScreen = () => {
 				backgroundColor: backgroundColors.consign,
 				padding: "20px 10px",
 			}}>
+			<div
+				onClick={() => setShowOrderModal(true)}
+				className="cart-icon-container"
+				ref={cartIconRef}>
+				<FaShoppingCart style={{width: "100%"}} />
+				<span>
+					{orderList.reduce((acc, cur) => {
+						return (acc -= cur.change)
+					}, 0)}
+				</span>
+			</div>
 			<Toaster />
 			<div style={{display: "flex", justifyContent: "space-evenly"}}>
 				<button className="btn-two green small" onClick={goToHome}>
@@ -332,7 +367,7 @@ export const StockScreen = () => {
 				/>
 			</div>
 			{showNCModal && (
-				<StockModal>
+				<StockModal setOpen={setShowNCModal}>
 					<h1>카테고리 추가</h1>
 					<input
 						style={{width: "30%", minWidth: "10rem"}}
@@ -357,7 +392,7 @@ export const StockScreen = () => {
 				</StockModal>
 			)}
 			{showNPModal && (
-				<StockModal>
+				<StockModal setOpen={setShowNPModal}>
 					<h1>상품 추가</h1>
 					<ModalLineDiv>
 						<p style={{width: "4rem", textAlign: "center", margin: "0"}}>
@@ -430,7 +465,7 @@ export const StockScreen = () => {
 				</StockModal>
 			)}
 			{showEditModal && currentPrd && (
-				<StockModal>
+				<StockModal setOpen={setShowEditModal}>
 					<h1>상품 수정</h1>
 					<ModalLineDiv>
 						<p style={{width: "4rem", textAlign: "center", margin: "0"}}>
@@ -511,6 +546,119 @@ export const StockScreen = () => {
 					</div>
 				</StockModal>
 			)}
+			{showOrderModal && (
+				<StockModal setOpen={setShowOrderModal}>
+					<div
+						style={{
+							display: "flex",
+							width: "100%",
+							height: "auto",
+							flexDirection: "column",
+							alignItems: "center",
+							justifyContent: "flex-start",
+							backgroundColor: "#e9e9e9",
+							padding: "10px",
+						}}>
+						<div
+							style={{
+								display: "flex",
+								width: "100%",
+								height: "auto",
+								minHeight: "2rem",
+								alignItems: "center",
+								justifyContent: "center",
+								border: "1px solid #545454",
+								backgroundColor: "#faf9f9",
+								borderRadius: "4px",
+							}}>
+							출고 내용
+						</div>
+						<div
+							style={{
+								display: "flex",
+								flexDirection: "column",
+								minWidth: "100px",
+								minHeight: "200px",
+								maxHeight: "500px",
+								justifyContent: "center",
+								alignItems: "center",
+								border: "2px solid #545454",
+								backgroundColor: "#faf9f9",
+								borderRadius: "4px",
+								marginTop: "6px",
+								overflowY: "scroll",
+							}}>
+							{data.map((datum) => (
+								<div
+									style={{
+										display: "flex",
+										flexDirection: "column",
+										justifyContent: "center",
+										alignItems: "center",
+									}}>
+									{orderList.filter((order) => order.catName === datum.catName)
+										.length > 0 ? (
+										<h4 style={{borderBottom: "3px solid black"}}>
+											{datum.catName}
+										</h4>
+									) : (
+										<></>
+									)}
+
+									{orderList
+										.filter((order) => order.catName === datum.catName)
+										.sort((a, b) => a.prdName.localeCompare(b.prdName))
+										.map((order) => (
+											<div
+												style={{
+													display: "flex",
+													width: "100%",
+													justifyContent: "space-evenly",
+													alignItems: "center",
+													marginBottom: "2px",
+												}}>
+												<h6 style={{margin: "0"}}>{order.prdName}</h6>
+
+												<h6 style={{margin: "0"}}> ×{-order.change}</h6>
+
+												<button
+													style={{padding: "2px"}}
+													className="btn-two black small"
+													onClick={() => onDeleteFromBucketClick(order)}>
+													<h6 style={{margin: "0"}}>제거</h6>
+												</button>
+											</div>
+										))}
+								</div>
+							))}
+						</div>
+						<textarea
+							style={{marginTop: "10px", width: "80%", minHeight: "50px"}}
+							name="memo"
+							placeholder="메모(선택)"
+							value={memo}
+							onChange={(e) => setMemo(e.target.value)}
+						/>
+					</div>
+
+					<div
+						style={{display: "flex", width: "100%", justifyContent: "center"}}>
+						<button
+							className="btn-two orange large"
+							style={{width: "40%", padding: "10px 0px", whiteSpace: "nowrap"}}
+							onClick={() => setOrderList([])}>
+							비우기
+						</button>
+						<button
+							disabled={orderList.length === 0}
+							style={{width: "40%", padding: "10px 20px"}}
+							className="btn-two red large"
+							onClick={onSubmitClick}>
+							제출
+						</button>
+					</div>
+				</StockModal>
+			)}
 			<div
 				style={{
 					width: "100%",
@@ -536,6 +684,7 @@ export const StockScreen = () => {
 									marginTop: "10px",
 									backgroundColor: "#faf9f9",
 									borderRadius: "4px",
+									paddingLeft: "4px",
 								}}>
 								{datum.catName}
 							</div>
@@ -626,7 +775,7 @@ export const StockScreen = () => {
 					</button>
 				)}
 			</div>
-			<div
+			{/* <div
 				style={{
 					display: "flex",
 					width: isMobile ? "90%" : "60%",
@@ -721,7 +870,7 @@ export const StockScreen = () => {
 					onClick={onSubmitClick}>
 					제출
 				</button>
-			</div>
+			</div> */}
 		</div>
 	)
 }

@@ -102,7 +102,7 @@ const router = createBrowserRouter(
 				{
 					path: "stock",
 					element: (
-						<TokenMiddleWare style={{width: "100%", height: "100%"}}>
+						<TokenMiddleWare>
 							<Outlet />
 						</TokenMiddleWare>
 					),

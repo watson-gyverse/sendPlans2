@@ -36,7 +36,7 @@ export const AgingMiddleWare = (props: any) => {
 }
 
 export const TokenMiddleWare = (props: any) => {
-	const token = sessionStorage.getItem("token")
+	const token = localStorage.getItem("token")
 	if (!token || token === "") {
 		toast("접근 권한이 필요합니다")
 		return (

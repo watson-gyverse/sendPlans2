@@ -173,7 +173,7 @@ const NewAgingCardItem = (props: INewAgingCardItem) => {
 							<></>
 						)}
 						<Button
-							style={{width: "auto", height: "40px"}}
+							style={{width: "auto", height: "40px", margin: "2px"}}
 							variant="danger"
 							onClick={() => {
 								// onClickAddInfo()
