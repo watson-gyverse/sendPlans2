@@ -10,9 +10,33 @@ import {StockOrder, StockOrderItem} from "../../utils/types/stockTypes"
 import styled from "styled-components"
 import moment from "moment"
 import {useMediaQuery} from "react-responsive"
+import {useEffect, useState} from "react"
+import {
+	QueryEndAtConstraint,
+	QueryStartAtConstraint,
+	endAt,
+	orderBy,
+	startAt,
+} from "firebase/firestore"
 export const OrderHistoryTable = () => {
 	const isMobile = useMediaQuery({query: "(max-width: 1224px)"})
-	const {data, refetch} = useFBFetch<StockOrder>(fbCollections.sp2Order)
+	const [currentPage, setCurrentPage] = useState(1)
+	const [pageSize, setPageSize] = useState(10)
+	const [cursor, setCursor] = useState<
+		QueryStartAtConstraint | QueryEndAtConstraint
+	>()
+
+	const {data, refetch, firstDoc, lastDoc} = useFBFetch<StockOrder>(
+		fbCollections.sp2Order,
+		undefined,
+		orderBy("dateTime", "desc"),
+		pageSize,
+		cursor,
+	)
+
+	useEffect(() => {
+		console.log(data)
+	}, [data])
 
 	const columnHelper = createColumnHelper<StockOrder>()
 
@@ -81,46 +105,76 @@ export const OrderHistoryTable = () => {
 		data: data.sort((a, b) => parseInt(b.dateTime) - parseInt(a.dateTime)),
 		getCoreRowModel: getCoreRowModel(),
 	})
+	useEffect(() => {
+		console.log(currentPage)
+	}, [currentPage])
+	useEffect(() => {
+		refetch()
+	}, [cursor])
 	return (
-		<table>
-			<thead>
-				{t.getHeaderGroups().map((hGroup) => {
-					return (
-						<tr key={hGroup.id}>
-							{hGroup.headers.map((header) => {
-								return (
-									<StyledHeader key={header.id} colSpan={header.colSpan}>
-										{header.isPlaceholder
-											? "-"
-											: flexRender(
-													header.column.columnDef.header,
-													header.getContext(),
-											  )}
-									</StyledHeader>
-								)
-							})}
-						</tr>
-					)
-				})}
-			</thead>
-			<tbody>
-				{t.getRowModel().rows.map((row) => {
-					return (
-						<tr key={row.id}>
-							{row.getVisibleCells().map((cell) => {
-								return (
-									<StyledCell key={cell.id}>
-										{flexRender(cell.column.columnDef.cell, cell.getContext())}
-									</StyledCell>
-								)
-							})}
-						</tr>
-					)
-				})}
-			</tbody>
-		</table>
+		<div>
+			<div style={{display: "flex"}}>
+				<button
+					onClick={() => {
+						if (currentPage > 1) {
+							setCurrentPage(currentPage - 1)
+							setCursor(endAt(firstDoc))
+						}
+					}}>
+					{"<"}
+				</button>
+				<button
+					onClick={() => {
+						setCurrentPage(currentPage + 1)
+						setCursor(startAt(lastDoc))
+					}}>
+					{">"}
+				</button>
+			</div>
+			<table>
+				<thead>
+					{t.getHeaderGroups().map((hGroup) => {
+						return (
+							<tr key={hGroup.id}>
+								{hGroup.headers.map((header) => {
+									return (
+										<StyledHeader key={header.id} colSpan={header.colSpan}>
+											{header.isPlaceholder
+												? "-"
+												: flexRender(
+														header.column.columnDef.header,
+														header.getContext(),
+												  )}
+										</StyledHeader>
+									)
+								})}
+							</tr>
+						)
+					})}
+				</thead>
+				<tbody>
+					{t.getRowModel().rows.map((row) => {
+						return (
+							<tr key={row.id}>
+								{row.getVisibleCells().map((cell) => {
+									return (
+										<StyledCell key={cell.id}>
+											{flexRender(
+												cell.column.columnDef.cell,
+												cell.getContext(),
+											)}
+										</StyledCell>
+									)
+								})}
+							</tr>
+						)
+					})}
+				</tbody>
+			</table>
+		</div>
 	)
 }
+
 const StyledHeader = styled.th`
 	border-right: 1px solid #afafaf;
 	border-bottom: 1px solid #afafaf;

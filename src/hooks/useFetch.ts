@@ -1,11 +1,14 @@
 import {
 	DocumentData,
 	QueryFieldFilterConstraint,
-	QueryLimitConstraint,
 	QueryOrderByConstraint,
 	and,
 	getDocs,
 	query,
+	limit,
+	QueryDocumentSnapshot,
+	QueryStartAtConstraint,
+	QueryEndAtConstraint,
 } from "firebase/firestore"
 import {useCallback, useEffect, useState} from "react"
 import {getCollection} from "../utils/consts/functions"
@@ -25,18 +28,30 @@ const useFBFetch = <T extends FB>(
 	collection: string,
 	conditions?: QueryFieldFilterConstraint[],
 	orderBy?: QueryOrderByConstraint,
-	limit?: QueryLimitConstraint,
+	limitValue?: number,
+	startOrEndAt?: QueryStartAtConstraint | QueryEndAtConstraint,
 ) => {
 	const db = getCollection(collection)
+	let q = conditions ? query(db, and(...conditions)) : db
+	if (orderBy) {
+		q = query(q, orderBy)
+	}
+	if (startOrEndAt) q = query(q, startOrEndAt)
 
-	const q = conditions ? query(db, and(...conditions)) : db
+	if (limitValue) q = query(q, limit(limitValue))
+
 	const [data, setData] = useState<T[]>([])
 	const [loading, setLoading] = useState(false)
-
+	const [firstDoc, setFirstDoc] =
+		useState<QueryDocumentSnapshot<DocumentData, DocumentData>>()
+	const [lastDoc, setLastDoc] =
+		useState<QueryDocumentSnapshot<DocumentData, DocumentData>>()
 	const getThem = useCallback(async () => {
 		setLoading(true)
-		console.log("호출합니다")
+		console.log("호출합니다", q)
 		const result = await getDocs(q)
+		setFirstDoc(result.docs[0])
+		setLastDoc(result.docs[result.docs.length - 1])
 		const list: T[] = []
 		result.forEach((doc: DocumentData) => {
 			let datum = {...doc.data(), docId: doc.id}
@@ -54,7 +69,7 @@ const useFBFetch = <T extends FB>(
 
 	const refetch = getThem
 
-	return {data, loading, refetch}
+	return {data, loading, refetch, firstDoc, lastDoc}
 }
 
 export default useFBFetch

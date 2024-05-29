@@ -96,7 +96,7 @@ export default function PresetScreen() {
 		fbCollections.sp2Storage,
 		[],
 		orderBy("uploadTime"),
-		limit(20),
+		20,
 	)
 
 	const [xlsxData, setXlsxData] = useState<XlsxStoreType[]>([])
