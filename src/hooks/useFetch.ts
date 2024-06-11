@@ -29,16 +29,17 @@ const useFBFetch = <T extends FB>(
 	conditions?: QueryFieldFilterConstraint[],
 	orderBy?: QueryOrderByConstraint,
 	limitValue?: number,
-	startOrEndAt?: QueryStartAtConstraint | QueryEndAtConstraint,
+	cursor?: QueryStartAtConstraint | QueryEndAtConstraint,
 ) => {
 	const db = getCollection(collection)
 	let q = conditions ? query(db, and(...conditions)) : db
 	if (orderBy) {
 		q = query(q, orderBy)
 	}
-	if (startOrEndAt) q = query(q, startOrEndAt)
-
 	if (limitValue) q = query(q, limit(limitValue))
+	if (cursor) {
+		q = query(q, cursor)
+	}
 
 	const [data, setData] = useState<T[]>([])
 	const [loading, setLoading] = useState(false)
@@ -69,7 +70,13 @@ const useFBFetch = <T extends FB>(
 
 	const refetch = getThem
 
-	return {data, loading, refetch, firstDoc, lastDoc}
+	return {
+		data,
+		loading,
+		refetch,
+		firstDoc,
+		lastDoc,
+	}
 }
 
 export default useFBFetch

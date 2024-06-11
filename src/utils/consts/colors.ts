@@ -16,8 +16,8 @@ export const fontColors = {
 
 export const cardColors = {
 	red: "#dc143c",
-	brightred: "#E9573E",
-	orange: "#ffab45",
+	orange: "#E9573E",
+	yellow: "#ffab45",
 	brown: "#853123",
 	lightblue: "#4777bf",
 	black: "#060708",

@@ -1,4 +1,10 @@
+import {useEffect, useMemo, useRef, useState} from "react"
 import toast, {Toaster} from "react-hot-toast"
+import {AiFillSetting} from "react-icons/ai"
+import {FaShoppingCart} from "react-icons/fa"
+import {useMediaQuery} from "react-responsive"
+import {useNavigate} from "react-router-dom"
+import styled from "styled-components"
 import {
 	addCategory,
 	addOrder,
@@ -8,24 +14,18 @@ import {
 	updateProduct,
 	updateProductsAfterOrder,
 } from "../../apis/stockApi"
-import {backgroundColors, cardColors} from "../../utils/consts/colors"
-import "./button.css"
-import "./modal.css"
-import "./cart.css"
+import {StockModal} from "../../components/stock-section/stockModal"
 import useFBFetch from "../../hooks/useFetch"
+import {backgroundColors, cardColors} from "../../utils/consts/colors"
 import {fbCollections} from "../../utils/consts/constants"
 import {
 	StockCategory,
 	StockOrderItem,
 	StockProduct,
 } from "../../utils/types/stockTypes"
-import {useEffect, useMemo, useRef, useState} from "react"
-import {StockModal} from "../../components/stock-section/stockModal"
-import {useNavigate} from "react-router-dom"
-import {AiFillSetting} from "react-icons/ai"
-import {useMediaQuery} from "react-responsive"
-import styled from "styled-components"
-import {FaShoppingCart} from "react-icons/fa"
+import "./button.css"
+import "./cart.css"
+import "./modal.css"
 export const StockScreen = () => {
 	const navigate = useNavigate()
 	const [isEditMode, setEditMode] = useState(false)
@@ -145,6 +145,18 @@ export const StockScreen = () => {
 				setNewPrdName("")
 				setNewPrdCnt(0)
 				refetch()
+				addOrder(
+					[
+						{
+							catId: currentId,
+							prdName: newPrdName,
+							change: newPrdCnt,
+							curStock: newPrdCnt,
+							catName: currentCat,
+						},
+					],
+					"새상품 추가",
+				)
 			})
 	}
 
@@ -156,6 +168,18 @@ export const StockScreen = () => {
 				refetch()
 				setOrderList([])
 				setShowEditModal(false)
+				addOrder(
+					[
+						{
+							catId: currentId,
+							prdName: pd.prdName,
+							change: pd.prdCnt * -1,
+							curStock: 0,
+							catName: currentCat,
+						},
+					],
+					"상품 삭제",
+				)
 			})
 		}
 	}
@@ -224,6 +248,12 @@ export const StockScreen = () => {
 			setCurrentId(docId)
 			setNewPrdName(pd.prdName)
 			setNewPrdCnt(pd.prdCnt)
+			if (pd.color) {
+				const idx: number = Object.values(cardColors).indexOf(pd.color)
+				console.log("idx", idx)
+
+				setColorNumber(idx ? idx : 0)
+			}
 		} else {
 			if (pd.prdCnt === 0) {
 				toast.error("재고가 없습니다.")
@@ -299,6 +329,11 @@ export const StockScreen = () => {
 		}
 	}
 
+	const onProductCountChange = (e: any) => {
+		const v = e.target.value === "" ? 0 : parseInt(e.target.value, 10)
+		setNewPrdCnt(v)
+	}
+
 	const onColorSelectorClick = () => {
 		if (colorNumber < 5) setColorNumber(colorNumber + 1)
 		else setColorNumber(0)
@@ -345,7 +380,7 @@ export const StockScreen = () => {
 				onClick={() => setShowOrderModal(true)}
 				className="cart-icon-container"
 				ref={cartIconRef}>
-				<FaShoppingCart style={{width: "100%"}} />
+				<FaShoppingCart style={{width: "100%", height: "50%"}} />
 				<span>
 					{orderList.reduce((acc, cur) => {
 						return (acc -= cur.change)
@@ -438,7 +473,7 @@ export const StockScreen = () => {
 					</ModalLineDiv>
 					<ModalLineDiv>
 						<p style={{width: "6rem", textAlign: "center", margin: "0"}}>
-							컬러(hex)
+							컬러
 						</p>
 						<button
 							style={{
@@ -494,7 +529,7 @@ export const StockScreen = () => {
 								style={{width: "3rem", minWidth: "4rem"}}
 								type="text"
 								value={newPrdCnt}
-								onChange={(e) => setNewPrdCnt(parseInt(e.target.value))}
+								onChange={(e) => onProductCountChange(e)}
 								placeholder="수량"
 							/>
 							<button
@@ -506,7 +541,7 @@ export const StockScreen = () => {
 					</ModalLineDiv>
 					<ModalLineDiv>
 						<p style={{width: "6rem", textAlign: "center", margin: "0"}}>
-							컬러(hex)
+							컬러
 						</p>
 						<button
 							style={{
@@ -697,12 +732,16 @@ export const StockScreen = () => {
 									overflowY: "hidden",
 									msOverflowStyle: isMobile ? "none" : "scrollbar",
 									scrollbarWidth: isMobile ? "none" : "thin",
+									borderBottom: "1px black solid",
+									paddingBottom: "4px",
+									marginBottom: "4px",
+									backgroundColor: "#fafafa",
 								}}>
 								{datum.products &&
 									datum.products
 										.sort((a, b) => a.prdOrder - b.prdOrder)
 										.map((pd, idx) => (
-											<div>
+											<div style={{display: "flex", width: "auto"}}>
 												<button
 													className="btn-two orange large"
 													style={{
@@ -754,16 +793,23 @@ export const StockScreen = () => {
 								)}
 							</div>
 							{isEditMode && idx < data.length - 1 && (
-								<button
-									style={{width: "20%"}}
-									onClick={() =>
-										onExchangeCategoryOrderClick(
-											data[idx].docId,
-											data[idx + 1].docId,
-										)
-									}>
-									↕
-								</button>
+								<div
+									style={{
+										display: "flex",
+										width: "100%",
+										justifyContent: "center",
+									}}>
+									<button
+										style={{width: "40%"}}
+										onClick={() =>
+											onExchangeCategoryOrderClick(
+												data[idx].docId,
+												data[idx + 1].docId,
+											)
+										}>
+										↕
+									</button>
+								</div>
 							)}
 						</div>
 					))}

@@ -15,28 +15,18 @@ import {
 	QueryEndAtConstraint,
 	QueryStartAtConstraint,
 	endAt,
+	endBefore,
 	orderBy,
+	startAfter,
 	startAt,
 } from "firebase/firestore"
-export const OrderHistoryTable = () => {
+
+type TableData = {
+	data: StockOrder[]
+}
+export const OrderHistoryTable = (props: TableData) => {
+	const {data} = props
 	const isMobile = useMediaQuery({query: "(max-width: 1224px)"})
-	const [currentPage, setCurrentPage] = useState(1)
-	const [pageSize, setPageSize] = useState(10)
-	const [cursor, setCursor] = useState<
-		QueryStartAtConstraint | QueryEndAtConstraint
-	>()
-
-	const {data, refetch, firstDoc, lastDoc} = useFBFetch<StockOrder>(
-		fbCollections.sp2Order,
-		undefined,
-		orderBy("dateTime", "desc"),
-		pageSize,
-		cursor,
-	)
-
-	useEffect(() => {
-		console.log(data)
-	}, [data])
 
 	const columnHelper = createColumnHelper<StockOrder>()
 
@@ -70,11 +60,12 @@ export const OrderHistoryTable = () => {
 				}, init)
 				const a = Object.entries(g).map((value) => {
 					return (
-						<div>
+						<div key={value[0]}>
 							<h4>{value[0]}</h4>
 							<div>
 								{value[1].map((v) => (
 									<div
+										key={v.catId + v.prdName}
 										style={{
 											display: "flex",
 											flexDirection: "row",
@@ -102,35 +93,20 @@ export const OrderHistoryTable = () => {
 
 	const t = useReactTable({
 		columns: columns,
-		data: data.sort((a, b) => parseInt(b.dateTime) - parseInt(a.dateTime)),
+		data: data
+			// .slice(0, -1)
+			.sort((a, b) => parseInt(b.dateTime) - parseInt(a.dateTime)),
 		getCoreRowModel: getCoreRowModel(),
 	})
-	useEffect(() => {
-		console.log(currentPage)
-	}, [currentPage])
-	useEffect(() => {
-		refetch()
-	}, [cursor])
+
 	return (
-		<div>
-			<div style={{display: "flex"}}>
-				<button
-					onClick={() => {
-						if (currentPage > 1) {
-							setCurrentPage(currentPage - 1)
-							setCursor(endAt(firstDoc))
-						}
-					}}>
-					{"<"}
-				</button>
-				<button
-					onClick={() => {
-						setCurrentPage(currentPage + 1)
-						setCursor(startAt(lastDoc))
-					}}>
-					{">"}
-				</button>
-			</div>
+		<div
+			style={{
+				display: "flex",
+				flexDirection: "column",
+				width: "100vw",
+				justifyContent: "center",
+			}}>
 			<table>
 				<thead>
 					{t.getHeaderGroups().map((hGroup) => {
