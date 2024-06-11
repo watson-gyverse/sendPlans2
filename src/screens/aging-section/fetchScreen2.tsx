@@ -10,7 +10,7 @@ import AgingModal from "../../components/aging-section/agingModal"
 import {AgingEditContextType} from "../../contexts/agingEditContext"
 import {backgroundColors} from "../../utils/consts/colors"
 import {fbCollections, xlsxAgingHeaders} from "../../utils/consts/constants"
-import {sortAgingItems} from "../../utils/consts/functions"
+import {sortAgingItems, sortArray} from "../../utils/consts/functions"
 import {MeatInfoWithEntry, XlsxAgingType} from "../../utils/types/meatTypes"
 import {AgingScreen} from "./agingScreen"
 import useFBFetch from "../../hooks/useFetch"
@@ -149,7 +149,9 @@ export const FetchScreen2 = () => {
 			acc[key] ? acc[key].push(cur) : (acc[key] = [cur])
 			return acc
 		}, init)
-		const converted = sortArray(Object.values(reducedS))
+		const converted = sortArray(Object.values(reducedS), [
+			(item) => item.entry.split("/")[0],
+		])
 		setStoredItems([...converted])
 	}, [rawItems])
 
@@ -169,15 +171,15 @@ export const FetchScreen2 = () => {
 		setRawItems(sorted)
 	}, [recentMeatInfo])
 
-	function sortArray(oArray: MeatInfoWithEntry[][]): MeatInfoWithEntry[][] {
-		const newArray: MeatInfoWithEntry[][] = []
-		oArray.forEach((array) => {
-			const converted = _.sortBy(array, (item) => item.entry.split("/")[0])
-			console.log(converted)
-			newArray.push(converted)
-		})
-		return newArray
-	}
+	// function sortArray(oArray: MeatInfoWithEntry[][]): MeatInfoWithEntry[][] {
+	// 	const newArray: MeatInfoWithEntry[][] = []
+	// 	oArray.forEach((array) => {
+	// 		const converted = _.sortBy(array, (item) => item.entry.split("/")[0])
+	// 		console.log(converted)
+	// 		newArray.push(converted)
+	// 	})
+	// 	return newArray
+	// }
 
 	useEffect(() => {
 		console.log(whichTab)

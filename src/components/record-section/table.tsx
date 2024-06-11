@@ -67,20 +67,20 @@ export const RecordTable = (props: IRecordTable) => {
 			.sort((a, b) => {
 				if (a.storedDate !== b.storedDate) {
 					return (
-						parseToDate(a.storedDate).getTime() -
-						parseToDate(b.storedDate).getTime()
+						parseToDate(b.storedDate).getTime() -
+						parseToDate(a.storedDate).getTime()
 					)
 				} else {
 					if (a.agingDate !== b.agingDate) {
 						return (
-							parseToDate(a.agingDate).getTime() -
-							parseToDate(b.agingDate).getTime()
+							parseToDate(b.agingDate).getTime() -
+							parseToDate(a.agingDate).getTime()
 						)
 					} else {
 						if (a.cutDate !== b.cutDate) {
 							return (
-								parseToDate(a.cutDate).getTime() -
-								parseToDate(b.cutDate).getTime()
+								parseToDate(b.cutDate).getTime() -
+								parseToDate(a.cutDate).getTime()
 							)
 						}
 						return Number(a.entry) - Number(b.entry)

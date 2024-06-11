@@ -2,13 +2,18 @@ import {where} from "firebase/firestore"
 import useFBFetch from "../../hooks/useFetch"
 import {fbCollections} from "../../utils/consts/constants"
 import {MeatInfoAiO} from "../../utils/types/meatTypes"
-import {AgingFinishCard} from "../../components/aging-section/agingFinishCard"
+import {
+	AgingCardsTab,
+	AgingFinishCard,
+} from "../../components/aging-section/agingFinishCard"
 import {useEffect, useState} from "react"
 import {deleteFromAgingFridge} from "../../apis/agingApi"
 import FinishAgingModal from "../../components/aging-section/agingFinishModal"
 import toast, {Toaster} from "react-hot-toast"
 import {Stack} from "react-bootstrap"
 import {useLocation} from "react-router-dom"
+import _ from "lodash"
+import {sortArray} from "../../utils/consts/functions"
 
 interface IAgingScreen {
 	place: string
@@ -30,6 +35,7 @@ export const AgingScreen = (props: IAgingScreen) => {
 			  ]
 			: [where("place", "==", props.place)],
 	)
+	const [agingItems, setAgingItems] = useState<MeatInfoAiO[][]>()
 	const [recentItem, setRecentItem] = useState<MeatInfoAiO>()
 
 	const [finishModalShow, setFinishModalShow] = useState(false)
@@ -60,30 +66,63 @@ export const AgingScreen = (props: IAgingScreen) => {
 			toast("입고 상태인 항목이 없어\n숙성 중 탭으로 이동했습니다")
 		}
 		setIsInitialized(true)
+
+		let init: {[index: string]: Array<MeatInfoAiO>} = {}
+		const reducedA = data.reduce((acc, cur) => {
+			let key = cur.meatNumber + cur.cut
+			acc[key] ? acc[key].push(cur) : (acc[key] = [cur])
+			return acc
+		}, init)
+		const converted = sortArray(Object.values(reducedA), [
+			(item) => item.storedDate,
+			(item) => item.agingDate,
+		])
+		setAgingItems([...converted])
 	}, [data])
+
+	// function sortArray(oArray: MeatInfoAiO[][]): MeatInfoAiO[][] {
+	// 	const newArray: MeatInfoAiO[][] = []
+	// 	oArray.forEach((array) => {
+	// 		const converted = _.sortBy(array,[ (item) => item.storedDate,(item=>item.agingDate)])
+
+	// 		newArray.push(converted)
+	// 	})
+	// 	return newArray
+	// }
+
+	useEffect(() => {
+		console.log(agingItems)
+	}, [agingItems])
+
+	const handleClickEvent = (item: MeatInfoAiO) => {
+		setRecentItem(item)
+		setFinishModalShow(true)
+	}
+	const handleClickDelete = (item: MeatInfoAiO) => {
+		onClickAgingDeleteButton(item)
+	}
+
 	return (
 		<Stack gap={2}>
 			<Toaster />
-			{data.map((item) => {
-				return (
-					<div key={item.docId}>
-						<div
-							style={{
-								width: "100%",
-							}}>
-							<AgingFinishCard
-								meatInfo={item}
-								isEditMode={props.isEditMode}
-								clickEvent={() => {
-									setRecentItem(item)
-									setFinishModalShow(true)
-								}}
-								onClickDelete={() => onClickAgingDeleteButton(item)}
-							/>
-						</div>
-					</div>
-				)
-			})}
+			<div
+				style={{
+					display: "flex",
+					flexDirection: "column",
+					justifyContent: "center",
+				}}>
+				{agingItems &&
+					agingItems.map((items) => (
+						// items.map((item) => <h1>{item.cut}</h1>),
+						<AgingCardsTab
+							data={items}
+							isEditMode={props.isEditMode}
+							clickEvent={handleClickEvent}
+							onClickDelete={handleClickDelete}
+						/>
+					))}
+			</div>
+
 			{recentItem && finishModalShow && (
 				<FinishAgingModal
 					meatInfo={recentItem}

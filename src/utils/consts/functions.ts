@@ -158,3 +158,15 @@ export function storingXlsxData(items: MeatInfoWithCount[]): XlsxStoreType[] {
 	}
 	return list
 }
+export function sortArray<T>(
+	oArray: T[][],
+	iteratees: _.Many<_.ListIteratee<T>>[],
+): T[][] {
+	const newArray: T[][] = []
+	oArray.forEach((array) => {
+		const converted = _.sortBy(array, ...iteratees)
+
+		newArray.push(converted)
+	})
+	return newArray
+}

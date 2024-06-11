@@ -1,21 +1,71 @@
 import {Button, Stack} from "react-bootstrap"
-import toast from "react-hot-toast"
 import {MeatInfoAiO, MeatInfoWithEntry} from "../../utils/types/meatTypes"
 import {TiDeleteOutline} from "react-icons/ti"
 import {backgroundColors} from "../../utils/consts/colors"
+import {useEffect, useState} from "react"
 
 type AgingCardType = {
 	meatInfo: MeatInfoAiO
 	isEditMode: boolean
-	clickEvent: () => void
+	clickEvent: (meatInfo: MeatInfoAiO) => void
 	onClickDelete: (meatInfo: MeatInfoAiO) => void
+}
+
+type AgingTabType = {
+	data: MeatInfoAiO[]
+	isEditMode: boolean
+	clickEvent: (item: MeatInfoAiO) => void
+	onClickDelete: (meatInfo: MeatInfoAiO) => void
+}
+
+export const AgingCardsTab = (props: AgingTabType) => {
+	const [show, setShow] = useState(false)
+
+	return (
+		<div>
+			<div
+				style={{
+					border: "1px black solid",
+					padding: "4px",
+					marginTop: "4px",
+					marginBottom: "4px",
+					backgroundColor: backgroundColors.agedCard,
+					borderRadius: "6px",
+				}}
+				onClick={() => setShow(!show)}>
+				{props.data[0].meatNumber} {props.data[0].cut}
+				<br />첫 입고일
+				{props.data[0].storedDate}
+			</div>
+			<div
+				style={{
+					display: show ? "flex" : "none",
+					flexDirection: "column",
+					justifyContent: "center",
+				}}>
+				{props.data.map((item) => (
+					<AgingFinishCard
+						meatInfo={item}
+						isEditMode={props.isEditMode}
+						clickEvent={props.clickEvent}
+						onClickDelete={props.onClickDelete}
+					/>
+				))}
+			</div>
+		</div>
+	)
 }
 
 export const AgingFinishCard = (props: AgingCardType) => {
 	const {meatInfo, isEditMode, clickEvent, onClickDelete} = props
 
 	return (
-		<div>
+		<div
+			style={{
+				display: "flex",
+				flexDirection: "column",
+				alignItems: "center",
+			}}>
 			{meatInfo && (
 				<div
 					style={{
@@ -96,7 +146,7 @@ export const AgingFinishCard = (props: AgingCardType) => {
 									height: "80px",
 									padding: 0,
 								}}
-								onClick={clickEvent}
+								onClick={() => clickEvent(meatInfo)}
 								variant="danger">
 								결과
 								<br />
