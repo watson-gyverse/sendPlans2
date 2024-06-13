@@ -40,16 +40,27 @@ const columns = [
 				id: "species",
 				cell: (info) => info.getValue(),
 				header: () => "육종",
+				filterFn: "equalsString",
+				enableSorting: false,
+				meta: {
+					filterVariant: "select",
+				},
 			}),
 			columnHelper.accessor("cut", {
 				id: "cut",
 				cell: (info) => info.getValue(),
 				header: () => "부위",
+				filterFn: "equalsString",
+				enableSorting: false,
+				meta: {
+					filterVariant: "select",
+				},
 			}),
 			columnHelper.accessor("grade", {
 				id: "grade",
 				cell: (info) => info.getValue(),
 				header: () => "등급",
+				filterFn: "equalsString",
 			}),
 			columnHelper.accessor("price", {
 				id: "price",
@@ -60,6 +71,7 @@ const columns = [
 				id: "gender",
 				cell: (info) => info.getValue(),
 				header: () => "암수",
+				enableSorting: false,
 			}),
 		],
 	}),
@@ -68,40 +80,47 @@ const columns = [
 		columns: [
 			columnHelper.accessor("beforeWeight", {
 				id: "beforeWeight",
-				cell: (info) => info.getValue(),
+				cell: (info) => info.getValue() + "g",
 				header: () => "입고",
+				enableColumnFilter: false,
 			}),
 			columnHelper.accessor("afterWeight", {
 				id: "afterWeight",
-				cell: (info) => info.getValue(),
+				cell: (info) => info.getValue() + "g",
 				header: () => "숙성후",
+				enableColumnFilter: false,
 			}),
 			columnHelper.accessor("cutWeight", {
 				id: "cutWeight",
-				cell: (info) => info.getValue(),
+				cell: (info) => info.getValue() + "g",
 				header: () => "손질후",
+				enableColumnFilter: false,
 			}),
 			columnHelper.accessor("loss", {
 				id: "loss",
 				cell: (info) => info.getValue(),
 				header: () => "숙성로스",
+				enableColumnFilter: false,
 			}),
 
 			columnHelper.accessor("lossP", {
 				id: "lossP",
 				cell: (info) => info.getValue(),
 				header: () => "숙성로스%",
+				enableColumnFilter: false,
 			}),
 
 			columnHelper.accessor("cutLoss", {
 				id: "cutLoss",
 				cell: (info) => info.getValue(),
 				header: () => "최종로스",
+				enableColumnFilter: false,
 			}),
 			columnHelper.accessor("cutLossP", {
 				id: "cutLossP",
 				cell: (info) => info.getValue(),
 				header: () => "최종로스%",
+				enableColumnFilter: false,
 			}),
 		],
 	}),

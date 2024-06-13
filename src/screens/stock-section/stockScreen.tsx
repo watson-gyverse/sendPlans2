@@ -116,22 +116,13 @@ export const StockScreen = () => {
 		data
 			.filter((datum) => datum.docId === currentId)
 			.forEach((datum) => {
-				console.log("docid: ", datum.docId)
-
-				console.log("pds: ", datum.products)
-
 				datum.products.forEach((prd) => {
-					console.log("prev: ", prd.prdOrder, ", max: ", max)
-					console.log(prd.prdOrder > max)
-
 					if (prd.prdOrder > max) {
 						max = prd.prdOrder
-						console.log("max: ", max)
 					}
 				})
 			})
 
-		console.log("final max : ", max)
 		newPrdName &&
 			updateProduct(
 				currentId,
@@ -185,7 +176,16 @@ export const StockScreen = () => {
 	}
 
 	const onModifyProductClick = (pd: StockProduct) => {
-		console.log(currentId, newPrdName, newPrdCnt, pd.prdName)
+		if (
+			currentPrd &&
+			newPrdCnt === currentPrd.prdCnt &&
+			newPrdName === currentPrd.prdName &&
+			currentPrd.color === Object.values(cardColors)[colorNumber]
+		) {
+			console.log("수정사항 없음")
+			toast.error("수정사항 없음")
+			return
+		}
 		deleteProduct(currentId, {
 			prdOrder: pd.prdOrder,
 			prdName: pd.prdName,
@@ -221,8 +221,6 @@ export const StockScreen = () => {
 	}
 
 	const onExchangeCategoryOrderClick = (nCatId: string, sCatId: string) => {
-		console.log("nCId", nCatId)
-		console.log("sId", sCatId)
 		exchangeCategoryOrder(nCatId, sCatId).then(() => {
 			toast.success("변경완료")
 			refetch()
@@ -250,7 +248,6 @@ export const StockScreen = () => {
 			setNewPrdCnt(pd.prdCnt)
 			if (pd.color) {
 				const idx: number = Object.values(cardColors).indexOf(pd.color)
-				console.log("idx", idx)
 
 				setColorNumber(idx ? idx : 0)
 			}
@@ -280,12 +277,7 @@ export const StockScreen = () => {
 					curStock: 0,
 				}
 				newOrder.curStock = pd.prdCnt + newOrder.change
-				console.log(
-					pd.prdCnt,
-					existing.change,
-					newOrder.change,
-					newOrder.curStock,
-				)
+
 				newOrderList.push(newOrder)
 
 				setOrderList(newOrderList)
@@ -313,7 +305,6 @@ export const StockScreen = () => {
 			const cnt = orderList.reduce((prev, curr) => {
 				return curr.change + prev
 			}, 0)
-			console.log(cnt)
 			addOrder(orderList, memo).then(async (result) => {
 				// 주문 후 재고 업데이트
 				updateProductsAfterOrder(orderList).then(() => {
@@ -345,16 +336,11 @@ export const StockScreen = () => {
 	}
 	const cartIconRef = useRef<HTMLDivElement>(null)
 	useEffect(() => {
-		console.log("움직여다오", cartIconRef)
-
 		if (cartIconRef.current) {
-			console.log("add")
-
 			cartIconRef.current.classList.add("bounce")
 		}
 		const cleanUpAnimation = () => {
 			if (cartIconRef.current) {
-				console.log("remove")
 				cartIconRef.current.classList.remove("bounce")
 			}
 		}

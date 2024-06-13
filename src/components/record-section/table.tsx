@@ -1,15 +1,20 @@
-import {flexRender, getCoreRowModel, useReactTable} from "@tanstack/react-table"
-import useFBFetch from "../../hooks/useFetch"
+import {
+	ColumnFiltersState,
+	SortingState,
+	flexRender,
+	getCoreRowModel,
+	getFacetedRowModel,
+	getFacetedUniqueValues,
+	getFilteredRowModel,
+	getSortedRowModel,
+	useReactTable,
+} from "@tanstack/react-table"
 import {MeatInfoAiO, MeatTableData} from "../../utils/types/meatTypes"
-import {fbCollections} from "../../utils/consts/constants"
 import {useEffect, useState} from "react"
 import columns from "./columns"
-import {
-	ThreeStepComma,
-	parseToDate,
-	sortMeatInfoArray,
-} from "../../utils/consts/functions"
+import {ThreeStepComma, parseToDate} from "../../utils/consts/functions"
 import styled from "styled-components"
+import {TableHeader} from "./tableHeader"
 
 interface IRecordTable {
 	data: MeatInfoAiO[]
@@ -18,6 +23,8 @@ interface IRecordTable {
 export const RecordTable = (props: IRecordTable) => {
 	const {data} = props
 	const [tableData, setTableData] = useState<MeatTableData[]>([])
+	const [sorting, setSorting] = useState<SortingState>([])
+	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
 	useEffect(() => {
 		const added = data
@@ -93,7 +100,18 @@ export const RecordTable = (props: IRecordTable) => {
 	const t = useReactTable({
 		columns: columns,
 		data: tableData,
+		state: {
+			sorting,
+			columnFilters,
+		},
+		enableMultiSort: true,
+		onSortingChange: setSorting,
+		onColumnFiltersChange: setColumnFilters,
 		getCoreRowModel: getCoreRowModel(),
+		getSortedRowModel: getSortedRowModel(),
+		getFilteredRowModel: getFilteredRowModel(),
+		getFacetedRowModel: getFacetedRowModel(),
+		getFacetedUniqueValues: getFacetedUniqueValues(),
 	})
 	return (
 		<table>
@@ -102,16 +120,7 @@ export const RecordTable = (props: IRecordTable) => {
 					return (
 						<tr key={hGroup.id}>
 							{hGroup.headers.map((header) => {
-								return (
-									<TableHeader key={header.id} colSpan={header.colSpan}>
-										{header.isPlaceholder
-											? "-"
-											: flexRender(
-													header.column.columnDef.header,
-													header.getContext(),
-											  )}
-									</TableHeader>
-								)
+								return <TableHeader header={header} table={t} />
 							})}
 						</tr>
 					)
@@ -131,15 +140,6 @@ export const RecordTable = (props: IRecordTable) => {
 		</table>
 	)
 }
-
-const TableHeader = styled.th`
-	text-align: center;
-	background-color: "#f0cb26";
-	padding: 6px;
-	border: 1px solid black;
-	text-weight: bold;
-	text-size: 1.1rem;
-`
 
 const TableCell = styled.td`
 	border: 1px solid black;

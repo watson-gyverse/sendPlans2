@@ -80,16 +80,6 @@ export const AgingScreen = (props: IAgingScreen) => {
 		setAgingItems([...converted])
 	}, [data])
 
-	// function sortArray(oArray: MeatInfoAiO[][]): MeatInfoAiO[][] {
-	// 	const newArray: MeatInfoAiO[][] = []
-	// 	oArray.forEach((array) => {
-	// 		const converted = _.sortBy(array,[ (item) => item.storedDate,(item=>item.agingDate)])
-
-	// 		newArray.push(converted)
-	// 	})
-	// 	return newArray
-	// }
-
 	useEffect(() => {
 		console.log(agingItems)
 	}, [agingItems])

@@ -231,6 +231,7 @@ export async function finishAging(item: MeatInfoAiO, thenWhat: () => void) {
 		finishDate: item.finishDate,
 		afterWeight: item.afterWeight,
 		cutWeight: item.cutWeight,
+		cutDate: item.cutDate,
 	})
 		.then(() => {
 			console.log("숙성종료처리 완료")

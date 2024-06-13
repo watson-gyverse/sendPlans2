@@ -65,6 +65,7 @@ export const AgingFinishCard = (props: AgingCardType) => {
 				display: "flex",
 				flexDirection: "column",
 				alignItems: "center",
+				marginBottom: "3px",
 			}}>
 			{meatInfo && (
 				<div
