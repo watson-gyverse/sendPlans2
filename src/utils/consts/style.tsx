@@ -2,14 +2,14 @@ import {PropsWithChildren} from "react"
 import styled from "styled-components"
 
 interface PortraitProps {
-	bgColor: string
+	bgcolor: string
 	padding: string
 }
 
 export const PortraitDiv = (props: PropsWithChildren<PortraitProps>) => {
 	return (
 		<PortraitContainer>
-			<StyledPortraitDiv bgColor={props.bgColor} padding={props.padding}>
+			<StyledPortraitDiv bgcolor={props.bgcolor} padding={props.padding}>
 				{props.children}
 			</StyledPortraitDiv>
 		</PortraitContainer>
@@ -17,7 +17,7 @@ export const PortraitDiv = (props: PropsWithChildren<PortraitProps>) => {
 }
 
 export const StyledPortraitDiv = styled.div<PortraitProps>`
-	background-color: ${(props) => props.bgColor};
+	background-color: ${(props) => props.bgcolor};
 	padding: ${(props) => props.padding};
 	width: 100%;
 	height: auto;

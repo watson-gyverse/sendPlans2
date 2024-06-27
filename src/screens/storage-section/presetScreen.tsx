@@ -13,7 +13,7 @@ import {backgroundColors} from "../../utils/consts/colors"
 import {DatePickerSet} from "../../components/common/datePickerSet"
 import {PortraitDiv, StyledHeader} from "../../utils/consts/style"
 import useFBFetch from "../../hooks/useFetch"
-import {orderBy} from "firebase/firestore"
+import {limit, orderBy} from "firebase/firestore"
 import {MeatInfoWithEntry, XlsxStoreType} from "../../utils/types/meatTypes"
 import _ from "lodash"
 import * as xlsx from "xlsx"
@@ -96,7 +96,7 @@ export default function PresetScreen() {
 		fbCollections.sp2Storage,
 		[],
 		orderBy("uploadTime"),
-		30,
+		limit(40),
 	)
 
 	const [xlsxData, setXlsxData] = useState<XlsxStoreType[]>([])
@@ -113,17 +113,6 @@ export default function PresetScreen() {
 	const write = useCallback(_.debounce(writeXlsx, 2000), [xlsxData])
 
 	useEffect(() => {
-		console.log(
-			data
-				.filter((item) => "uploadTime" in item)
-				.sort((a, b) =>
-					a.uploadTime && b.uploadTime
-						? b.uploadTime - a.uploadTime
-						: parseToDate(b.storedDate).getTime() -
-						  parseToDate(a.storedDate).getTime(),
-				),
-		)
-		new Date().getDate()
 		const max = data
 			.filter((item) => "uploadTime" in item)
 			.sort((a, b) =>
@@ -148,6 +137,10 @@ export default function PresetScreen() {
 					typeof max === "number" &&
 					new Date(item.uploadTime!).getDate() === new Date(max!).getDate(),
 			)
+			.sort(
+				(a, b) =>
+					parseInt(a.entry.split("/")[0]) - parseInt(b.entry.split("/")[0]),
+			)
 			.map((item) => {
 				return {
 					입고일: item.storedDate,
@@ -167,7 +160,7 @@ export default function PresetScreen() {
 	}, [data])
 
 	return (
-		<PortraitDiv bgColor={backgroundColors.storage_back} padding="30px 10px">
+		<PortraitDiv bgcolor={backgroundColors.storage_back} padding="30px 10px">
 			<Toaster position="top-center" reverseOrder={false} />
 			<StyledHeader>
 				<Button

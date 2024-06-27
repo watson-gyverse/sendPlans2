@@ -17,6 +17,7 @@ import RecordBranchScreen from "./screens/record-section/recordScreen"
 import {StockScreen} from "./screens/stock-section/stockScreen"
 import {OrderHistoryScreen} from "./screens/stock-section/orderHistoryScreen"
 import {SampleFormScreen} from "./screens/form-section/sampleFormScreen"
+import {PyverseScreen} from "./screens/pyverse-section/pyverseScreen"
 
 const router = createBrowserRouter(
 	[
@@ -112,6 +113,7 @@ const router = createBrowserRouter(
 					],
 				},
 				{path: "submit", element: <SampleFormScreen />},
+				{path: "py", element: <PyverseScreen />},
 				{
 					path: "*",
 					element: <ErrorScreen />,

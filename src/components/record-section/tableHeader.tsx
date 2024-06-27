@@ -1,23 +1,15 @@
-import {Filters, Header, Table, flexRender} from "@tanstack/react-table"
+import {Header, flexRender} from "@tanstack/react-table"
 import styled from "styled-components"
 import {MeatTableData} from "../../utils/types/meatTypes"
 import {FaSort, FaSortDown, FaSortUp} from "react-icons/fa"
-import {useEffect, useMemo} from "react"
+import {useMemo} from "react"
 
 type TableHeaderType = {
 	header: Header<MeatTableData, unknown>
-	table: Table<MeatTableData>
 }
 
-export const TableHeader = ({header, table}: TableHeaderType) => {
+export const TableHeader = ({header}: TableHeaderType) => {
 	const columnFilterValue = header.column.getFilterValue()
-	const sortedUniqueValues = useMemo(
-		() => Array.from(header.column.getFacetedUniqueValues().keys()).sort(),
-		[header.column],
-	)
-	useEffect(() => {
-		console.log(sortedUniqueValues)
-	}, [sortedUniqueValues])
 
 	const onFilterChange = (value: any) => {
 		if (value === "null") {
@@ -52,10 +44,15 @@ export const TableHeader = ({header, table}: TableHeaderType) => {
 					<select
 						value={columnFilterValue?.toString()}
 						onChange={({currentTarget: {value}}) => onFilterChange(value)}>
-						<option value="null">선택안함</option>
-						{sortedUniqueValues.map((value) => (
-							<option key={value}>{value}</option>
-						))}
+						<option value="null" key={"null"}>
+							선택안함
+						</option>
+						{Array.from(header.column.getFacetedUniqueValues().keys())
+							.sort()
+							.map((value) => (
+								<option key={value}>{value}</option>
+							))}
+						<span>흑흑</span>
 					</select>
 				) : null}
 			</ColumnFilter>
@@ -68,8 +65,8 @@ const TableHeaderStyle = styled.th`
 	background-color: "#f0cb26";
 	padding: 6px;
 	border: 1px solid black;
-	text-weight: bold;
-	text-size: 1.1rem;
+	font-weight: bold;
+	font-size: 1.1rem;
 `
 const Sorter = styled.div<ISorter>`
 	width: ${(props) => props.width};

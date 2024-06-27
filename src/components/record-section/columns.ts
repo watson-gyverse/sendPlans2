@@ -10,21 +10,25 @@ const columns = [
 				id: "storedDate",
 				cell: (info) => info.getValue(),
 				header: () => "입고",
+				enableColumnFilter: false,
 			}),
 			columnHelper.accessor("agingDate", {
 				id: "agingDate",
 				cell: (info) => info.getValue(),
 				header: () => "숙성 시작",
+				enableColumnFilter: false,
 			}),
 			columnHelper.accessor("finishDate", {
 				id: "finishDate",
 				cell: (info) => info.getValue(),
 				header: () => "숙성 종료",
+				enableColumnFilter: false,
 			}),
 			columnHelper.accessor("cutDate", {
 				id: "cutDate",
 				cell: (info) => info.getValue(),
 				header: () => "손질",
+				enableColumnFilter: false,
 			}),
 			columnHelper.accessor("ultraTime", {
 				id: "ultraTime",
@@ -37,14 +41,12 @@ const columns = [
 		header: "고기",
 		columns: [
 			columnHelper.accessor("species", {
-				id: "species",
-				cell: (info) => info.getValue(),
+				// id: "species",
+				// cell: (info) => info.getValue(),
 				header: () => "육종",
 				filterFn: "equalsString",
-				enableSorting: false,
-				meta: {
-					filterVariant: "select",
-				},
+				size: 70,
+				// enableSorting: false,
 			}),
 			columnHelper.accessor("cut", {
 				id: "cut",
@@ -65,13 +67,15 @@ const columns = [
 			columnHelper.accessor("price", {
 				id: "price",
 				cell: (info) => info.getValue(),
-				header: () => "가격(100g/￦)",
+				header: () => "가격(100g)",
+				enableColumnFilter: false,
 			}),
 			columnHelper.accessor("gender", {
 				id: "gender",
 				cell: (info) => info.getValue(),
 				header: () => "암수",
 				enableSorting: false,
+				filterFn: "equalsString",
 			}),
 		],
 	}),

@@ -5,10 +5,10 @@ import {
 	and,
 	getDocs,
 	query,
-	limit,
 	QueryDocumentSnapshot,
 	QueryStartAtConstraint,
 	QueryEndAtConstraint,
+	QueryLimitConstraint,
 } from "firebase/firestore"
 import {useCallback, useEffect, useState} from "react"
 import {getCollection} from "../utils/consts/functions"
@@ -28,7 +28,7 @@ const useFBFetch = <T extends FB>(
 	collection: string,
 	conditions?: QueryFieldFilterConstraint[],
 	orderBy?: QueryOrderByConstraint,
-	limitValue?: number,
+	limit?: QueryLimitConstraint,
 	cursor?: QueryStartAtConstraint | QueryEndAtConstraint,
 ) => {
 	const db = getCollection(collection)
@@ -36,7 +36,7 @@ const useFBFetch = <T extends FB>(
 	if (orderBy) {
 		q = query(q, orderBy)
 	}
-	if (limitValue) q = query(q, limit(limitValue))
+	if (limit) q = query(q, limit)
 	if (cursor) {
 		q = query(q, cursor)
 	}
@@ -49,7 +49,7 @@ const useFBFetch = <T extends FB>(
 		useState<QueryDocumentSnapshot<DocumentData, DocumentData>>()
 	const getThem = useCallback(async () => {
 		setLoading(true)
-		console.log("호출합니다", q)
+		// console.log("호출합니다", q)
 		const result = await getDocs(q)
 		setFirstDoc(result.docs[0])
 		setLastDoc(result.docs[result.docs.length - 1])

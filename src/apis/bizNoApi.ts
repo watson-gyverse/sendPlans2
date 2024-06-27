@@ -32,7 +32,7 @@ export async function GetFromBizNum(
 
 			return item
 		} else {
-			console.log("널죽이겠다", result.data)
+			console.log("너무하네", result.data)
 			return null
 		}
 	} catch (err) {

@@ -7,6 +7,7 @@ export const RecordPCScreen = (props: IRecordScreen) => {
 
 	return (
 		<LandScapeDiv>
+			<span style={{marginLeft: "5px"}}>※필터 다중 적용은 Shift+클릭</span>
 			<RecordTable data={data} />
 		</LandScapeDiv>
 	)

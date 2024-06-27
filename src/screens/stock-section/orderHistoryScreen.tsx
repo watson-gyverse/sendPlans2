@@ -8,10 +8,12 @@ import {
 	QueryStartAtConstraint,
 	endAt,
 	endBefore,
+	limit,
+	limitToLast,
 	orderBy,
 	startAfter,
 } from "firebase/firestore"
-import {useEffect, useState} from "react"
+import {useEffect, useMemo, useState} from "react"
 
 export const OrderHistoryScreen = () => {
 	const navigate = useNavigate()
@@ -20,11 +22,16 @@ export const OrderHistoryScreen = () => {
 	const [cursor, setCursor] = useState<
 		QueryStartAtConstraint | QueryEndAtConstraint
 	>()
+	const limitation = useMemo(() => {
+		if (cursor instanceof QueryEndAtConstraint) return limitToLast(pageSize)
+		return limit(pageSize)
+	}, [pageSize, cursor])
+
 	const {data, loading, refetch, firstDoc, lastDoc} = useFBFetch<StockOrder>(
 		fbCollections.sp2Order,
 		undefined,
 		orderBy("dateTime", "desc"),
-		pageSize,
+		limitation,
 		cursor,
 	)
 	const onBackClick = () => {
@@ -38,7 +45,8 @@ export const OrderHistoryScreen = () => {
 				setCurrentPage(currentPage - 1)
 			}
 		})
-	}, [cursor])
+	}, [limitation])
+
 	return (
 		<div
 			style={{
@@ -57,7 +65,7 @@ export const OrderHistoryScreen = () => {
 					disabled={loading || currentPage === 1}
 					onClick={() => {
 						if (currentPage > 1) {
-							setCursor(endAt(firstDoc))
+							setCursor(endBefore(firstDoc))
 						}
 					}}>
 					{"<"}

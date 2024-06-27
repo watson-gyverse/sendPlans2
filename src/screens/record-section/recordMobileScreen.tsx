@@ -13,15 +13,13 @@ export interface IRecordScreen {
 }
 
 export default function RecordMobileScreen(props: IRecordScreen) {
-	const navigate = useNavigate()
-	const [filterOpen, setFilterOpen] = useState(true)
 	// const [modalShow, setModalShow] = useState(false)
 	// const data = useFBFetch<MeatInfoAiO>(fbCollections.sp2Record).data
 	const {data} = props
 
 	return (
 		<PortraitDiv
-			bgColor={backgroundColors.record}
+			bgcolor={backgroundColors.record}
 			padding="20px 10px"
 			// style={{
 			// 	backgroundColor: "#f0d286",

@@ -1,0 +1,11 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "uploadToS3",
+			"command": "npm",
+			"args": ["run", "build", "&&", "npm", "run", "s3sync"]
+		}
+	]
+}

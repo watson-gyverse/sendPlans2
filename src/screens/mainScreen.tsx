@@ -13,6 +13,9 @@ import styled from "styled-components"
 import {fbLogout, getAuthentication} from "../utils/Firebase"
 import {StockModal} from "../components/stock-section/stockModal"
 import {LoginUser, addUser, updateUserLogin} from "../apis/userApi"
+import {GetRecentPyverse} from "../apis/pyverseApi"
+import {DebouncedButton} from "../components/common/debouncedButton"
+import _ from "lodash"
 
 export default function MainScreen() {
 	const navigate = useNavigate()
@@ -60,6 +63,9 @@ export default function MainScreen() {
 		// toast("입고/숙성기록\n업데이트 예정")
 
 		navigate("/report")
+	}
+	const naviToPyScreen = () => {
+		navigate("/py")
 	}
 	const naviToConsignScreen = () => {
 		toast.remove()
@@ -110,11 +116,6 @@ export default function MainScreen() {
 		}
 	}
 
-	const onShowingTextChange = (e: any) => {
-		setShowingText(e.target.value)
-		toast("temp")
-	}
-
 	const onRefugeClick = () => {
 		setLoginModalOpen(false)
 		setTempToken("")
@@ -146,7 +147,7 @@ export default function MainScreen() {
 	const [a, seta] = useState(false)
 
 	return (
-		<PortraitDiv bgColor={backgroundColors.base} padding="20px 10px 0px 10px">
+		<PortraitDiv bgcolor={backgroundColors.base} padding="20px 10px 0px 10px">
 			<Toaster />
 			<Stack gap={2} style={{display: "flex", alignItems: "center"}}>
 				<p
@@ -220,10 +221,10 @@ export default function MainScreen() {
 					<Button
 						style={{height: "140px", width: "140px"}}
 						variant="info"
-						onClick={naviToConsignScreen}>
+						onClick={naviToPyScreen}>
 						<VscRocket style={{height: "60px", width: "60px"}} />
 						<br />
-						대량숙성
+						가격조회
 					</Button>
 					<Button
 						style={{height: "140px", width: "140px"}}
@@ -234,9 +235,11 @@ export default function MainScreen() {
 						벌레신고
 					</Button>
 				</StackDiv>
+				{/* <button onClick={naviToPyScreen}>파이</button> */}
 				<button style={{marginTop: "30px"}} onClick={onResetSessionClick}>
 					비상용 세션 초기화
 				</button>
+				<button onClick={naviToConsignScreen}>대량숙성페이지</button>
 				<div
 					style={{
 						display: "flex",
