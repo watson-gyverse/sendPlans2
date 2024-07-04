@@ -77,3 +77,25 @@ const dummyMeatInfo2: MeatInfoWithCount = {
 	uploadTime: null,
 }
 export const dummys = [dummyMeatInfo, dummyMeatInfo2]
+
+export const pyBeefCuts = [
+	"등심",
+	"목심",
+	"부채살",
+	"살치살",
+	"채끝",
+	"토마호크",
+	"티본",
+	"안심",
+]
+
+export const pyPorkCuts = ["삼겹살", "목살", "뼈등심"]
+
+export const pyStores = [
+	"헬로미트",
+	"미트프렌즈",
+	"민속친한우",
+	"라이블리",
+	"금천미트",
+	"ds푸드",
+]

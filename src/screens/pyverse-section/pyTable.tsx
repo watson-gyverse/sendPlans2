@@ -10,10 +10,10 @@ export const PyverseTable = (props: IPyverseTable) => {
 
 	return (
 		<table>
-			<tr>
+			<tr key={"tr"}>
 				{tableData &&
 					Object.keys(tableData[0]).map((datum) => {
-						return <th>{datum}</th>
+						return <th key={datum}>{datum}</th>
 					})}
 			</tr>
 			<tbody>
