@@ -13,7 +13,7 @@ import {fbCollections, xlsxAgingHeaders} from "../../utils/consts/constants"
 import {sortAgingItems, sortArray} from "../../utils/consts/functions"
 import {MeatInfoWithEntry, XlsxAgingType} from "../../utils/types/meatTypes"
 import {AgingScreen} from "./agingScreen"
-import useFBFetch from "../../hooks/useFetch"
+import useFBFetch from "../../hooks/useFBFetch"
 import {where} from "firebase/firestore"
 
 export const FetchScreen2 = () => {
@@ -51,17 +51,6 @@ export const FetchScreen2 = () => {
 	const lastXlsxDate = localStorage.getItem(dateKey)
 	const [xlsxData, setXlsxData] = useState<XlsxAgingType[]>([])
 
-	// useEffect(() => {
-	// 	if (location.state !== null) setPlaceName(location.state.placeName)
-	// 	else {
-	// 		const ok = window.confirm("장소를 카대로 하시겠습니까? 취소: 매장")
-	// 		setPlaceName(ok ? "카대" : "매장")
-	// 		if (location.state !== null) setPlaceCount(location.state.placeCount)
-	// 		else {
-	// 			setPlaceCount(ok ? "4" : "2")
-	// 		}
-	// 	}
-	// }, [])
 	useEffect(() => {
 		if (data.length === 0 && mn !== null) {
 			setWhichTab(false)
@@ -205,6 +194,7 @@ export const FetchScreen2 = () => {
 			list.forEach(async (item) => {
 				await startAging(item)
 			})
+			setCheckedSList([])
 		}
 	}, [checkedSList])
 

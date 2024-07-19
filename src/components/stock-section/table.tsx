@@ -4,7 +4,7 @@ import {
 	getCoreRowModel,
 	useReactTable,
 } from "@tanstack/react-table"
-import useFBFetch from "../../hooks/useFetch"
+import useFBFetch from "../../hooks/useFBFetch"
 import {fbCollections} from "../../utils/consts/constants"
 import {StockOrder, StockOrderItem} from "../../utils/types/stockTypes"
 import styled from "styled-components"
@@ -26,7 +26,7 @@ type TableData = {
 }
 export const OrderHistoryTable = (props: TableData) => {
 	const {data} = props
-	const isMobile = useMediaQuery({query: "(max-width: 1224px)"})
+	const isMobile = useMediaQuery({query: "(max-width: 1440px)"})
 
 	const columnHelper = createColumnHelper<StockOrder>()
 

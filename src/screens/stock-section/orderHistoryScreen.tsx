@@ -1,7 +1,7 @@
 import {useNavigate} from "react-router-dom"
 import {OrderHistoryTable} from "../../components/stock-section/table"
 import {StockOrder} from "../../utils/types/stockTypes"
-import useFBFetch from "../../hooks/useFetch"
+import useFBFetch from "../../hooks/useFBFetch"
 import {fbCollections} from "../../utils/consts/constants"
 import {
 	QueryEndAtConstraint,

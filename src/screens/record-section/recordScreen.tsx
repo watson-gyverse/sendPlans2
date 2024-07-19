@@ -5,7 +5,7 @@ import {useMediaQuery} from "react-responsive"
 import styled from "styled-components"
 import {Button, Collapse} from "react-bootstrap"
 import {Filter} from "../../components/record-section/filter"
-import useFBFetch from "../../hooks/useFetch"
+import useFBFetch from "../../hooks/useFBFetch"
 import {FirestorePlace} from "../../utils/types/otherTypes"
 import {fbCollections} from "../../utils/consts/constants"
 import {MeatInfoAiO} from "../../utils/types/meatTypes"
@@ -18,7 +18,7 @@ export default function RecordBranchScreen() {
 	const [filterOpen, setFilterOpen] = useState(true)
 	const [filteredRecords, setFilteredRecords] = useState<MeatInfoAiO[]>([])
 	const places = useFBFetch<FirestorePlace>(fbCollections.sp2Places).data
-	const isMobile = useMediaQuery({query: "(max-width: 1224px)"})
+	const isMobile = useMediaQuery({query: "(max-width: 1440px)"})
 	const onClickBack = () => {
 		navigate("../")
 	}

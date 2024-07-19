@@ -1,11 +1,12 @@
 import _ from "lodash"
-import {useMemo, useState} from "react"
+import {useEffect, useMemo, useState} from "react"
 import {useNavigate} from "react-router-dom"
 import styled from "styled-components"
 import {GetRecentPyverse} from "../../apis/pyverseApi"
 import {pyBeefCuts, pyPorkCuts, pyStores} from "../../utils/consts/meat"
 import {PyverseData} from "../../utils/types/otherTypes"
 import {PyverseTable} from "./pyTable"
+import useRdsFetch from "../../hooks/useRdsFetch"
 
 export const PyverseScreen = () => {
 	const navigate = useNavigate()
@@ -27,18 +28,17 @@ export const PyverseScreen = () => {
 	const [grade, setGrade] = useState("")
 	const [isStoreOpen, setStoreOpen] = useState(false)
 	const [limit, setLimit] = useState(40)
-
 	const [firstIds, setFirstIds] = useState<number[]>([])
+	const [nextId, setNextId] = useState(0)
 
-	const [lastId, setId] = useState(0)
-
-	// useEffect(() => {
-	// 	// console.log(tableData)
-	// }, [tableData])
-
+	const [isLoading, setLoading] = useState(false)
 	const naviToHome = () => {
 		navigate("../")
 	}
+
+	useEffect(() => {
+		setLoading(false)
+	}, [tableData])
 	const onPyClick = _.debounce(async (id: number) => {
 		const pydata = await GetRecentPyverse(
 			cut,
@@ -52,9 +52,10 @@ export const PyverseScreen = () => {
 			if (pydata.length === limit + 1) {
 				//다음페이지가 있음
 				setTableData(pydata.slice(0, -1))
-				setId(pydata[pydata.length - 1].id)
+				setNextId(pydata[pydata.length - 1].id)
 			} else {
 				setTableData(pydata)
+				setNextId(-1)
 			}
 		}
 	}, 1000)
@@ -101,13 +102,15 @@ export const PyverseScreen = () => {
 	}
 
 	const onNextButtonClick = () => {
+		setLoading(true)
 		const newArray = JSON.parse(JSON.stringify(firstIds))
 		newArray.push(tableData[0].id)
 		setFirstIds(newArray)
-		onPyClick(lastId)
+		onPyClick(nextId)
 	}
 
 	const onBeforeButtonClick = () => {
+		setLoading(true)
 		const beforeId = firstIds.pop()
 		if (beforeId) {
 			const newArray = JSON.parse(JSON.stringify(firstIds))
@@ -125,8 +128,8 @@ export const PyverseScreen = () => {
 				width: "100%",
 			}}>
 			<MenuButton onClick={naviToHome}>뒤로</MenuButton>
-			<span>{lastId}</span>
-			<span>{limit}</span>
+			{/* <span>{nextId}</span>
+			<span>{limit}</span> */}
 			<div>
 				{firstIds.map((id) => (
 					<span>{id}</span>
@@ -200,18 +203,32 @@ export const PyverseScreen = () => {
 							))}
 						</MenuUl>
 					)}
-					<MenuButton onClick={() => onPyClick(0)}>조회</MenuButton>
+					<MenuButton
+						style={{
+							border: "4px solid #da4c1d",
+						}}
+						disabled={cut === "" && store === ""}
+						onClick={() => onPyClick(0)}>
+						조회
+					</MenuButton>
 				</div>
 			</div>
-			<div>
-				<button
-					disabled={firstIds.length < 1}
-					onClick={() => onBeforeButtonClick()}>
-					◁
-				</button>
-				<button onClick={() => onNextButtonClick()}>▷</button>
-			</div>
-			{tableData.length > 1 && <PyverseTable tableData={tableData} />}
+
+			{tableData.length > 1 && (
+				<div>
+					<button
+						disabled={firstIds.length < 1 || isLoading}
+						onClick={() => onBeforeButtonClick()}>
+						◁
+					</button>
+					<button
+						disabled={nextId === -1 || isLoading}
+						onClick={() => onNextButtonClick()}>
+						▷
+					</button>
+					<PyverseTable tableData={tableData} />
+				</div>
+			)}
 		</div>
 	)
 }
@@ -221,7 +238,7 @@ const MenuButton = styled.button`
 	height: 50px;
 	margin: 10px;
 	background-color: #ffffff;
-	border: 3px solid #57dfe6;
+	border: 4px solid #2fd1da;
 	border-radius: 12px;
 	font-size: 1.2rem;
 `

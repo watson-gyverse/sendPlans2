@@ -41,12 +41,9 @@ const columns = [
 		header: "고기",
 		columns: [
 			columnHelper.accessor("species", {
-				// id: "species",
-				// cell: (info) => info.getValue(),
 				header: () => "육종",
 				filterFn: "equalsString",
 				size: 70,
-				// enableSorting: false,
 			}),
 			columnHelper.accessor("cut", {
 				id: "cut",

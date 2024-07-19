@@ -218,7 +218,9 @@ export default function CameraScreen() {
 					</button>
 					<input
 						style={{width: "9rem"}}
-						type="text"
+						type="number"
+						inputMode="numeric"
+						pattern="[0-9]*"
 						name="뽀삐"
 						value={manualNumber}
 						onChange={(e) => setManualNumber(e.target.value)}

@@ -2,7 +2,6 @@ import {useEffect, useMemo, useRef, useState} from "react"
 import toast, {Toaster} from "react-hot-toast"
 import {AiFillSetting} from "react-icons/ai"
 import {FaShoppingCart} from "react-icons/fa"
-import {useMediaQuery} from "react-responsive"
 import {useNavigate} from "react-router-dom"
 import styled from "styled-components"
 import {
@@ -15,7 +14,7 @@ import {
 	updateProductsAfterOrder,
 } from "../../apis/stockApi"
 import {StockModal} from "../../components/stock-section/stockModal"
-import useFBFetch from "../../hooks/useFetch"
+import useFBFetch from "../../hooks/useFBFetch"
 import {backgroundColors, cardColors} from "../../utils/consts/colors"
 import {fbCollections} from "../../utils/consts/constants"
 import {
@@ -26,6 +25,8 @@ import {
 import "./button.css"
 import "./cart.css"
 import "./modal.css"
+import {StockCatDiv} from "../../components/stock-section/StockCategory"
+import {duration} from "moment"
 export const StockScreen = () => {
 	const navigate = useNavigate()
 	const [isEditMode, setEditMode] = useState(false)
@@ -33,7 +34,6 @@ export const StockScreen = () => {
 	const [newCatName, setNewCatName] = useState("")
 	const [showNCModal, setShowNCModal] = useState(false)
 	const [currentId, setCurrentId] = useState("") //doc
-
 	const [newPrdName, setNewPrdName] = useState("")
 	const [newPrdCnt, setNewPrdCnt] = useState(0)
 	const [colorNumber, setColorNumber] = useState(0)
@@ -46,7 +46,6 @@ export const StockScreen = () => {
 	const [currentPrd, setCurrentPrd] = useState<StockProduct>()
 	const [currentCat, setCurrentCat] = useState("")
 	const {data, refetch} = useFBFetch<StockCategory>(fbCollections.sp2Stock)
-	const isMobile = useMediaQuery({query: "(max-width: 1224px)"})
 	const [orderList, setOrderList] = useState<StockOrderItem[]>([])
 	const [memo, setMemo] = useState("")
 
@@ -262,8 +261,9 @@ export const StockScreen = () => {
 				const newOrderList = orderList.filter(
 					(order) => order.prdName !== pd.prdName,
 				)
-				if (existing.change === pd.prdCnt) {
+				if (existing.change * -1 === pd.prdCnt) {
 					toast.error("재고가 없습니다.")
+					return
 				}
 				let newOrder = {
 					catId: docId,
@@ -279,7 +279,7 @@ export const StockScreen = () => {
 				newOrder.curStock = pd.prdCnt + newOrder.change
 
 				newOrderList.push(newOrder)
-
+				toast.success(`${pd.prdName}추가함 `)
 				setOrderList(newOrderList)
 			} else {
 				const newCat: StockOrderItem = {
@@ -289,6 +289,7 @@ export const StockScreen = () => {
 					change: -1,
 					curStock: pd.prdCnt - 1,
 				}
+				toast.success(`${newCat.prdName}추가함 `)
 				setOrderList(
 					[...orderList, newCat].sort(
 						(a, b) => b.catName.charCodeAt(0) - a.catName.charCodeAt(0),
@@ -331,10 +332,11 @@ export const StockScreen = () => {
 	}
 	const onDeleteFromBucketClick = (order: StockOrderItem) => {
 		const newOrderList = orderList.filter((o) => o.prdName !== order.prdName)
-
+		toast("제거함")
 		setOrderList(newOrderList)
 	}
 	const cartIconRef = useRef<HTMLDivElement>(null)
+
 	useEffect(() => {
 		if (cartIconRef.current) {
 			cartIconRef.current.classList.add("bounce")
@@ -345,7 +347,6 @@ export const StockScreen = () => {
 			}
 		}
 		const timeoutId = setTimeout(cleanUpAnimation, 500)
-
 		return () => {
 			clearTimeout(timeoutId)
 		}
@@ -355,7 +356,7 @@ export const StockScreen = () => {
 		<div
 			style={{
 				height: "100%",
-				width: "100%", //isMobile ? "100vw" : "100%",
+				width: "100%",
 				display: "flex",
 				flexDirection: "column",
 				alignItems: "center",
@@ -373,7 +374,7 @@ export const StockScreen = () => {
 					}, 0)}
 				</span>
 			</div>
-			<Toaster />
+			<Toaster toastOptions={{duration: 700}} />
 			<div style={{display: "flex", justifyContent: "space-evenly"}}>
 				<button className="btn-two green small" onClick={goToHome}>
 					뒤로
@@ -690,115 +691,18 @@ export const StockScreen = () => {
 				{data
 					.sort((a, b) => a.order - b.order)
 					.map((datum, idx) => (
-						<div
-							style={{
-								width: "100%",
-								display: "flex",
-								flexDirection: "column",
-								maxWidth: "1200px",
-							}}>
-							<div
-								style={{
-									width: "100%",
-									minHeight: "1rem",
-									border: "1px solid #545454",
-									marginTop: "10px",
-									backgroundColor: "#faf9f9",
-									borderRadius: "4px",
-									paddingLeft: "4px",
-								}}>
-								{datum.catName}
-							</div>
-							<div
-								style={{
-									display: "flex",
-									whiteSpace: "nowrap",
-									overflow: "scroll",
-									overflowX: "auto",
-									overflowY: "hidden",
-									msOverflowStyle: isMobile ? "none" : "scrollbar",
-									scrollbarWidth: isMobile ? "none" : "thin",
-									borderBottom: "1px black solid",
-									paddingBottom: "4px",
-									marginBottom: "4px",
-									backgroundColor: "#fafafa",
-								}}>
-								{datum.products &&
-									datum.products
-										.sort((a, b) => a.prdOrder - b.prdOrder)
-										.map((pd, idx) => (
-											<div style={{display: "flex", width: "auto"}}>
-												<button
-													className="btn-two orange large"
-													style={{
-														maxWidth: "13rem",
-														minWidth: "10rem",
-														padding: "10px",
-														height: "8rem",
-														maxHeight: "8rem",
-														backgroundColor:
-															pd.color && pd.color !== ""
-																? pd.color.charAt(0) === "#"
-																	? `${pd.color}`
-																	: `#${pd.color}`
-																: undefined,
-													}}
-													onClick={() =>
-														onProductClick(datum.docId, datum.catName, pd)
-													}>
-													<h4 style={{whiteSpace: "normal"}}>{pd.prdName}</h4>
-													<h5 style={{margin: "0"}}>재고:{pd.prdCnt}개</h5>
-												</button>
-												{isEditMode && idx < datum.products.length - 1 && (
-													<button
-														onClick={() =>
-															onExchangeProductOrderClick(
-																datum.docId,
-																datum.products[idx],
-																datum.products[idx + 1],
-															)
-														}>
-														{"↔"}
-													</button>
-												)}
-											</div>
-										))}
-								{isEditMode && (
-									<button
-										className="btn-two green large"
-										onClick={() => onShowAddPrdModal(datum.docId)}
-										style={{
-											width: "10rem",
-											padding: "10px",
-											maxHeight: "8rem",
-										}}>
-										항목
-										<br />
-										추가하기
-									</button>
-								)}
-							</div>
-							{isEditMode && idx < data.length - 1 && (
-								<div
-									style={{
-										display: "flex",
-										width: "100%",
-										justifyContent: "center",
-									}}>
-									<button
-										style={{width: "40%"}}
-										onClick={() =>
-											onExchangeCategoryOrderClick(
-												data[idx].docId,
-												data[idx + 1].docId,
-											)
-										}>
-										↕
-									</button>
-								</div>
-							)}
-						</div>
+						<StockCatDiv
+							onProductClick={onProductClick}
+							isEditMode={isEditMode}
+							onExchangeProductOrderClick={onExchangeProductOrderClick}
+							onShowAddPrdModal={onShowAddPrdModal}
+							data={data}
+							onExchangeCategoryOrderClick={onExchangeCategoryOrderClick}
+							datum={datum}
+							idx={idx}
+						/>
 					))}
+
 				{isEditMode && (
 					<button
 						style={{width: "50%", maxWidth: "800px"}}
@@ -807,102 +711,6 @@ export const StockScreen = () => {
 					</button>
 				)}
 			</div>
-			{/* <div
-				style={{
-					display: "flex",
-					width: isMobile ? "90%" : "60%",
-					flexDirection: "column",
-					justifyContent: "center",
-					alignItems: "center",
-					backgroundColor: "#e9e9e9",
-					padding: "10px",
-				}}>
-				<div
-					style={{
-						display: "flex",
-						width: "100%",
-						minHeight: "1rem",
-						justifyContent: "center",
-						alignItems: "center",
-						border: "1px solid #545454",
-						backgroundColor: "#faf9f9",
-						borderRadius: "4px",
-					}}>
-					출고 내용
-				</div>
-				<div
-					style={{
-						width: "100%",
-						minHeight: "30px",
-						justifyContent: "center",
-						alignItems: "center",
-						border: "1px solid #545454",
-						backgroundColor: "#faf9f9",
-						borderRadius: "4px",
-						marginTop: "6px",
-					}}>
-					{data.map((datum) => (
-						<div
-							style={{
-								display: "flex",
-								flexDirection: "column",
-								justifyContent: "center",
-								alignItems: "center",
-							}}>
-							{orderList.filter((order) => order.catName === datum.catName)
-								.length > 0 ? (
-								<h4>{datum.catName}</h4>
-							) : (
-								<></>
-							)}
-
-							{orderList
-								.filter((order) => order.catName === datum.catName)
-								.sort((a, b) => a.prdName.localeCompare(b.prdName))
-								.map((order) => (
-									<div
-										style={{
-											display: "flex",
-											width: "200px",
-											justifyContent: "space-evenly",
-											alignItems: "center",
-											marginBottom: "2px",
-										}}>
-										<h6 style={{margin: "0"}}>{order.prdName}</h6>
-										<h6 style={{margin: "0"}}> ×{-order.change}</h6>
-										<button
-											style={{padding: "2px"}}
-											className="btn-two black small"
-											onClick={() => onDeleteFromBucketClick(order)}>
-											<h6 style={{margin: "0"}}>제거</h6>
-										</button>
-									</div>
-								))}
-						</div>
-					))}
-				</div>
-				<textarea
-					style={{marginTop: "10px", width: "60%", height: "40px"}}
-					name="memo"
-					placeholder="메모(선택)"
-					value={memo}
-					onChange={(e) => setMemo(e.target.value)}
-				/>
-			</div>
-
-			<div style={{display: "flex"}}>
-				<button
-					className="btn-two orange large"
-					onClick={() => setOrderList([])}>
-					비우기
-				</button>
-				<button
-					disabled={orderList.length === 0}
-					className="btn-two red large"
-					onClick={onSubmitClick}>
-					제출
-				</button>
-			</div> */}
 		</div>
 	)
 }

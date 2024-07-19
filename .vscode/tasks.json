@@ -4,8 +4,8 @@
 		{
 			"type": "shell",
 			"label": "uploadToS3",
-			"command": "npm",
-			"args": ["run", "build", "&&", "npm", "run", "s3sync"]
+			"command": "time",
+			"args": ["npm", "run", "build", "&&", "npm", "run", "s3sync"]
 		}
 	]
 }

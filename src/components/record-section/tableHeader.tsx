@@ -2,7 +2,6 @@ import {Header, flexRender} from "@tanstack/react-table"
 import styled from "styled-components"
 import {MeatTableData} from "../../utils/types/meatTypes"
 import {FaSort, FaSortDown, FaSortUp} from "react-icons/fa"
-import {useMemo} from "react"
 
 type TableHeaderType = {
 	header: Header<MeatTableData, unknown>

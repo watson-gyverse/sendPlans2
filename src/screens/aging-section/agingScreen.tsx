@@ -1,5 +1,5 @@
 import {where} from "firebase/firestore"
-import useFBFetch from "../../hooks/useFetch"
+import useFBFetch from "../../hooks/useFBFetch"
 import {fbCollections} from "../../utils/consts/constants"
 import {MeatInfoAiO} from "../../utils/types/meatTypes"
 import {

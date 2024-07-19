@@ -2,7 +2,7 @@ import {Button, Stack} from "react-bootstrap"
 import {MeatInfoAiO, MeatInfoWithEntry} from "../../utils/types/meatTypes"
 import {TiDeleteOutline} from "react-icons/ti"
 import {backgroundColors} from "../../utils/consts/colors"
-import {useEffect, useState} from "react"
+import {useState} from "react"
 
 type AgingCardType = {
 	meatInfo: MeatInfoAiO
@@ -43,14 +43,19 @@ export const AgingCardsTab = (props: AgingTabType) => {
 					flexDirection: "column",
 					justifyContent: "center",
 				}}>
-				{props.data.map((item) => (
-					<AgingFinishCard
-						meatInfo={item}
-						isEditMode={props.isEditMode}
-						clickEvent={props.clickEvent}
-						onClickDelete={props.onClickDelete}
-					/>
-				))}
+				{props.data
+					.sort(
+						(a, b) =>
+							parseInt(a.entry.split("/")[0]) - parseInt(b.entry.split("/")[0]),
+					)
+					.map((item) => (
+						<AgingFinishCard
+							meatInfo={item}
+							isEditMode={props.isEditMode}
+							clickEvent={props.clickEvent}
+							onClickDelete={props.onClickDelete}
+						/>
+					))}
 			</div>
 		</div>
 	)
