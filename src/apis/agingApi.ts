@@ -10,80 +10,84 @@ import {
 import {MeatInfoAiO, MeatInfoWithEntry} from "../utils/types/meatTypes"
 import {firestoreDB} from "../utils/Firebase"
 import {fbCollections} from "../utils/consts/constants"
-import {getCollection, sortMeatInfoArray} from "../utils/consts/functions"
+import {
+	addUserPropertyToData,
+	getCollection,
+	sortMeatInfoArray,
+} from "../utils/consts/functions"
 const dbStorage = getCollection(fbCollections.sp2Storage)
 const dbAging = getCollection(fbCollections.sp2Aging)
 const dbRecord = getCollection(fbCollections.sp2Record)
 
-export async function fetchFromFirestore(
-	setStoredItems: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
-	setAgingItems: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
-	place: string,
-	thenWhat: () => void,
-	catchWhat: () => void,
-) {
-	//storage
-	const sResult = await getDocs(dbStorage)
-	var sArray: MeatInfoWithEntry[] = []
-	sResult.forEach((doc: any) => {
-		let data: MeatInfoWithEntry = doc.data()
-		const item: MeatInfoWithEntry = {
-			storedDate: data.storedDate,
-			species: data.species,
-			cut: data.cut,
-			meatNumber: data.meatNumber,
-			origin: data.origin,
-			gender: data.gender,
-			grade: data.grade,
-			freeze: data.freeze,
-			price: data.price,
-			entry: data.entry,
-			place: place,
-			fridgeName: null,
-			floor: null,
-			beforeWeight: null,
-			agingDate: null,
-			docId: doc.id,
-			ultraTime: null,
-			uploadTime: data.uploadTime,
-		}
-		sArray.push(item)
-	})
-	//aging
-	const aQuery = query(dbAging, where("place", "==", place))
-	const aResult = await getDocs(aQuery)
-	var aArray: MeatInfoAiO[] = []
-	aResult.forEach((doc: any) => {
-		let data: MeatInfoAiO = doc.data()
-		const item: MeatInfoAiO = {
-			storedDate: data.storedDate,
-			species: data.species,
-			cut: data.cut,
-			meatNumber: data.meatNumber,
-			origin: data.origin,
-			gender: data.gender,
-			grade: data.grade,
-			freeze: data.freeze,
-			price: data.price,
-			entry: data.entry,
-			place: data.place,
-			fridgeName: data.fridgeName,
-			floor: data.floor,
-			beforeWeight: data.beforeWeight,
-			agingDate: data.agingDate,
-			docId: doc.id,
-			ultraTime: data.ultraTime,
-			finishDate: data.finishDate,
-			afterWeight: data.afterWeight,
-			cutWeight: data.cutWeight,
-			cutDate: data.cutDate,
-			uploadTime: data.uploadTime,
-		}
-		aArray.push(item)
-	})
-	setStoredItems(sortMeatInfoArray(sArray))
-	setAgingItems(sortMeatInfoArray(aArray))
-}
+// export async function fetchFromFirestore(
+// 	setStoredItems: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
+// 	setAgingItems: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
+// 	place: string,
+// 	thenWhat: () => void,
+// 	catchWhat: () => void,
+// ) {
+// 	//storage
+// 	const sResult = await getDocs(dbStorage)
+// 	var sArray: MeatInfoWithEntry[] = []
+// 	sResult.forEach((doc: any) => {
+// 		let data: MeatInfoWithEntry = doc.data()
+// 		const item: MeatInfoWithEntry = {
+// 			storedDate: data.storedDate,
+// 			species: data.species,
+// 			cut: data.cut,
+// 			meatNumber: data.meatNumber,
+// 			origin: data.origin,
+// 			gender: data.gender,
+// 			grade: data.grade,
+// 			freeze: data.freeze,
+// 			price: data.price,
+// 			entry: data.entry,
+// 			place: place,
+// 			fridgeName: null,
+// 			floor: null,
+// 			beforeWeight: null,
+// 			agingDate: null,
+// 			docId: doc.id,
+// 			ultraTime: null,
+// 			uploadTime: data.uploadTime,
+// 		}
+// 		sArray.push(item)
+// 	})
+// 	//aging
+// 	const aQuery = query(dbAging, where("place", "==", place))
+// 	const aResult = await getDocs(aQuery)
+// 	var aArray: MeatInfoAiO[] = []
+// 	aResult.forEach((doc: any) => {
+// 		let data: MeatInfoAiO = doc.data()
+// 		const item: MeatInfoAiO = {
+// 			storedDate: data.storedDate,
+// 			species: data.species,
+// 			cut: data.cut,
+// 			meatNumber: data.meatNumber,
+// 			origin: data.origin,
+// 			gender: data.gender,
+// 			grade: data.grade,
+// 			freeze: data.freeze,
+// 			price: data.price,
+// 			entry: data.entry,
+// 			place: data.place,
+// 			fridgeName: data.fridgeName,
+// 			floor: data.floor,
+// 			beforeWeight: data.beforeWeight,
+// 			agingDate: data.agingDate,
+// 			docId: doc.id,
+// 			ultraTime: data.ultraTime,
+// 			finishDate: data.finishDate,
+// 			afterWeight: data.afterWeight,
+// 			cutWeight: data.cutWeight,
+// 			cutDate: data.cutDate,
+// 			uploadTime: data.uploadTime,
+// 		}
+// 		aArray.push(item)
+// 	})
+// 	setStoredItems(sortMeatInfoArray(sArray))
+// 	setAgingItems(sortMeatInfoArray(aArray))
+// }
 
 export async function fetchFromFirestore2(
 	setStoredItems: React.Dispatch<React.SetStateAction<MeatInfoWithEntry[]>>,
@@ -94,7 +98,12 @@ export async function fetchFromFirestore2(
 ) {
 	try {
 		//storage
-		const sResult = await getDocs(dbStorage)
+		const user = localStorage.getItem("email")?.includes("gyverse")
+			? "가이버스"
+			: localStorage.getItem("email")
+		if (!user) return
+		const q = query(dbStorage, where("user", "==", user))
+		const sResult = await getDocs(q)
 		var sArray: MeatInfoWithEntry[] = []
 		sResult.forEach((doc: any) => {
 			let data: MeatInfoWithEntry = doc.data()
@@ -163,9 +172,10 @@ export async function fetchFromFirestore2(
 }
 
 export async function passToAgingCollection(
-	item: MeatInfoWithEntry,
+	originData: MeatInfoWithEntry,
 	// thenWhat: () => Promise<void>
 ) {
+	const item = addUserPropertyToData(originData)
 	await addDoc(dbAging, {
 		storedDate: item.storedDate,
 		species: item.species,
@@ -183,6 +193,7 @@ export async function passToAgingCollection(
 		agingDate: item.agingDate,
 		place: item.place,
 		ultraTime: item.ultraTime,
+		user: item.user,
 	})
 		.then(() => console.log("aging으로 넘김"))
 		.catch(() => {
@@ -211,28 +222,31 @@ export async function deleteFromAgingFridge(id: string, thenWhat: () => void) {
 }
 
 export async function finishAging(item: MeatInfoAiO, thenWhat: () => void) {
-	await addDoc(dbRecord, {
-		storedDate: item.storedDate,
-		species: item.species,
-		cut: item.cut,
-		meatNumber: item.meatNumber,
-		origin: item.origin,
-		gender: item.gender,
-		grade: item.grade,
-		freeze: item.freeze,
-		price: item.price,
-		entry: item.entry,
-		fridgeName: item.fridgeName,
-		floor: item.floor,
-		beforeWeight: item.beforeWeight,
-		agingDate: item.agingDate,
-		place: item.place,
-		ultraTime: item.ultraTime,
-		finishDate: item.finishDate,
-		afterWeight: item.afterWeight,
-		cutWeight: item.cutWeight,
-		cutDate: item.cutDate,
-	})
+	await addDoc(
+		dbRecord,
+		addUserPropertyToData({
+			storedDate: item.storedDate,
+			species: item.species,
+			cut: item.cut,
+			meatNumber: item.meatNumber,
+			origin: item.origin,
+			gender: item.gender,
+			grade: item.grade,
+			freeze: item.freeze,
+			price: item.price,
+			entry: item.entry,
+			fridgeName: item.fridgeName,
+			floor: item.floor,
+			beforeWeight: item.beforeWeight,
+			agingDate: item.agingDate,
+			place: item.place,
+			ultraTime: item.ultraTime,
+			finishDate: item.finishDate,
+			afterWeight: item.afterWeight,
+			cutWeight: item.cutWeight,
+			cutDate: item.cutDate,
+		}),
+	)
 		.then(() => {
 			console.log("숙성종료처리 완료")
 		})

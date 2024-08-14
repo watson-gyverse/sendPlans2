@@ -65,3 +65,9 @@ export const xlsxAgingHeaders = [
 	"보관",
 	"단가",
 ]
+
+export type PyDataSorter = {
+	ByWeight: "ByWeight"
+	ByTotalPrice: "ByTotalPrice"
+	ByPrice: "ByPrice"
+}

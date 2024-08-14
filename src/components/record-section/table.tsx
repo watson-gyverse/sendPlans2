@@ -100,11 +100,6 @@ export const RecordTable = (props: IRecordTable) => {
 		getFacetedUniqueValues: getFacetedUniqueValues(),
 	})
 
-	// useEffect(() => {
-	// 	t.getAllColumns().map((c) => {
-	// 		console.log("facet", c.getFacetedUniqueValues())
-	// 	})
-	// }, [tableData])
 	return (
 		<table>
 			<thead>

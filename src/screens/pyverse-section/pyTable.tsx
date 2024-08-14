@@ -4,6 +4,8 @@ import {
 	createColumnHelper,
 	flexRender,
 	getCoreRowModel,
+	getFacetedUniqueValues,
+	getFilteredRowModel,
 	useReactTable,
 } from "@tanstack/react-table"
 
@@ -18,6 +20,8 @@ export const PyverseTable = (props: IPyverseTable) => {
 		data: tableData,
 		columns: columns,
 		getCoreRowModel: getCoreRowModel(),
+		getFilteredRowModel: getFilteredRowModel(),
+		getFacetedUniqueValues: getFacetedUniqueValues(),
 		defaultColumn: {
 			size: 80,
 			minSize: 80,
@@ -148,7 +152,7 @@ const columns = [
 				style={{
 					color: "#0057bb",
 				}}>
-				{info.getValue()}
+				바로가기
 			</a>
 		),
 	}),

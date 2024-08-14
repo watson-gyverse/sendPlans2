@@ -1,14 +1,27 @@
-import {DocumentData, addDoc, deleteDoc, doc, getDocs} from "firebase/firestore"
+import {
+	DocumentData,
+	addDoc,
+	deleteDoc,
+	doc,
+	getDocs,
+	query,
+	where,
+} from "firebase/firestore"
 import {FirestorePlace} from "../utils/types/otherTypes"
 import {firestoreDB} from "../utils/Firebase"
 import {fbCollections} from "../utils/consts/constants"
-import {getCollection} from "../utils/consts/functions"
+import {addUserPropertyToData, getCollection} from "../utils/consts/functions"
 
 const dbPlace = getCollection(fbCollections.sp2Places)
 export async function getPlaces(
 	setPlaces: React.Dispatch<React.SetStateAction<FirestorePlace[]>>,
 ) {
-	const result = await getDocs(dbPlace)
+	const user = localStorage.getItem("email")?.includes("gyverse")
+		? "가이버스"
+		: localStorage.getItem("email")
+	if (!user) return
+	const q = query(dbPlace, where("user", "==", user))
+	const result = await getDocs(q)
 	var places: FirestorePlace[] = []
 	result.forEach((doc: DocumentData) => {
 		let data: FirestorePlace = {
@@ -16,6 +29,7 @@ export async function getPlaces(
 			name: doc.data().name,
 			count: doc.data().count,
 		}
+
 		places.push(data)
 	})
 
@@ -26,10 +40,13 @@ export async function addPlace(
 	count: string,
 	setPlaces: React.Dispatch<React.SetStateAction<FirestorePlace[]>>,
 ) {
-	await addDoc(dbPlace, {
-		name: placeName,
-		count: count,
-	})
+	await addDoc(
+		dbPlace,
+		addUserPropertyToData({
+			name: placeName,
+			count: count,
+		}),
+	)
 		.then(() => {
 			console.log("추가완료")
 			getPlaces(setPlaces)

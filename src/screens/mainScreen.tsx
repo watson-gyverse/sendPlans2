@@ -1,4 +1,4 @@
-import {Button, ButtonGroup, Modal, Stack, ToggleButton} from "react-bootstrap"
+import {Button, ButtonGroup, Modal, Stack} from "react-bootstrap"
 import {useNavigate} from "react-router-dom"
 import toast, {Toaster} from "react-hot-toast"
 import {GiCardboardBoxClosed} from "react-icons/gi"
@@ -16,19 +16,22 @@ import {LoginUser, addUser, updateUserLogin} from "../apis/userApi"
 import {GetRecentPyverse} from "../apis/pyverseApi"
 import {DebouncedButton} from "../components/common/debouncedButton"
 import _ from "lodash"
+import {checkValidEmail} from "../utils/consts/functions"
+import BuildTimestamp from "../utils/timestamp"
 
 export default function MainScreen() {
 	const navigate = useNavigate()
 	const [token, setToken] = useState(localStorage.getItem("token"))
 	const [tempToken, setTempToken] = useState("")
+	const [email, setEmail] = useState(localStorage.getItem("email"))
 	const [isLoginModalOpen, setLoginModalOpen] = useState(false)
-	const [showingText, setShowingText] = useState("이용약관")
+	// const [showingText, setShowingText] = useState("이용약관")
 	const [isAgreeChecked, setAgreeChecked] = useState(false)
 
 	const handleAgreeBoxChange = () => {
 		setAgreeChecked(!isAgreeChecked)
 	}
-	const [description, setDesc] = useState("")
+	// const [description, setDesc] = useState("")
 
 	const [loginUser, setLoginUser] = useState<LoginUser>()
 
@@ -44,6 +47,9 @@ export default function MainScreen() {
 			window.removeEventListener("storage", handleTokenChange)
 		}
 	}, [token])
+	useEffect(() => {
+		console.log("email변경됨", email)
+	}, [email])
 	const naviToDateScreen = () => {
 		toast.remove()
 		navigate("/storage/")
@@ -91,8 +97,11 @@ export default function MainScreen() {
 				const token = await result.user.getIdToken()
 				if (Math.abs(newUser.createdAt - newUser.lastLogin) > 10000) {
 					updateUserLogin(newUser.email)
+					if (result.user.email)
+						localStorage.setItem("email", result.user.email)
 					localStorage.setItem("token", result.user.refreshToken)
 					setToken(token)
+					setEmail(result.user.email)
 				} else {
 					setLoginModalOpen(true)
 					setTempToken(token)
@@ -104,7 +113,9 @@ export default function MainScreen() {
 			}
 		} else {
 			setToken("")
+			setEmail("")
 			localStorage.removeItem("token")
+			localStorage.removeItem("email")
 		}
 	}
 
@@ -113,6 +124,7 @@ export default function MainScreen() {
 		if (ok) {
 			fbLogout()
 			setToken("")
+			setEmail("")
 		}
 	}
 
@@ -131,7 +143,9 @@ export default function MainScreen() {
 				console.log("addUser result: ", result)
 			}
 			setToken(tempToken)
+			setEmail(loginUser.email)
 			localStorage.setItem("token", tempToken)
+			localStorage.setItem("email", loginUser.email)
 		} else {
 			setTempToken("")
 		}
@@ -140,8 +154,10 @@ export default function MainScreen() {
 
 	const onResetSessionClick = () => {
 		localStorage.removeItem("token")
+		localStorage.removeItem("email")
 		setToken("")
 		setTempToken("")
+		setEmail("")
 	}
 
 	const [a, seta] = useState(false)
@@ -162,6 +178,7 @@ export default function MainScreen() {
 					}}>
 					미트가이버
 				</p>
+				<span style={{display: "none"}}>{email}</span>
 				<div style={{display: "flex"}}>
 					{!token && (
 						<button
@@ -180,9 +197,18 @@ export default function MainScreen() {
 						</button>
 					)}
 				</div>
-				<StackDiv>
+				<div
+					style={{
+						width: "304px",
+						display: "flex",
+						flexWrap: "wrap",
+						justifyContent: "center",
+					}}>
 					<Button
-						style={{height: "140px", width: "140px"}}
+						style={{
+							aspectRatio: "1/1",
+							width: "40%",
+						}}
 						variant="primary"
 						onClick={naviToDateScreen}>
 						<GiCardboardBoxClosed style={{height: "60px", width: "60px"}} />
@@ -190,56 +216,58 @@ export default function MainScreen() {
 						입고하기
 					</Button>
 					<Button
-						style={{height: "140px", width: "140px"}}
+						style={{aspectRatio: "1/1", width: "40%"}}
 						variant="danger"
 						onClick={naviToAgingScreen}>
 						<RiTimer2Line style={{height: "60px", width: "60px"}} />
 						<br />
 						숙성하기
 					</Button>
-				</StackDiv>
-
-				<StackDiv>
 					<Button
-						style={{height: "140px", width: "140px"}}
+						style={{width: "40%", aspectRatio: "1/1"}}
 						variant="warning"
 						onClick={naviToHistoryScreen}>
 						<RiHistoryFill style={{height: "60px", width: "60px"}} />
 						<br />
 						조회하기
 					</Button>
+					{email && email.includes("gyverse") && (
+						<Button
+							style={{width: "40%", aspectRatio: "1/1"}}
+							variant="secondary"
+							onClick={naviToStockScreen}>
+							<VscLayoutMenubar style={{height: "60px", width: "60px"}} />
+							<br />
+							재고관리
+						</Button>
+					)}
+
 					<Button
-						style={{height: "140px", width: "140px"}}
-						variant="secondary"
-						onClick={naviToStockScreen}>
-						<VscLayoutMenubar style={{height: "60px", width: "60px"}} />
-						<br />
-						재고관리
-					</Button>
-				</StackDiv>
-				<StackDiv>
-					<Button
-						style={{height: "140px", width: "140px"}}
-						variant="info"
-						onClick={naviToPyScreen}>
-						<VscRocket style={{height: "60px", width: "60px"}} />
-						<br />
-						가격조회
-					</Button>
-					<Button
-						style={{height: "140px", width: "140px"}}
+						style={{width: "40%", aspectRatio: "1/1"}}
 						variant="success"
 						onClick={naviToReportScreen}>
 						<GiBugNet style={{height: "60px", width: "60px"}} />
 						<br />
 						벌레신고
 					</Button>
-				</StackDiv>
+					{email && email.includes("gyverse") && (
+						<Button
+							style={{width: "40%", aspectRatio: "1/1"}}
+							variant="info"
+							onClick={naviToPyScreen}>
+							<VscRocket style={{height: "60px", width: "60px"}} />
+							<br />
+							가격조회
+						</Button>
+					)}
+				</div>
 				{/* <button onClick={naviToPyScreen}>파이</button> */}
 				<button style={{marginTop: "30px"}} onClick={onResetSessionClick}>
 					비상용 세션 초기화
 				</button>
-				<button onClick={naviToConsignScreen}>대량숙성페이지</button>
+				{email && email.includes("gyverse") && (
+					<button onClick={naviToConsignScreen}>대량숙성페이지</button>
+				)}
 				<div
 					style={{
 						display: "flex",
@@ -257,6 +285,7 @@ export default function MainScreen() {
 						rel="noreferrer noopener">
 						개인정보 취급방침
 					</a>
+					<BuildTimestamp />
 				</div>
 			</Stack>
 			{isLoginModalOpen && (
@@ -289,9 +318,11 @@ export default function MainScreen() {
 							서비스 이용이 제한될 수 있습니다.
 						</p>
 						<ButtonGroup style={{justifyContent: "center"}}>
-							<button className="btn-two small white" onClick={onRefugeClick}>
+							<MainButton
+								className="btn-two small white"
+								onClick={onRefugeClick}>
 								동의안함
-							</button>
+							</MainButton>
 							<button
 								disabled={!isAgreeChecked}
 								className="btn-two small orange"
@@ -311,7 +342,7 @@ export default function MainScreen() {
 				<Modal.Header closeButton>
 					<h6>상세 정보</h6>
 				</Modal.Header>
-				<Modal.Body>ㅁㄴㅇㄹ</Modal.Body>
+				<Modal.Body>{}</Modal.Body>
 			</Modal>
 		</PortraitDiv>
 	)
@@ -319,6 +350,12 @@ export default function MainScreen() {
 
 const StackDiv = styled.div`
 	display: flex;
-	justify-content: space-evenly;
-	width: 304px;
+	flex-wrap: wrap;
+	/* justify-content: space-evenly; */
+	width: 340px;
+	gap: 5px;
+`
+const MainButton = styled.button`
+	flex-basis: calc(50%-2.5px);
+	aspect-ratio: 1/1;
 `

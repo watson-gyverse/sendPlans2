@@ -1,12 +1,11 @@
 import _ from "lodash"
-import {useEffect, useMemo, useState} from "react"
+import {useEffect, useMemo, useRef, useState} from "react"
 import {useNavigate} from "react-router-dom"
 import styled from "styled-components"
 import {GetRecentPyverse} from "../../apis/pyverseApi"
 import {pyBeefCuts, pyPorkCuts, pyStores} from "../../utils/consts/meat"
 import {PyverseData} from "../../utils/types/otherTypes"
 import {PyverseTable} from "./pyTable"
-import useRdsFetch from "../../hooks/useRdsFetch"
 
 export const PyverseScreen = () => {
 	const navigate = useNavigate()
@@ -36,6 +35,17 @@ export const PyverseScreen = () => {
 		navigate("../")
 	}
 
+	useEffect(() => {
+		const handleScroll = _.debounce(() => {
+			setCutOpen(false)
+			setGradeOpen(false)
+			setStoreOpen(false)
+		}, 100)
+		window.addEventListener("scroll", handleScroll, {passive: true})
+		return () => {
+			window.removeEventListener("scroll", handleScroll)
+		}
+	}, [isCutOpen, isGradeOpen, isStoreOpen])
 	useEffect(() => {
 		setLoading(false)
 	}, [tableData])
@@ -127,9 +137,10 @@ export const PyverseScreen = () => {
 				padding: "10px 40px",
 				width: "100%",
 			}}>
+			{/* <>{encodeURIComponent("1++")}</> */}
 			<MenuButton onClick={naviToHome}>뒤로</MenuButton>
-			{/* <span>{nextId}</span>
-			<span>{limit}</span> */}
+			<span>크롤링시각: {tableData.length > 1 && tableData[0].timestamp}</span>
+			{/* <span>{limit}</?span> */}
 			<div>
 				{firstIds.map((id) => (
 					<span>{id}</span>

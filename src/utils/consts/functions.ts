@@ -170,3 +170,34 @@ export function sortArray<T>(
 	})
 	return newArray
 }
+
+export function checkValidAccount(): boolean {
+	const token = localStorage.getItem("token")
+	const email = localStorage.getItem("email")
+	if (!token || token === "") {
+		return false
+	}
+	if (email && checkValidEmail(email)) {
+		return true
+	}
+
+	return false
+}
+
+export function checkValidEmail(email: string): boolean {
+	if (allowedMails.some((mail) => mail.startsWith(email))) {
+		return true
+	}
+	if (email.split("@")[1].startsWith("gyverse")) return true
+	return false
+}
+const allowedMails = ["mg.poc.240812@gmail.com", "sofivne@gmail.com"]
+
+export function addUserPropertyToData<T>(data: T): T & {user: string} {
+	const user = localStorage.getItem("email")
+	if (!user) return {...data, user: "-1"}
+	if (user.includes("gyverse.com")) {
+		return {...data, user: "가이버스"}
+	}
+	return {...data, user}
+}

@@ -27,13 +27,15 @@ export const AgingCardsTab = (props: AgingTabType) => {
 				style={{
 					border: "1px black solid",
 					padding: "4px",
+					paddingLeft: "8px",
 					marginTop: "4px",
 					marginBottom: "4px",
 					backgroundColor: backgroundColors.agedCard,
 					borderRadius: "6px",
 				}}
 				onClick={() => setShow(!show)}>
-				{props.data[0].meatNumber} {props.data[0].cut}
+				<span style={{fontWeight: "700"}}>{props.data[0].meatNumber}</span> /{" "}
+				<span style={{fontWeight: "700"}}>{props.data[0].cut}</span>
 				<br />첫 입고일
 				{props.data[0].storedDate}
 			</div>
@@ -110,12 +112,16 @@ export const AgingFinishCard = (props: AgingCardType) => {
 							justifyContent: "space-between",
 						}}>
 						<Stack style={{width: "40%"}} gap={2}>
-							<h6>입고일:</h6>
-							<h6>{meatInfo.storedDate}</h6>
-							<h6>숙성시작일:</h6>
-							<h6>{meatInfo.agingDate}</h6>
+							<div>
+								<h6>입고일:</h6>
+								<h6>{meatInfo.storedDate}</h6>
+							</div>
+							<div>
+								<h6>숙성시작일:</h6>
+								<h6 style={{fontWeight: "700"}}>{meatInfo.agingDate}</h6>
+							</div>
 							<h6>육종: {meatInfo.species}</h6>
-							<h6>부위: {meatInfo.cut}</h6>
+							<h6 style={{fontWeight: "700"}}>부위: {meatInfo.cut}</h6>
 							<h6>등급: {meatInfo.grade ? meatInfo.grade : "-"}</h6>
 							<h6>순번: {String(meatInfo.entry).padStart(3, "0")}</h6>{" "}
 						</Stack>
@@ -128,16 +134,28 @@ export const AgingFinishCard = (props: AgingCardType) => {
 								원산지:
 								{meatInfo.origin ? meatInfo.origin : "-"}
 							</h6>
-							<h6>암수: {meatInfo.gender ? meatInfo.gender : "-"}</h6>
-							<h6>
-								냉장고:
-								{meatInfo.fridgeName ? meatInfo.fridgeName : "-"}
-							</h6>
-							<h6>층: {meatInfo.floor ? meatInfo.floor : "-"}</h6>
-							<h6>
-								무게(g):
-								{meatInfo.beforeWeight ? meatInfo.beforeWeight : "-"}
-							</h6>
+							<div>
+								<h6>암수:</h6>
+								<h6> {meatInfo.gender ? meatInfo.gender : "-"}</h6>
+							</div>
+							<div style={{display: "flex"}}>
+								<h6>냉장고:</h6>
+								<h6 style={{fontWeight: "700"}}>
+									{meatInfo.fridgeName ? meatInfo.fridgeName : "-"}
+								</h6>
+							</div>
+							<div style={{display: "flex"}}>
+								<h6>층:</h6>
+								<h6 style={{fontWeight: "700"}}>
+									{meatInfo.floor ? meatInfo.floor : "-"}
+								</h6>
+							</div>
+							<div style={{display: "flex"}}>
+								<h6>무게(g):</h6>
+								<h6 style={{fontWeight: "700"}}>
+									{meatInfo.beforeWeight ? meatInfo.beforeWeight : "-"}
+								</h6>
+							</div>
 							<h6>초음파: {meatInfo.ultraTime}</h6>
 						</Stack>
 						<div

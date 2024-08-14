@@ -9,6 +9,7 @@ import {
 	QueryStartAtConstraint,
 	QueryEndAtConstraint,
 	QueryLimitConstraint,
+	where,
 } from "firebase/firestore"
 import {useCallback, useEffect, useState} from "react"
 import {getCollection} from "../utils/consts/functions"
@@ -26,13 +27,20 @@ type FB =
 
 const useFBFetch = <T extends FB>(
 	collection: string,
-	conditions?: QueryFieldFilterConstraint[],
+	conditions: QueryFieldFilterConstraint[] = [],
 	orderBy?: QueryOrderByConstraint,
 	limit?: QueryLimitConstraint,
 	cursor?: QueryStartAtConstraint | QueryEndAtConstraint,
 ) => {
 	const db = getCollection(collection)
-	let q = conditions ? query(db, and(...conditions)) : db
+	const user = localStorage.getItem("email")?.includes("gyverse")
+		? "가이버스"
+		: localStorage.getItem("email")
+	console.log("user now: ", user)
+
+	let q = conditions
+		? query(db, and(...conditions, where("user", "==", user)))
+		: db
 	if (orderBy) {
 		q = query(q, orderBy)
 	}

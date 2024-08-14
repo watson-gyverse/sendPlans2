@@ -159,13 +159,18 @@ function AgingModal(props: AgingModalParams) {
 								}}>
 								<p style={{fontWeight: "800"}}> 냉장고 번호:</p>
 							</Form.Label>
+							<br />
 							{Array.from({length: placeCount}, (_, i) => {
 								let a = i + 1
 								return (
 									<Form.Check
 										inline
 										type="radio"
-										label={a}
+										label={
+											<h6 style={{width: "1.5rem", textAlign: "center"}}>
+												{a}
+											</h6>
+										}
 										{...register("fridgeName", {
 											required: "보관방식을 입력해주세요",
 										})}
@@ -191,13 +196,16 @@ function AgingModal(props: AgingModalParams) {
 							}}>
 							<p style={{fontWeight: "800", margin: "0"}}> 냉장고 층:</p>
 						</Form.Label>
+						<br />
 						{Array.from({length: 5}, (_, i) => {
 							let a = i + 1
 							return (
 								<Form.Check
 									inline
 									type="radio"
-									label={a}
+									label={
+										<h6 style={{width: "1.5rem", textAlign: "center"}}>{a}</h6>
+									}
 									{...register("floor", {})}
 									value={a}
 									name="floor"
@@ -227,11 +235,14 @@ function AgingModal(props: AgingModalParams) {
 								<Form.Check
 									inline
 									type="radio"
-									label={a}
-									{...register("ultraTime", {})}
+									label={
+										<h6 style={{width: "1rem", textAlign: "center"}}>{a}</h6>
+									}
+									{...register("ultraTime")}
 									value={a}
 									name="ultraTime"
 									id={"ultraTime" + a}
+									key={a}
 								/>
 							)
 						})}

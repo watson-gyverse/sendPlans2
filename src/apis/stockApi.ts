@@ -8,7 +8,7 @@ import {
 	updateDoc,
 	writeBatch,
 } from "firebase/firestore"
-import {getCollection} from "../utils/consts/functions"
+import {addUserPropertyToData, getCollection} from "../utils/consts/functions"
 import {fbCollections} from "../utils/consts/constants"
 import {firestoreDB} from "../utils/Firebase"
 import {StockOrderItem, StockProduct} from "../utils/types/stockTypes"
@@ -17,15 +17,21 @@ const dbStock = getCollection(fbCollections.sp2Stock)
 const dbOrder = getCollection(fbCollections.sp2Order)
 
 export async function addCategory(name: string, id: number) {
-	await addDoc(dbStock, {catName: name, order: id, products: []})
+	await addDoc(
+		dbStock,
+		addUserPropertyToData({catName: name, order: id, products: []}),
+	)
 }
 
 export async function addOrder(orderList: StockOrderItem[], memo: string) {
-	await addDoc(dbOrder, {
-		dateTime: new Date().getTime(),
-		orders: orderList,
-		memo: memo,
-	})
+	await addDoc(
+		dbOrder,
+		addUserPropertyToData({
+			dateTime: new Date().getTime(),
+			orders: orderList,
+			memo: memo,
+		}),
+	)
 }
 
 export async function updateProduct(
@@ -130,18 +136,8 @@ export async function exchangeProductsOrder(
 ) {
 	const categoryRef = doc(firestoreDB, `${fbCollections.sp2Stock}/${catId}`)
 	const batch = writeBatch(firestoreDB)
-	const newLPd: StockProduct = {
-		prdOrder: lPd.prdOrder + 1,
-		prdName: lPd.prdName,
-		prdCnt: lPd.prdCnt,
-		color: lPd.color,
-	}
-	const newRPd: StockProduct = {
-		prdOrder: rPd.prdOrder - 1,
-		prdName: rPd.prdName,
-		prdCnt: rPd.prdCnt,
-		color: rPd.color,
-	}
+	const newLPd: StockProduct = {...lPd, prdOrder: lPd.prdOrder + 1}
+	const newRPd: StockProduct = {...rPd, prdOrder: rPd.prdOrder - 1}
 	const promises: Promise<void>[] = []
 	promises.push(
 		new Promise((resolve) => {

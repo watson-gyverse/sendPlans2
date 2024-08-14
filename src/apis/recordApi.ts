@@ -1,7 +1,8 @@
-import {DocumentData, getDocs} from "firebase/firestore"
+import {DocumentData, doc, getDocs, writeBatch} from "firebase/firestore"
 import {fbCollections} from "../utils/consts/constants"
 import {getCollection} from "../utils/consts/functions"
 import {MeatInfoAiO} from "../utils/types/meatTypes"
+import {firestoreDB} from "../utils/Firebase"
 
 const dbRecord = getCollection(fbCollections.sp2Record)
 export async function getRecords(
@@ -39,3 +40,15 @@ export async function getRecords(
 
 //     setRecords(records)
 // }
+export async function addUsername(user: string) {
+	const batch = writeBatch(firestoreDB)
+	const collection = fbCollections.sp2Order
+	const snapshot = await getDocs(getCollection(collection))
+	snapshot.forEach((docu) => {
+		const docRef = doc(firestoreDB, `${collection}/${docu.id}`)
+		batch.update(docRef, {
+			user: user,
+		})
+	})
+	await batch.commit()
+}

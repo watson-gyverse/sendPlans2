@@ -3,6 +3,7 @@ import {Navigate} from "react-router-dom"
 import React from "react"
 import toast, {Toaster} from "react-hot-toast"
 import {sessionKeys} from "./consts/constants"
+import {checkValidAccount} from "./consts/functions"
 export const StorageMiddleWare = (props: any) => {
 	const session = sessionStorage
 	let tempDate = session.getItem(sessionKeys.storageDate)
@@ -36,8 +37,7 @@ export const AgingMiddleWare = (props: any) => {
 }
 
 export const TokenMiddleWare = (props: any) => {
-	const token = localStorage.getItem("token")
-	if (!token || token === "") {
+	if (!checkValidAccount()) {
 		toast("접근 권한이 필요합니다")
 		return (
 			<>

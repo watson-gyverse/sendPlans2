@@ -66,6 +66,7 @@ export default function EditScreen() {
 	}
 	const sendFirestore = () => {
 		const uploadTime = new Date().getTime()
+
 		xlsxData.forEach((item) => {
 			addToFirestore(
 				item,
@@ -75,7 +76,7 @@ export default function EditScreen() {
 					setButtonDisabled(true)
 				},
 				() => {
-					toast.error("실패했다..!")
+					toast.error("DB에 등록 실패")
 				},
 			)
 		})
@@ -100,8 +101,8 @@ export default function EditScreen() {
 			<Toaster />
 			<Stack gap={2}>
 				<Button
-					style={{width: "100px", height: "4rem"}}
-					onClick={() => navigate("../preset")}
+					style={{width: "100px", aspectRatio: "2/1"}}
+					onClick={() => navigate("../")}
 					variant="secondary">
 					뒤로
 				</Button>
@@ -127,7 +128,12 @@ export default function EditScreen() {
 						justifyContent: "space-evenly",
 					}}>
 					<Button
-						style={{backgroundColor: "#217346", border: "none"}}
+						style={{
+							backgroundColor: "#217346",
+							border: "none",
+							width: "100px",
+							aspectRatio: "2/1",
+						}}
 						disabled={disableXlsxButton}
 						onClick={write}>
 						엑셀로
@@ -135,7 +141,12 @@ export default function EditScreen() {
 						추출하기
 					</Button>
 					<Button
-						style={{backgroundColor: "#ffcb2b", border: "none"}}
+						style={{
+							backgroundColor: "#ffcb2b",
+							border: "none",
+							width: "100px",
+							aspectRatio: "2/1",
+						}}
 						disabled={disableButton}
 						onClick={send}>
 						DB에
