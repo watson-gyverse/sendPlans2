@@ -36,11 +36,13 @@ const DatePickerComponent = (props: DatePickerProps) => {
 	return (
 		<div>
 			<DatePicker
-				popperProps={{
-					positionFixed: true, // use this to make the popper position: fixed
-				}}
+				popperPlacement="bottom-start"
+				// popperProps={{
+				// 	positionFixed: true, // use this to make the popper position: fixed
+				// }}
 				selected={targetDate}
-				onChange={(date: Date) => {
+				onChange={(date: Date | null) => {
+					if (!date) return
 					const a = new Date(date)
 					a.setHours(0)
 					a.setMinutes(0)
