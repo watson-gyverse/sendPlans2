@@ -124,7 +124,7 @@ export async function fetchFromFirestore2(
 				beforeWeight: null,
 				agingDate: null,
 				docId: doc.id,
-				ultraTime: null,
+				// ultraTime: null,
 				uploadTime: data.uploadTime,
 			}
 			sArray.push(item)
@@ -152,7 +152,7 @@ export async function fetchFromFirestore2(
 				beforeWeight: data.beforeWeight,
 				agingDate: data.agingDate,
 				docId: doc.id,
-				ultraTime: data.ultraTime,
+				// ultraTime: data.ultraTime,
 				finishDate: data.finishDate,
 				afterWeight: data.afterWeight,
 				cutWeight: data.cutWeight,
@@ -192,7 +192,7 @@ export async function passToAgingCollection(
 		beforeWeight: item.beforeWeight,
 		agingDate: item.agingDate,
 		place: item.place,
-		ultraTime: item.ultraTime,
+		// ultraTime: item.ultraTime,
 		user: item.user,
 	})
 		.then(() => console.log("aging으로 넘김"))
@@ -240,7 +240,7 @@ export async function finishAging(item: MeatInfoAiO, thenWhat: () => void) {
 			beforeWeight: item.beforeWeight,
 			agingDate: item.agingDate,
 			place: item.place,
-			ultraTime: item.ultraTime,
+			// ultraTime: item.ultraTime,
 			finishDate: item.finishDate,
 			afterWeight: item.afterWeight,
 			cutWeight: item.cutWeight,

@@ -13,7 +13,7 @@ type AgingFormOptions = {
 	floor: number
 	beforeWeight: number
 	agingDate: string
-	ultraTime: number
+	// ultraTime: number
 }
 
 type AgingModalParams = {
@@ -72,7 +72,7 @@ function AgingModal(props: AgingModalParams) {
 			fridgeName: "",
 			floor: undefined,
 			beforeWeight: undefined,
-			ultraTime: 0,
+			// ultraTime: 0,
 		},
 	})
 
@@ -93,7 +93,7 @@ function AgingModal(props: AgingModalParams) {
 			agingDate:
 				moment(date).format("YYYY-MM-DD ") +
 				(amPm ? time : time + 12).toString().padStart(2, "0"),
-			ultraTime: data.ultraTime,
+			// ultraTime: data.ultraTime,
 		}
 		console.log(newInfo)
 		setMeatInfo(newInfo)
@@ -227,7 +227,7 @@ function AgingModal(props: AgingModalParams) {
 								<h6 style={{color: "red"}}>※층을 입력해주세요</h6>
 							)}
 					</Form.Group>
-					<Form.Group style={{marginTop: "10px"}}>
+					{/* <Form.Group style={{marginTop: "10px"}}>
 						<p style={{fontWeight: "800"}}> 초음파 가동 시간:</p>
 						{Array.from({length: 7}, (_, i) => {
 							let a = i
@@ -246,7 +246,7 @@ function AgingModal(props: AgingModalParams) {
 								/>
 							)
 						})}
-					</Form.Group>
+					</Form.Group> */}
 					<div
 						style={{
 							display: "flex",

@@ -34,7 +34,7 @@ export const RecordCard = (props: CardItem) => {
 				<h6 style={categoryStyle}>이력번호: {item.meatNumber}</h6>
 				<h6 style={categoryStyle}>냉:{item.fridgeName}/</h6>
 				<h6 style={categoryStyle}>층:{item.floor}/</h6>
-				<h6 style={categoryStyle}>{item.ultraTime}h</h6>
+				{/* <h6 style={categoryStyle}>{item.ultraTime}h</h6> */}
 				{/* <Button
                     style={{ width: "50px", height: "30px", padding: 0 }}
                     variant='warning'

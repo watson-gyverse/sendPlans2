@@ -30,11 +30,11 @@ const columns = [
 				header: () => "손질",
 				enableColumnFilter: false,
 			}),
-			columnHelper.accessor("ultraTime", {
-				id: "ultraTime",
-				cell: (info) => info.getValue(),
-				header: () => "초음파(h)",
-			}),
+			// columnHelper.accessor("ultraTime", {
+			// 	id: "ultraTime",
+			// 	cell: (info) => info.getValue(),
+			// 	header: () => "초음파(h)",
+			// }),
 		],
 	}),
 	columnHelper.group({

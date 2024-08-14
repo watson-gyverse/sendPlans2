@@ -156,7 +156,7 @@ export const AgingFinishCard = (props: AgingCardType) => {
 									{meatInfo.beforeWeight ? meatInfo.beforeWeight : "-"}
 								</h6>
 							</div>
-							<h6>초음파: {meatInfo.ultraTime}</h6>
+							{/* <h6>초음파: {meatInfo.ultraTime}</h6> */}
 						</Stack>
 						<div
 							style={{

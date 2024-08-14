@@ -115,11 +115,8 @@ const NewAgingCardItem = (props: INewAgingCardItem) => {
 
 	const isEmpty = () => {
 		const a = _.isNull(
-			item.agingDate ||
-				item.beforeWeight ||
-				item.fridgeName ||
-				item.floor ||
-				item.ultraTime,
+			item.agingDate || item.beforeWeight || item.fridgeName || item.floor,
+			// || item.ultraTime,
 		)
 		return a
 	}
@@ -150,10 +147,10 @@ const NewAgingCardItem = (props: INewAgingCardItem) => {
 							냉장고: {item.fridgeName ? item.fridgeName + "번" : "-"},{" "}
 							{item.floor ? item.floor + "층" : "-"}
 						</h6>
-						<h6>
+						{/* <h6>
 							초음파: {item.ultraTime ? item.ultraTime + "h" : "-"} /{" "}
 							{item.beforeWeight ? item.beforeWeight + "g" : "-"}
-						</h6>
+						</h6> */}
 					</div>
 					<div
 						style={{

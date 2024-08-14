@@ -118,9 +118,9 @@ export const FetchScreen2 = () => {
 					it.fridgeName === null ||
 					it.fridgeName === undefined ||
 					it.floor === null ||
-					it.floor === undefined ||
-					it.ultraTime === null ||
-					it.ultraTime === undefined
+					it.floor === undefined
+					// || it.ultraTime === null ||
+					// it.ultraTime === undefined
 				) {
 					isClean = false
 				} else {
@@ -213,7 +213,7 @@ export const FetchScreen2 = () => {
 				숙성전무게: String(item.beforeWeight),
 				냉장고번호: item.fridgeName!!,
 				냉장고층: String(item.floor),
-				초음파: String(item.ultraTime) + "h",
+				// 초음파: String(item.ultraTime) + "h",
 				이력번호: item.meatNumber!!,
 				순번: item.entry,
 				육종: item.species,

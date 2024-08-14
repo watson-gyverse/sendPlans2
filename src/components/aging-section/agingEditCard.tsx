@@ -78,11 +78,11 @@ export const AgingEditCard = (props: AgingCardType) => {
 								무게(g):
 								{meatInfo.beforeWeight ? meatInfo.beforeWeight : "-"}
 							</h6>
-							{meatInfo.ultraTime ? (
+							{/* {meatInfo.ultraTime ? (
 								<h6>초음파: {meatInfo.ultraTime}</h6>
 							) : (
 								<></>
-							)}
+							)} */}
 						</Stack>
 						<Stack
 							style={{

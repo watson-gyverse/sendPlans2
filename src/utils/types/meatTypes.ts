@@ -31,7 +31,7 @@ export type MeatInfoWithEntry = MeatInfo & {
 	beforeWeight: number | null
 	agingDate: string | null
 	docId: string
-	ultraTime: number | null
+	// ultraTime: number | null
 	uploadTime: number | null
 }
 
@@ -69,7 +69,7 @@ export type XlsxAgingType = {
 	숙성전무게: string
 	냉장고번호: string
 	냉장고층: string
-	초음파: string
+	// 초음파: string
 	이력번호: string
 	순번: string
 	육종: string
