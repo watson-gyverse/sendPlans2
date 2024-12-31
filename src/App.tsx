@@ -18,7 +18,9 @@ import {StockScreen} from "./screens/stock-section/stockScreen"
 import {OrderHistoryScreen} from "./screens/stock-section/orderHistoryScreen"
 import {SampleFormScreen} from "./screens/form-section/sampleFormScreen"
 import {PyverseScreen} from "./screens/pyverse-section/pyverseScreen"
-
+import {GalleryScreen} from "./screens/gallery-section/galleryScreen"
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query"
+import {ReactQueryDevtools} from "@tanstack/react-query-devtools"
 const router = createBrowserRouter(
 	[
 		{
@@ -114,6 +116,7 @@ const router = createBrowserRouter(
 				},
 				{path: "submit", element: <SampleFormScreen />},
 				{path: "py", element: <PyverseScreen />},
+				{path: "gallery", element: <GalleryScreen />},
 				{
 					path: "*",
 					element: <ErrorScreen />,
@@ -131,29 +134,32 @@ function App() {
 	// 	setLoading(false)
 	// }
 	// init()
-
+	const queryClient = new QueryClient()
 	const [scanText, setScanText] = useState<string>("undefined")
 	return (
-		<StorageContext.Provider
-			value={{
-				scanText,
-				setScanText,
-			}}>
-			<div
-				style={{
-					width: "100%",
-					height: "100%",
-					display: "flex",
-					justifyContent: "center",
-					alignItems: "flex-start",
-					backgroundColor: backgroundColors.base,
+		<QueryClientProvider client={queryClient}>
+			<StorageContext.Provider
+				value={{
+					scanText,
+					setScanText,
 				}}>
-				<RouterProvider
-					router={router}
-					// fallbackElement={<div>로딩</div>}
-				/>
-			</div>
-		</StorageContext.Provider>
+				<div
+					style={{
+						width: "100%",
+						height: "100%",
+						display: "flex",
+						justifyContent: "center",
+						alignItems: "flex-start",
+						backgroundColor: backgroundColors.base,
+					}}>
+					<RouterProvider
+						router={router}
+						// fallbackElement={<div>로딩</div>}
+					/>
+				</div>
+			</StorageContext.Provider>
+			<ReactQueryDevtools />
+		</QueryClientProvider>
 	)
 }
 

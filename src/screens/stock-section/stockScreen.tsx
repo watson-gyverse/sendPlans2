@@ -26,7 +26,6 @@ import "./button.css"
 import "./cart.css"
 import "./modal.css"
 import {StockCatDiv} from "../../components/stock-section/StockCategory"
-import {duration} from "moment"
 export const StockScreen = () => {
 	const navigate = useNavigate()
 	const [isEditMode, setEditMode] = useState(false)

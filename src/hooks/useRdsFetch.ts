@@ -26,7 +26,7 @@ const useRdsFetch = <T extends PyverseData>(
 		if (result) {
 			setData(result)
 		}
-		setLoading(true)
+		setLoading(false)
 	}, [cut, grade, store, id, limit])
 
 	// useEffect(() => {

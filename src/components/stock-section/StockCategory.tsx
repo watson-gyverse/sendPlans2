@@ -42,7 +42,7 @@ export const StockCatDiv = (props: TStockCatDiv) => {
 				width: "100%",
 				display: "flex",
 				flexDirection: "column",
-				maxWidth: "1200px",
+				maxWidth: "1600px",
 			}}>
 			<div
 				onClick={() => isMobile && setOpen(!isOpen)}

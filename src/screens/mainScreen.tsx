@@ -12,11 +12,8 @@ import {backgroundColors} from "../utils/consts/colors"
 import styled from "styled-components"
 import {fbLogout, getAuthentication} from "../utils/Firebase"
 import {StockModal} from "../components/stock-section/stockModal"
-import {LoginUser, addUser, updateUserLogin} from "../apis/userApi"
-import {GetRecentPyverse} from "../apis/pyverseApi"
-import {DebouncedButton} from "../components/common/debouncedButton"
-import _ from "lodash"
-import {checkValidEmail} from "../utils/consts/functions"
+import {LoginUser, addUser, updateUserLogin} from "../apis/userApi" 
+import _ from "lodash" 
 import BuildTimestamp from "../utils/timestamp"
 
 export default function MainScreen() {

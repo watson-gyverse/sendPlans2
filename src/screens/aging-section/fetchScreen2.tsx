@@ -23,7 +23,7 @@ export const FetchScreen2 = () => {
 		location.state ? location.state.placeName : "카대",
 	)
 	const [placeCount, setPlaceCount] = useState(
-		location.state ? location.state.placeCount : "4",
+		location.state ? location.state.placeCount : "0",
 	)
 
 	const agingKey = "RecentAging"

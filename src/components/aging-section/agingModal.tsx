@@ -1,12 +1,14 @@
-import {FloatingLabel, Modal} from "react-bootstrap"
+import moment from "moment"
+import {useEffect, useState} from "react"
+import {Modal} from "react-bootstrap"
 import Button from "react-bootstrap/Button"
 import Form from "react-bootstrap/Form"
 import {useForm} from "react-hook-form"
-import {useEffect, useState} from "react"
-import {MeatInfoWithEntry} from "../../utils/types/meatTypes"
-import moment from "moment"
-import {DatePickerSet} from "../common/datePickerSet"
+import styled from "styled-components"
+import "../../screens/stock-section/button.css"
 import {backgroundColors} from "../../utils/consts/colors"
+import {MeatInfoWithEntry} from "../../utils/types/meatTypes"
+import {DatePickerSet} from "../common/datePickerSet"
 
 type AgingFormOptions = {
 	fridgeName: string
@@ -61,12 +63,13 @@ function AgingModal(props: AgingModalParams) {
 	const {
 		register,
 		formState,
-		formState: {errors, isSubmitSuccessful},
-		watch,
+		formState: {errors},
 		handleSubmit,
 		reset,
+		getValues,
+		setValue,
 	} = useForm<AgingFormOptions>({
-		mode: "onSubmit",
+		// mode: "onSubmit",
 		defaultValues: {
 			agingDate: "",
 			fridgeName: "",
@@ -75,12 +78,6 @@ function AgingModal(props: AgingModalParams) {
 			// ultraTime: 0,
 		},
 	})
-
-	useEffect(() => {
-		if (formState.isSubmitSuccessful) {
-			reset()
-		}
-	}, [formState, reset])
 
 	const onSubmit = (data: AgingFormOptions) => {
 		console.log("data submitted")
@@ -100,6 +97,9 @@ function AgingModal(props: AgingModalParams) {
 		setDate(new Date())
 		setTime(new Date().getHours())
 		setAmPm(false)
+		if (formState.isSubmitSuccessful) {
+			reset()
+		}
 		setClose()
 	}
 
@@ -107,6 +107,11 @@ function AgingModal(props: AgingModalParams) {
 		console.log("ERROR:::", error)
 	}
 
+	const onOverBorderCount = (v: string) => {
+		if (parseInt(v) > placeCount) setValue("fridgeName", placeCount.toString())
+		if (parseInt(v) <= 0) setValue("fridgeName", "1")
+	}
+	console.count()
 	return (
 		<Modal
 			show={show}
@@ -121,46 +126,107 @@ function AgingModal(props: AgingModalParams) {
 				style={{backgroundColor: backgroundColors.storedCard}}
 				closeButton>
 				<Modal.Title>
-					<p style={{fontWeight: "800", marginBottom: "0"}}>
-						숙성 전 정보 입력/수정
-					</p>
+					<LabelText>숙성 전 정보 입력/수정</LabelText>
 				</Modal.Title>
 			</Modal.Header>
 			<Modal.Body style={{backgroundColor: backgroundColors.storedCard}}>
 				<Form onSubmit={handleSubmit(onSubmit, onError)}>
-					<h4 style={{fontWeight: "800"}}>숙성 시작 시각</h4>
-					<DatePickerSet dateData={dateData} />
+					<LabelText style={{fontWeight: "800"}}>숙성 시작 시각 : </LabelText>{" "}
 					<h6>
-						{" "}
+						{"("}
 						{moment(date).format("YYYY-MM-DD ") +
 							(amPm ? time : time + 12).toString().padStart(2, "0")}
+						{")"}
 					</h6>
-					<Form.Group className="mb-3" style={{marginTop: "10px"}}>
-						<FloatingLabel label="무게(g)">
-							<Form.Control
-								type="number"
-								placeholder="BeforeWeight"
-								{...register("beforeWeight", {
-									required: `숙성 전 무게를 입력해주세요 ${watch(
-										"beforeWeight",
-									)}`,
-								})}
-							/>
-							{errors.beforeWeight?.type === "required" && (
-								<h6 style={{color: "red"}}>※무게를 입력해주세요</h6>
-							)}
-						</FloatingLabel>
-						<Form.Group>
-							<Form.Label
-								style={{
-									width: "auto",
-									marginTop: "10px",
-									marginRight: "12px",
-								}}>
-								<p style={{fontWeight: "800"}}> 냉장고 번호:</p>
-							</Form.Label>
-							<br />
-							{Array.from({length: placeCount}, (_, i) => {
+					<DatePickerSet dateData={dateData} />
+					<Form.Group>
+						<Form.Label>
+							<LabelText style={{fontWeight: "800", margin: "0"}}>
+								무게(g) :
+							</LabelText>
+						</Form.Label>
+						<Form.Control
+							type="number"
+							{...register("beforeWeight", {
+								required: `숙성 전 무게를 입력해주세요`,
+							})}
+						/>
+						{errors.beforeWeight?.type === "required" && (
+							<h6 style={{color: "red"}}>※무게를 입력해주세요</h6>
+						)}
+					</Form.Group>
+					<Form.Label
+						style={{
+							width: "auto",
+							marginTop: "10px",
+							marginRight: "12px",
+						}}>
+						<LabelText style={{fontWeight: "800"}}> 냉장고 번호 :</LabelText>
+					</Form.Label>
+					<div
+						style={{
+							display: "flex",
+							padding: "0 80px",
+							justifyContent: "center",
+							alignItems: "center",
+						}}>
+						<button type="button" onClick={() => setValue("fridgeName", "2")}>
+							2
+						</button>
+						<button
+							type="button"
+							className="btn-two mini red"
+							style={{
+								width: "50px",
+								aspectRatio: "1/1",
+								boxShadow: "none",
+								borderRadius: "20%",
+							}}
+							onClick={() => {
+								if (parseInt(getValues("fridgeName")) > 1)
+									setValue(
+										"fridgeName",
+										(parseInt(getValues("fridgeName")) - 1).toString(),
+										{
+											shouldValidate: false,
+										},
+									)
+							}}>
+							-
+						</button>
+						<Form.Control
+							type="number"
+							placeholder={`1~${placeCount.toString()}`}
+							{...register("fridgeName", {
+								required: "냉장고 번호를 입력해주세요",
+							})}
+							onChange={(e) => onOverBorderCount(e.target.value)}
+							style={{width: "60px", height: "60px", fontSize: "1rem"}}
+						/>
+						<button
+							type="button"
+							className="btn-two mini red"
+							style={{
+								width: "50px",
+								aspectRatio: "1/1",
+								boxShadow: "none",
+								borderRadius: "20%",
+							}}
+							onClick={() => {
+								// if (parseInt(getValues("fridgeName")) < placeCount)
+								// 	setValue(
+								// 		"fridgeName",
+								// 		(parseInt(getValues("fridgeName")) + 1).toString(),
+								// 		{
+								// 			shouldValidate: false,
+								// 			shouldTouch: true,
+								// 		},
+								// 	)
+							}}>
+							+
+						</button>
+					</div>
+					{/* {Array.from({length: placeCount}, (_, i) => {
 								let a = i + 1
 								return (
 									<Form.Check
@@ -172,48 +238,45 @@ function AgingModal(props: AgingModalParams) {
 											</h6>
 										}
 										{...register("fridgeName", {
-											required: "보관방식을 입력해주세요",
+											required: "냉장고 번호를 입력해주세요",
 										})}
 										value={a}
 										name="fridgeName"
 										id={"fridgeName" + a}
 									/>
 								)
-							})}
-
-							{errors.fridgeName?.type === "required" &&
-								watch("fridgeName") === "" && (
-									<h6 style={{color: "red"}}>※냉장고 번호를 입력해주세요</h6>
-								)}
-						</Form.Group>
-					</Form.Group>
-					<Form.Group>
-						<Form.Label
-							style={{
-								width: "auto",
-								marginTop: "10px",
-								marginRight: "12px",
-							}}>
-							<p style={{fontWeight: "800", margin: "0"}}> 냉장고 층:</p>
-						</Form.Label>
-						<br />
-						{Array.from({length: 5}, (_, i) => {
-							let a = i + 1
-							return (
-								<Form.Check
-									inline
-									type="radio"
-									label={
-										<h6 style={{width: "1.5rem", textAlign: "center"}}>{a}</h6>
-									}
-									{...register("floor", {})}
-									value={a}
-									name="floor"
-									id={"floor" + a}
-								/>
-							)
-						})}
-						{/* <Form.Select
+							})} */}
+					{errors.fridgeName?.type === "required" &&
+						getValues("fridgeName") === "" && (
+							<h6 style={{color: "red"}}>※냉장고 번호를 입력해주세요</h6>
+						)}
+					<Form.Label
+						style={{
+							width: "auto",
+							marginTop: "10px",
+							marginRight: "12px",
+						}}>
+						<LabelText style={{fontWeight: "800", margin: "0"}}>
+							냉장고 층 :
+						</LabelText>
+					</Form.Label>
+					{Array.from({length: 5}, (_, i) => {
+						let a = i + 1
+						return (
+							<Form.Check
+								inline
+								type="radio"
+								label={
+									<h6 style={{width: "1.5rem", textAlign: "center"}}>{a}</h6>
+								}
+								{...register("floor", {required: "냉장고 층을 선택하세요"})}
+								value={a}
+								name="floor"
+								id={"floor" + a}
+							/>
+						)
+					})}
+					{/* <Form.Select
 							aria-label="floor"
 							{...register("floor", {required: true})}>
 							{Array.from({length: 5}, (_, i) => (
@@ -222,11 +285,9 @@ function AgingModal(props: AgingModalParams) {
 								</option>
 							))}
 						</Form.Select> */}
-						{errors.floor?.type === "required" &&
-							watch("floor") === undefined && (
-								<h6 style={{color: "red"}}>※층을 입력해주세요</h6>
-							)}
-					</Form.Group>
+					{errors.floor?.type === "required" && (
+						<h6 style={{color: "red"}}>※층을 입력해주세요</h6>
+					)}
 					{/* <Form.Group style={{marginTop: "10px"}}>
 						<p style={{fontWeight: "800"}}> 초음파 가동 시간:</p>
 						{Array.from({length: 7}, (_, i) => {
@@ -269,3 +330,8 @@ function AgingModal(props: AgingModalParams) {
 }
 
 export default AgingModal
+
+const LabelText = styled.p`
+	font-weight: 800;
+	margin: 0;
+`
